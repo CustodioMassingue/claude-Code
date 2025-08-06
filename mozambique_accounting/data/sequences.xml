@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Invoice Sequences -->
+    <record id="sequence_moz_invoice_ft" model="ir.sequence">
+        <field name="name">Fatura</field>
+        <field name="code">moz.invoice.ft</field>
+        <field name="prefix">FT%(year)s/</field>
+        <field name="padding">8</field>
+        <field name="company_id" eval="False"/>
+        <field name="use_date_range">True</field>
+    </record>
+
+    <record id="sequence_moz_invoice_fr" model="ir.sequence">
+        <field name="name">Fatura-Recibo</field>
+        <field name="code">moz.invoice.fr</field>
+        <field name="prefix">FR%(year)s/</field>
+        <field name="padding">8</field>
+        <field name="company_id" eval="False"/>
+        <field name="use_date_range">True</field>
+    </record>
+
+    <record id="sequence_moz_invoice_nc" model="ir.sequence">
+        <field name="name">Nota de Crédito</field>
+        <field name="code">moz.invoice.nc</field>
+        <field name="prefix">NC%(year)s/</field>
+        <field name="padding">8</field>
+        <field name="company_id" eval="False"/>
+        <field name="use_date_range">True</field>
+    </record>
+
+    <record id="sequence_moz_invoice_nd" model="ir.sequence">
+        <field name="name">Nota de Débito</field>
+        <field name="code">moz.invoice.nd</field>
+        <field name="prefix">ND%(year)s/</field>
+        <field name="padding">8</field>
+        <field name="company_id" eval="False"/>
+        <field name="use_date_range">True</field>
+    </record>
+
+    <record id="sequence_moz_invoice_vd" model="ir.sequence">
+        <field name="name">Venda a Dinheiro</field>
+        <field name="code">moz.invoice.vd</field>
+        <field name="prefix">VD%(year)s/</field>
+        <field name="padding">8</field>
+        <field name="company_id" eval="False"/>
+        <field name="use_date_range">True</field>
+    </record>
+
+    <record id="sequence_moz_invoice_gt" model="ir.sequence">
+        <field name="name">Guia de Transporte</field>
+        <field name="code">moz.invoice.gt</field>
+        <field name="prefix">GT%(year)s/</field>
+        <field name="padding">8</field>
+        <field name="company_id" eval="False"/>
+        <field name="use_date_range">True</field>
+    </record>
+
+    <!-- Bank Statement Sequence -->
+    <record id="sequence_moz_bank_statement" model="ir.sequence">
+        <field name="name">Bank Statement</field>
+        <field name="code">moz.bank.statement</field>
+        <field name="prefix">STMT/%(year)s/</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <!-- Asset Sequence -->
+    <record id="sequence_moz_asset" model="ir.sequence">
+        <field name="name">Asset</field>
+        <field name="code">moz.asset</field>
+        <field name="prefix">ASSET/</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <!-- General Invoice Sequence (fallback) -->
+    <record id="sequence_moz_invoice" model="ir.sequence">
+        <field name="name">Invoice</field>
+        <field name="code">moz.invoice</field>
+        <field name="prefix">INV%(year)s/</field>
+        <field name="padding">8</field>
+        <field name="company_id" eval="False"/>
+        <field name="use_date_range">True</field>
+    </record>
+</odoo>

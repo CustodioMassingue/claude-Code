@@ -1,0 +1,451 @@
+// Mozambique Accounting Module - Main Styles
+// ============================================
+
+// Variables
+$moz-primary: #00a859;  // Mozambique flag green
+$moz-secondary: #ffcd00; // Mozambique flag yellow
+$moz-danger: #dc3545;
+$moz-success: #28a745;
+$moz-warning: #ffc107;
+$moz-info: #17a2b8;
+
+// Dashboard Styles
+.moz-accounting-dashboard {
+    padding: 20px;
+    
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        
+        h1 {
+            color: $moz-primary;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        
+        .period-selector {
+            display: flex;
+            gap: 10px;
+            
+            .btn {
+                padding: 8px 16px;
+                border-radius: 4px;
+                
+                &.active {
+                    background-color: $moz-primary;
+                    color: white;
+                }
+            }
+        }
+    }
+    
+    // Metric Cards
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+        
+        .metric-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            
+            &:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            }
+            
+            .metric-label {
+                color: #6c757d;
+                font-size: 12px;
+                text-transform: uppercase;
+                margin-bottom: 8px;
+            }
+            
+            .metric-value {
+                font-size: 24px;
+                font-weight: 600;
+                color: #212529;
+                margin-bottom: 8px;
+            }
+            
+            .metric-change {
+                font-size: 14px;
+                
+                &.positive {
+                    color: $moz-success;
+                    
+                    &::before {
+                        content: "↑ ";
+                    }
+                }
+                
+                &.negative {
+                    color: $moz-danger;
+                    
+                    &::before {
+                        content: "↓ ";
+                    }
+                }
+            }
+        }
+        
+        // Special card styles
+        .metric-card.revenue {
+            border-left: 4px solid $moz-success;
+        }
+        
+        .metric-card.expenses {
+            border-left: 4px solid $moz-danger;
+        }
+        
+        .metric-card.profit {
+            border-left: 4px solid $moz-primary;
+        }
+        
+        .metric-card.tax {
+            border-left: 4px solid $moz-warning;
+        }
+    }
+    
+    // Quick Actions
+    .quick-actions {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        
+        h3 {
+            margin-bottom: 20px;
+            color: #212529;
+        }
+        
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            
+            .action-btn {
+                display: flex;
+                align-items: center;
+                padding: 12px 16px;
+                border: 1px solid #dee2e6;
+                border-radius: 6px;
+                background: white;
+                transition: all 0.2s;
+                cursor: pointer;
+                
+                &:hover {
+                    background: $moz-primary;
+                    color: white;
+                    border-color: $moz-primary;
+                    
+                    .action-icon {
+                        color: white;
+                    }
+                }
+                
+                .action-icon {
+                    font-size: 20px;
+                    margin-right: 12px;
+                    color: $moz-primary;
+                }
+                
+                .action-text {
+                    flex: 1;
+                    
+                    .action-title {
+                        font-weight: 500;
+                        margin-bottom: 2px;
+                    }
+                    
+                    .action-desc {
+                        font-size: 12px;
+                        color: #6c757d;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Bank Reconciliation Widget
+.bank-reconciliation-widget {
+    .reconciliation-header {
+        background: linear-gradient(135deg, $moz-primary, darken($moz-primary, 10%));
+        color: white;
+        padding: 20px;
+        border-radius: 8px 8px 0 0;
+        
+        h2 {
+            margin: 0;
+            font-size: 20px;
+        }
+        
+        .header-stats {
+            display: flex;
+            gap: 30px;
+            margin-top: 10px;
+            
+            .stat {
+                .stat-value {
+                    font-size: 24px;
+                    font-weight: 600;
+                }
+                
+                .stat-label {
+                    font-size: 12px;
+                    opacity: 0.9;
+                }
+            }
+        }
+    }
+    
+    .reconciliation-filters {
+        background: #f8f9fa;
+        padding: 15px;
+        border-bottom: 1px solid #dee2e6;
+        
+        .filter-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+            
+            .filter-group {
+                flex: 1;
+                min-width: 200px;
+                
+                label {
+                    display: block;
+                    font-size: 12px;
+                    color: #6c757d;
+                    margin-bottom: 4px;
+                }
+                
+                input, select {
+                    width: 100%;
+                    padding: 6px 10px;
+                    border: 1px solid #ced4da;
+                    border-radius: 4px;
+                }
+            }
+        }
+    }
+    
+    .reconciliation-lines {
+        .line-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #dee2e6;
+            transition: background 0.2s;
+            
+            &:hover {
+                background: #f8f9fa;
+            }
+            
+            &.selected {
+                background: lighten($moz-primary, 45%);
+            }
+            
+            .line-checkbox {
+                margin-right: 15px;
+            }
+            
+            .line-info {
+                flex: 1;
+                
+                .line-date {
+                    font-size: 12px;
+                    color: #6c757d;
+                }
+                
+                .line-description {
+                    font-weight: 500;
+                    margin: 4px 0;
+                }
+                
+                .line-partner {
+                    font-size: 14px;
+                    color: #495057;
+                }
+            }
+            
+            .line-amount {
+                font-size: 18px;
+                font-weight: 600;
+                margin: 0 20px;
+                
+                &.positive {
+                    color: $moz-success;
+                }
+                
+                &.negative {
+                    color: $moz-danger;
+                }
+            }
+            
+            .line-suggestions {
+                .suggestion-badge {
+                    display: inline-block;
+                    padding: 4px 8px;
+                    background: $moz-info;
+                    color: white;
+                    border-radius: 4px;
+                    font-size: 12px;
+                    margin-right: 8px;
+                }
+            }
+            
+            .line-actions {
+                display: flex;
+                gap: 8px;
+                
+                .btn-sm {
+                    padding: 4px 8px;
+                    font-size: 12px;
+                }
+            }
+        }
+    }
+}
+
+// Invoice Certification Badge
+.invoice-certification {
+    .certification-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 12px;
+        background: linear-gradient(135deg, $moz-success, darken($moz-success, 10%));
+        color: white;
+        border-radius: 20px;
+        font-size: 14px;
+        
+        .fa-check-circle {
+            margin-right: 6px;
+        }
+        
+        &.pending {
+            background: linear-gradient(135deg, $moz-warning, darken($moz-warning, 10%));
+        }
+        
+        &.failed {
+            background: linear-gradient(135deg, $moz-danger, darken($moz-danger, 10%));
+        }
+    }
+    
+    .qr-code-container {
+        margin-top: 20px;
+        padding: 15px;
+        background: white;
+        border: 2px solid $moz-primary;
+        border-radius: 8px;
+        text-align: center;
+        
+        .qr-code {
+            margin: 10px auto;
+            
+            img {
+                max-width: 200px;
+                height: auto;
+            }
+        }
+        
+        .qr-code-text {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 10px;
+        }
+    }
+}
+
+// SAF-T Export Wizard
+.saft-export-wizard {
+    .wizard-header {
+        background: $moz-primary;
+        color: white;
+        padding: 20px;
+        margin: -20px -20px 20px;
+        
+        h2 {
+            margin: 0;
+            
+            .fa-file-export {
+                margin-right: 10px;
+            }
+        }
+        
+        .wizard-description {
+            margin-top: 10px;
+            opacity: 0.9;
+        }
+    }
+    
+    .export-options {
+        .option-group {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            
+            h4 {
+                margin-top: 0;
+                color: $moz-primary;
+            }
+            
+            .form-check {
+                margin-bottom: 10px;
+            }
+        }
+    }
+    
+    .export-progress {
+        margin-top: 20px;
+        
+        .progress {
+            height: 30px;
+            border-radius: 15px;
+            
+            .progress-bar {
+                background: $moz-primary;
+                font-size: 14px;
+                line-height: 30px;
+            }
+        }
+        
+        .progress-status {
+            margin-top: 10px;
+            text-align: center;
+            color: #6c757d;
+        }
+    }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+    .moz-accounting-dashboard {
+        .metrics-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .quick-actions .action-buttons {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    .bank-reconciliation-widget {
+        .reconciliation-filters .filter-row {
+            flex-direction: column;
+            
+            .filter-group {
+                width: 100%;
+            }
+        }
+    }
+}

@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <!-- Dashboard Template -->
+    <t t-name="mozambique_accounting.Dashboard">
+        <div class="moz-accounting-dashboard">
+            <div class="dashboard-header">
+                <h1>Painel de Contabilidade</h1>
+                <div class="period-selector">
+                    <button class="btn" t-att-class="{ 'active': state.period === 'month' }" 
+                            t-on-click="() => onPeriodChange('month')">
+                        Mês
+                    </button>
+                    <button class="btn" t-att-class="{ 'active': state.period === 'quarter' }" 
+                            t-on-click="() => onPeriodChange('quarter')">
+                        Trimestre
+                    </button>
+                    <button class="btn" t-att-class="{ 'active': state.period === 'year' }" 
+                            t-on-click="() => onPeriodChange('year')">
+                        Ano
+                    </button>
+                </div>
+            </div>
+
+            <div class="metrics-grid" t-if="!state.loading">
+                <div class="metric-card revenue">
+                    <div class="metric-label">Receita Total</div>
+                    <div class="metric-value" t-esc="formatCurrency(state.metrics.totalRevenue)"/>
+                    <div class="metric-change positive">+12.5% vs período anterior</div>
+                </div>
+                
+                <div class="metric-card expenses">
+                    <div class="metric-label">Despesas Totais</div>
+                    <div class="metric-value" t-esc="formatCurrency(state.metrics.totalExpenses)"/>
+                    <div class="metric-change negative">-5.2% vs período anterior</div>
+                </div>
+                
+                <div class="metric-card profit">
+                    <div class="metric-label">Margem de Lucro</div>
+                    <div class="metric-value" t-esc="state.metrics.profitMargin + '%'"/>
+                    <div class="metric-change positive">+2.1% vs período anterior</div>
+                </div>
+                
+                <div class="metric-card tax">
+                    <div class="metric-label">IVA a Pagar (16%)</div>
+                    <div class="metric-value" t-esc="formatCurrency(state.metrics.vatToPay)"/>
+                    <div class="metric-change">Vencimento: 20 do próximo mês</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-label">Faturas Pendentes</div>
+                    <div class="metric-value" t-esc="state.metrics.pendingInvoices"/>
+                    <div class="metric-change">Valor total: <t t-esc="formatCurrency(state.metrics.pendingAmount)"/></div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-label">Saldo Bancário</div>
+                    <div class="metric-value" t-esc="formatCurrency(state.metrics.bankBalance)"/>
+                    <div class="metric-change positive">+8.3% vs mês anterior</div>
+                </div>
+            </div>
+
+            <div class="quick-actions">
+                <h3>Ações Rápidas</h3>
+                <div class="action-buttons">
+                    <div class="action-btn" t-on-click="createInvoice">
+                        <i class="fa fa-file-invoice action-icon"/>
+                        <div class="action-text">
+                            <div class="action-title">Nova Fatura</div>
+                            <div class="action-desc">Criar fatura certificada</div>
+                        </div>
+                    </div>
+                    
+                    <div class="action-btn" t-on-click="viewBankReconciliation">
+                        <i class="fa fa-university action-icon"/>
+                        <div class="action-text">
+                            <div class="action-title">Reconciliação Bancária</div>
+                            <div class="action-desc">Reconciliar extratos</div>
+                        </div>
+                    </div>
+                    
+                    <div class="action-btn" t-on-click="generateSaftReport">
+                        <i class="fa fa-file-export action-icon"/>
+                        <div class="action-text">
+                            <div class="action-title">Exportar SAF-T(MZ)</div>
+                            <div class="action-desc">Gerar ficheiro para AT</div>
+                        </div>
+                    </div>
+                    
+                    <div class="action-btn" t-on-click="viewTaxReport">
+                        <i class="fa fa-chart-pie action-icon"/>
+                        <div class="action-text">
+                            <div class="action-title">Relatório Fiscal</div>
+                            <div class="action-desc">Ver impostos do período</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <!-- Bank Reconciliation Template -->
+    <t t-name="mozambique_accounting.BankReconciliation">
+        <div class="bank-reconciliation-widget">
+            <div class="reconciliation-header">
+                <h2>Reconciliação Bancária</h2>
+                <div class="header-stats">
+                    <div class="stat">
+                        <div class="stat-value" t-esc="state.bankLines.length"/>
+                        <div class="stat-label">Linhas Pendentes</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" t-esc="formatCurrency(getTotalAmount())"/>
+                        <div class="stat-label">Valor Total</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" t-esc="state.suggestions.length"/>
+                        <div class="stat-label">Sugestões Automáticas</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="reconciliation-filters">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label>Data Inicial</label>
+                        <input type="date" t-model="state.filters.dateFrom" t-on-change="applyFilters"/>
+                    </div>
+                    <div class="filter-group">
+                        <label>Data Final</label>
+                        <input type="date" t-model="state.filters.dateTo" t-on-change="applyFilters"/>
+                    </div>
+                    <div class="filter-group">
+                        <label>Parceiro</label>
+                        <select t-model="state.filters.partner" t-on-change="applyFilters">
+                            <option value="">Todos</option>
+                            <option t-foreach="partners" t-as="partner" 
+                                    t-key="partner.id" t-att-value="partner.id">
+                                <t t-esc="partner.name"/>
+                            </option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <button class="btn btn-primary" t-on-click="autoReconcile">
+                            <i class="fa fa-magic"/> Reconciliar Automaticamente
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="reconciliation-lines">
+                <div t-foreach="state.bankLines" t-as="line" t-key="line.id" 
+                     class="line-item" t-att-class="{ 'selected': state.selectedLines.has(line.id) }">
+                    
+                    <input type="checkbox" class="line-checkbox" 
+                           t-att-checked="state.selectedLines.has(line.id)"
+                           t-on-click="() => toggleSelection(line.id)"/>
+                    
+                    <div class="line-info">
+                        <div class="line-date" t-esc="line.date"/>
+                        <div class="line-description" t-esc="line.name"/>
+                        <div class="line-partner" t-if="line.partner_id">
+                            <i class="fa fa-user"/> <t t-esc="line.partner_id[1]"/>
+                        </div>
+                    </div>
+                    
+                    <div class="line-amount" t-att-class="{ 'positive': line.amount > 0, 'negative': line.amount < 0 }">
+                        <t t-esc="formatCurrency(Math.abs(line.amount))"/>
+                    </div>
+                    
+                    <div class="line-suggestions" t-if="line.suggestions">
+                        <span class="suggestion-badge" t-foreach="line.suggestions.slice(0,2)" 
+                              t-as="suggestion" t-key="suggestion.id">
+                            <t t-esc="suggestion.name"/>
+                        </span>
+                    </div>
+                    
+                    <div class="line-actions">
+                        <button class="btn btn-sm btn-success" 
+                                t-if="line.suggestions and line.suggestions.length"
+                                t-on-click="() => reconcileWithInvoice(line.id, line.suggestions[0].id)">
+                            <i class="fa fa-check"/> Confirmar
+                        </button>
+                        <button class="btn btn-sm btn-primary" 
+                                t-on-click="() => createPayment(line.id)">
+                            <i class="fa fa-plus"/> Criar Pagamento
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+</templates>

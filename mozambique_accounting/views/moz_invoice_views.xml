@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Invoice Tree View -->
+    <record id="view_moz_invoice_tree" model="ir.ui.view">
+        <field name="name">moz.invoice.list</field>
+        <field name="model">moz.invoice</field>
+        <field name="arch" type="xml">
+            <list string="Invoices" decoration-info="state=='draft'" decoration-success="state=='certified'" decoration-danger="state=='cancelled'">
+                <field name="number"/>
+                <field name="invoice_type"/>
+                <field name="partner_id"/>
+                <field name="invoice_date"/>
+                <field name="due_date"/>
+                <field name="amount_untaxed" sum="Total Untaxed"/>
+                <field name="amount_tax" sum="Total Tax"/>
+                <field name="amount_total" sum="Total Amount"/>
+                <field name="state" widget="badge"/>
+                <field name="payment_state" widget="badge"/>
+                <field name="hash_code" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Invoice Form View -->
+    <record id="view_moz_invoice_form" model="ir.ui.view">
+        <field name="name">moz.invoice.form</field>
+        <field name="model">moz.invoice</field>
+        <field name="arch" type="xml">
+            <form string="Invoice">
+                <header>
+                    <button name="action_post" string="Post" type="object" class="btn-primary" states="draft"/>
+                    <button name="action_certify" string="Certify with AT" type="object" class="btn-primary" states="posted"/>
+                    <button name="action_cancel" string="Cancel" type="object" states="draft,posted"/>
+                    <button name="action_draft" string="Reset to Draft" type="object" states="cancelled"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,posted,certified"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_journal_entry" type="object" class="oe_stat_button" icon="fa-book" attrs="{'invisible': [('move_id', '=', False)]}">
+                            <field name="move_id" invisible="1"/>
+                            <span>Journal Entry</span>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Certified" bg_color="bg-success" attrs="{'invisible': [('state', '!=', 'certified')]}"/>
+                    <widget name="web_ribbon" title="Cancelled" bg_color="bg-danger" attrs="{'invisible': [('state', '!=', 'cancelled')]}"/>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="number" readonly="1" force_save="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="invoice_type"/>
+                            <field name="partner_id" context="{'show_vat': True}"/>
+                            <field name="partner_vat" readonly="1"/>
+                            <field name="partner_street" readonly="1"/>
+                            <field name="payment_term_id"/>
+                            <field name="reference"/>
+                        </group>
+                        <group>
+                            <field name="invoice_date"/>
+                            <field name="due_date"/>
+                            <field name="journal_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="currency_id" groups="base.group_multi_currency"/>
+                            <field name="fiscal_position_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Invoice Lines" name="invoice_lines">
+                            <field name="invoice_line_ids" widget="one2many">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="product_id"/>
+                                    <field name="name" widget="text"/>
+                                    <field name="account_id" options="{'no_create': True}"/>
+                                    <field name="quantity"/>
+                                    <field name="uom_id" groups="uom.group_uom"/>
+                                    <field name="price_unit"/>
+                                    <field name="discount" string="Disc (%)"/>
+                                    <field name="tax_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                                    <field name="price_subtotal" sum="Total" widget="monetary"/>
+                                    <field name="currency_id" invisible="1"/>
+                                </list>
+                            </field>
+                            <group class="oe_subtotal_footer oe_right">
+                                <field name="amount_untaxed" widget="monetary"/>
+                                <field name="amount_tax" widget="monetary"/>
+                                <div class="oe_subtotal_footer_separator oe_inline">
+                                    <label for="amount_total"/>
+                                </div>
+                                <field name="amount_total" class="oe_subtotal_footer_separator" widget="monetary"/>
+                            </group>
+                            <div class="clearfix"/>
+                        </page>
+                        <page string="Tax Summary" name="tax_summary">
+                            <field name="tax_summary_ids">
+                                <list>
+                                    <field name="tax_id"/>
+                                    <field name="base_amount" widget="monetary" sum="Total Base"/>
+                                    <field name="tax_amount" widget="monetary" sum="Total Tax"/>
+                                    <field name="currency_id" invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Certification" name="certification" attrs="{'invisible': [('state', 'not in', ['certified'])]}">
+                            <group>
+                                <group>
+                                    <field name="certification_date"/>
+                                    <field name="hash_code"/>
+                                    <field name="previous_hash"/>
+                                    <field name="at_code"/>
+                                </group>
+                                <group>
+                                    <field name="qr_code" widget="image" options="{'size': [200, 200]}"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Other Info" name="other_info">
+                            <group>
+                                <field name="payment_state"/>
+                                <field name="narration" placeholder="Terms and conditions..."/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Invoice Search View -->
+    <record id="view_moz_invoice_search" model="ir.ui.view">
+        <field name="name">moz.invoice.search</field>
+        <field name="model">moz.invoice</field>
+        <field name="arch" type="xml">
+            <search string="Search Invoices">
+                <field name="number"/>
+                <field name="partner_id"/>
+                <field name="invoice_date"/>
+                <field name="reference"/>
+                <separator/>
+                <filter name="draft" string="Draft" domain="[('state','=','draft')]"/>
+                <filter name="posted" string="Posted" domain="[('state','=','posted')]"/>
+                <filter name="certified" string="Certified" domain="[('state','=','certified')]"/>
+                <separator/>
+                <filter name="not_paid" string="Not Paid" domain="[('payment_state','=','not_paid')]"/>
+                <filter name="paid" string="Paid" domain="[('payment_state','=','paid')]"/>
+                <separator/>
+                <filter name="this_month" string="This Month" domain="[('invoice_date','&gt;=',(datetime.date.today().replace(day=1)).strftime('%Y-%m-%d'))]"/>
+                <filter name="last_month" string="Last Month" domain="[('invoice_date','&gt;=',(datetime.date.today().replace(day=1) - relativedelta(months=1)).strftime('%Y-%m-%d')),('invoice_date','&lt;',datetime.date.today().replace(day=1).strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_by_partner" string="Customer" context="{'group_by':'partner_id'}"/>
+                    <filter name="group_by_type" string="Type" context="{'group_by':'invoice_type'}"/>
+                    <filter name="group_by_state" string="State" context="{'group_by':'state'}"/>
+                    <filter name="group_by_date" string="Invoice Date" context="{'group_by':'invoice_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Invoice Kanban View -->
+    <record id="view_moz_invoice_kanban" model="ir.ui.view">
+        <field name="name">moz.invoice.kanban</field>
+        <field name="model">moz.invoice</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_mobile">
+                <field name="number"/>
+                <field name="partner_id"/>
+                <field name="amount_total"/>
+                <field name="invoice_date"/>
+                <field name="state"/>
+                <field name="currency_id"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="o_kanban_record_top">
+                                <div class="o_kanban_record_headings">
+                                    <strong class="o_kanban_record_title">
+                                        <field name="partner_id"/>
+                                    </strong>
+                                </div>
+                                <field name="amount_total" widget="monetary"/>
+                            </div>
+                            <div class="o_kanban_record_body">
+                                <field name="number"/>
+                            </div>
+                            <div class="o_kanban_record_bottom">
+                                <div class="oe_kanban_bottom_left">
+                                    <field name="invoice_date"/>
+                                </div>
+                                <div class="oe_kanban_bottom_right">
+                                    <field name="state" widget="badge"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Invoice Action -->
+    <record id="action_moz_invoice" model="ir.actions.act_window">
+        <field name="name">Invoices</field>
+        <field name="res_model">moz.invoice</field>
+        <field name="view_mode">list,kanban,form,pivot,graph</field>
+        <field name="context">{'default_invoice_type': 'FT'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first invoice
+            </p>
+            <p>
+                Create and manage certified invoices compliant with Mozambican tax regulations.
+            </p>
+        </field>
+    </record>
+</odoo>

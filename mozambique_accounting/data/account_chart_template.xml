@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Chart of Accounts Template -->
+    <record id="moz_chart_template" model="account.chart.template">
+        <field name="name">Mozambique PGC-NIRF Chart of Accounts</field>
+        <field name="code">MZ-PGC-NIRF</field>
+        <field name="currency_id" ref="base.MZN"/>
+        <field name="bank_account_code_prefix">12</field>
+        <field name="cash_account_code_prefix">11</field>
+        <field name="transfer_account_code_prefix">58</field>
+    </record>
+
+    <!-- Account Templates - Assets (Classe 1 e 2) -->
+    <record id="account_template_11" model="account.account.template">
+        <field name="code">11</field>
+        <field name="name">Caixa</field>
+        <field name="account_type">asset_cash</field>
+        <field name="chart_template_id" ref="moz_chart_template"/>
+    </record>
+
+    <record id="account_template_12" model="account.account.template">
+        <field name="code">12</field>
+        <field name="name">Depósitos à Ordem</field>
+        <field name="account_type">asset_cash</field>
+        <field name="chart_template_id" ref="moz_chart_template"/>
+    </record>
+
+    <record id="account_template_13" model="account.account.template">
+        <field name="code">13</field>
+        <field name="name">Outros Depósitos Bancários</field>
+        <field name="account_type">asset_current</field>
+        <field name="chart_template_id" ref="moz_chart_template"/>
+    </record>
+
+    <record id="account_template_21" model="account.account.template">
+        <field name="code">21</field>
+        <field name="name">Clientes</field>
+        <field name="account_type">asset_receivable</field>
+        <field name="reconcile">True</field>
+        <field name="chart_template_id" ref="moz_chart_template"/>
+    </record>
+
+    <record id="account_template_22" model="account.account.template">
+        <field name="code">22</field>
+        <field name="name">Fornecedores</field>
+        <field name="account_type">liability_payable</field>
+        <field name="reconcile">True</field>
+        <field name="chart_template_id" ref="moz_chart_template"/>
+    </record>
+
+    <record id="account_template_24" model="account.account.template">
+        <field name="code">24</field>
+        <field name="name">Estado e Outros Entes Públicos</field>
+        <field name="account_type">asset_current</field>
+        <field name="chart_template_id" ref="moz_chart_template"/>
+    </record>
+
+    <record id="account_template_2411" model="account.account.template">
+        <field name="code">2411</field>
+        <field name="name">IVA - Imposto sobre Valor Acrescentado</field>
+        <field name="account_type">asset_current</field>
+        <field name="chart_template_id" ref="moz_chart_template"/>
+    </record>
+
+    <record id="account_template_2412" model="account.account.template">
+        <field name="code">2412</field>
+        <field name="name">IRPC - Imposto sobre Rendimento</field>
+        <field name="account_type">liability_current</field>
+        <field name="chart_template_id" ref="moz_chart_template"/>
+    </record>
+
+    <record id="account_template_2413" model="account.account.template">
+        <field name="code">2413</field>
+        <field name="name">IRPS - Retenção na Fonte</field>
+        <field name="account_type">liability_current</field>
+        <field name="chart_template_id" ref="moz_chart_template"/>
+    </record>
+
+    <!-- Fixed Assets (Classe 3) -->
+    <record id="account_template_31" model="account.account.template">
+        <field name="code">31</field>
+        <field name="name">Terrenos e Recursos Naturais</field>
+        <field name="account_type">asset_fixed</field>
+        <field name="chart_template_id" ref="moz_chart_template"/>
+    </record>
+
+    <record id="account_template_32" model="account.account.template">
+        <field name="code">32</field>
+        <field name="name">Edifícios e Outras Construções</field>
+        <field name="account_type">asset_fixed</field>
+        <field name="chart_template_id" ref="moz_chart_template"/>
+    </record>
+
+    <record id="account_template_33" model="account.account.template">
+        <field name="code">33</field>
+        <field name="name">Equipamento Básico</field>
+        <field name="account_type">asset_fixed</field>
+        <field name="chart_template_id" ref="moz_chart_template"/>
+    </record>
+
+    <record id="account_template_34" model="account.account.template">
+        <field name="code">34</field>
+        <field name="name">Equipamento de Transporte</field>
+        <field name="account_type">asset_fixed</field>
+        <field name="chart_template_id" ref="moz_chart_template"/>
+    </record>
+
+    <record id="account_template_35" model="account.account.template">
+        <field name="code">35</field>
+        <field name="name">Equipamento Administrativo</field>
+        <field name="account_type">asset_fixed</field>
+        <field name="chart_template_id" ref="moz_chart_template"/>
+    </record>
+
+    <record id="account_template_38" model="account.account.template">
+        <field name="code">38</field>
+        <field name="name">Depreciações Acumuladas</field>
+        <field name="account_type">asset_fixed</field>
+        <field name="chart_template_id" ref="moz_chart_template"/>
+    </record>
+
+    <!-- Inventory (Classe 3) -->
+    <record id="account_template_31_stock" model="account.account.template">
+        <field name="code">31</field>
+        <field name="name">Mercadorias</field>
+        <field name="account_type">asset_current</field>
+        <field name="chart_template_id" ref="moz_chart_template"/>
+    </record>
+
+    <record id="account_template_32_stock" model="account.account.template">
+        <field name="code">32</field>
+        <field name="name">Matérias-Primas</field>
+        <field name="account_type">asset_current</field>
+        <field name="chart_template_id" ref="moz_chart_template"/>
+    </record>
+
+    <!-- Equity (Classe 5) -->
+    <record id="account_template_51" model="account.account.template">
+        <field name="code">51</field>
+        <field name="name">Capital Social</field>
+        <field name="account_type">equity</field>
+        <field name="chart_template_id" ref="moz_chart_template"/>
+    </record>
+
+    <record id="account_template_55" model="account.account.template">
+        <field name="code">55</field>
+        <field name="name">Reservas</field>
+        <field name="account_type">equity</field>
+        <field name="chart_template_id" ref="moz_chart_template"/>
+    </record>
+
+    <record id="account_template_56" model="account.account.template">
+        <field name="code">56</field>
+        <field name="name">Resultados Transitados</field>
+        <field name="account_type">equity</field>
+        <field name="chart_template_id" ref="moz_chart_template"/>
+    </record>
+
+    <record id="account_template_59" model="account.account.template">
+        <field name="code">59</field>
+        <field name="name">Resultado Líquido do Período</field>
+        <field name="account_type">equity</field>
+        <field name="chart_template_id" ref="moz_chart_template"/>
+    </record>
+
+    <!-- Costs (Classe 6) -->
+    <record id="account_template_61" model="account.account.template">
+        <field name="code">61</field>
+        <field name="name">Custo das Mercadorias Vendidas</field>
+        <field name="account_type">expense_direct_cost</field>
+        <field name="chart_template_id" ref="moz_chart_template"/>
+    </record>
+
+    <record id="account_template_62" model="account.account.template">
+        <field name="code">62</field>
+        <field name="name">Fornecimentos e Serviços Externos</field>
+        <field name="account_type">expense</field>
+        <field name="chart_template_id" ref="moz_chart_template"/>
+    </record>
+
+    <record id="account_template_63" model="account.account.template">
+        <field name="code">63</field>
+        <field name="name">Gastos com o Pessoal</field>
+        <field name="account_type">expense</field>
+        <field name="chart_template_id" ref="moz_chart_template"/>
+    </record>
+
+    <record id="account_template_64" model="account.account.template">
+        <field name="code">64</field>
+        <field name="name">Gastos de Depreciação e Amortização</field>
+        <field name="account_type">expense_depreciation</field>
+        <field name="chart_template_id" ref="moz_chart_template"/>
+    </record>
+
+    <record id="account_template_68" model="account.account.template">
+        <field name="code">68</field>
+        <field name="name">Outros Gastos Operacionais</field>
+        <field name="account_type">expense</field>
+        <field name="chart_template_id" ref="moz_chart_template"/>
+    </record>
+
+    <record id="account_template_69" model="account.account.template">
+        <field name="code">69</field>
+        <field name="name">Gastos Financeiros</field>
+        <field name="account_type">expense</field>
+        <field name="chart_template_id" ref="moz_chart_template"/>
+    </record>
+
+    <!-- Revenue (Classe 7) -->
+    <record id="account_template_71" model="account.account.template">
+        <field name="code">71</field>
+        <field name="name">Vendas de Produtos</field>
+        <field name="account_type">income</field>
+        <field name="chart_template_id" ref="moz_chart_template"/>
+    </record>
+
+    <record id="account_template_72" model="account.account.template">
+        <field name="code">72</field>
+        <field name="name">Prestação de Serviços</field>
+        <field name="account_type">income</field>
+        <field name="chart_template_id" ref="moz_chart_template"/>
+    </record>
+
+    <record id="account_template_78" model="account.account.template">
+        <field name="code">78</field>
+        <field name="name">Outros Rendimentos Operacionais</field>
+        <field name="account_type">income_other</field>
+        <field name="chart_template_id" ref="moz_chart_template"/>
+    </record>
+
+    <record id="account_template_79" model="account.account.template">
+        <field name="code">79</field>
+        <field name="name">Rendimentos Financeiros</field>
+        <field name="account_type">income_other</field>
+        <field name="chart_template_id" ref="moz_chart_template"/>
+    </record>
+
+    <!-- Results (Classe 8) -->
+    <record id="account_template_81" model="account.account.template">
+        <field name="code">81</field>
+        <field name="name">Resultado Operacional</field>
+        <field name="account_type">equity</field>
+        <field name="chart_template_id" ref="moz_chart_template"/>
+    </record>
+
+    <record id="account_template_82" model="account.account.template">
+        <field name="code">82</field>
+        <field name="name">Resultado Financeiro</field>
+        <field name="account_type">equity</field>
+        <field name="chart_template_id" ref="moz_chart_template"/>
+    </record>
+
+    <record id="account_template_86" model="account.account.template">
+        <field name="code">86</field>
+        <field name="name">Imposto sobre o Rendimento</field>
+        <field name="account_type">expense</field>
+        <field name="chart_template_id" ref="moz_chart_template"/>
+    </record>
+
+    <record id="account_template_88" model="account.account.template">
+        <field name="code">88</field>
+        <field name="name">Resultado Líquido</field>
+        <field name="account_type">equity</field>
+        <field name="chart_template_id" ref="moz_chart_template"/>
+    </record>
+</odoo>
