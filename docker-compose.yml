@@ -1,0 +1,41 @@
+version: '3.9'  # Adicionado para clareza e compatibilidade
+services:
+  odoo:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: modelo-odoo
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=${HOST}
+      - DB_USER=${USER}
+      - DB_PASSWORD=${PASSWORD}
+      - DB_NAME=${POSTGRES_DB}
+    depends_on:
+      postgres:
+        condition: service_healthy  # Garante que o Postgres esteja pronto
+    ports:
+      - "8069:8069"
+    volumes:
+      - data:/var/lib/odoo:rw
+      - ./custom-addons/ubuntu_server:/mnt/extra-addons:rw
+  postgres:
+    image: postgres:15
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - PGDATA=/var/lib/postgresql/data/pgdata  # Adicionado para consistência
+    volumes:
+      - db:/var/lib/postgresql/data/pgdata:rw
+    healthcheck:  # Adicionado para suportar o condition: service_healthy
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+volumes:
+  data:
+  db:
