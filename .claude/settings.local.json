@@ -13,7 +13,9 @@
       "Bash(\"C:\\Users\\custodio.massingue\\AppData\\Local\\Programs\\Python\\Python311\\python.exe\" -m pip install psycopg2-binary)",
       "Bash(\"C:\\Users\\custodio.massingue\\AppData\\Local\\Programs\\Python\\Python311\\python.exe\" clean_and_fix_mozambique_module.py)",
       "Bash(bash:*)",
-      "Bash(docker exec:*)"
+      "Bash(docker exec:*)",
+      "Bash(mkdir:*)",
+      "Bash(rm:*)"
     ],
     "deny": []
   }

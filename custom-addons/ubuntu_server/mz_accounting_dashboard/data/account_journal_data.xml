@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Ensure default journals are visible on dashboard -->
+        <function model="account.journal" name="search">
+            <value eval="[('type', 'in', ['sale', 'purchase', 'bank', 'cash', 'general'])]"/>
+            <value eval="{'show_on_dashboard': True}"/>
+        </function>
+    </data>
+</odoo>

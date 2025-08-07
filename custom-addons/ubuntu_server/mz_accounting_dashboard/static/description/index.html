@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>MZ Accounting Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #875A7B;
+            border-bottom: 3px solid #875A7B;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #614051;
+            margin-top: 30px;
+        }
+        h3 {
+            color: #495057;
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .feature-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #875A7B;
+        }
+        .feature-card h4 {
+            color: #875A7B;
+            margin-top: 0;
+        }
+        .screenshot {
+            width: 100%;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            background: #875A7B;
+            color: white;
+            border-radius: 3px;
+            font-size: 12px;
+            margin: 2px;
+        }
+        .tech-stack {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        ul li:before {
+            content: "✓ ";
+            color: #28a745;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>MZ Professional Accounting Dashboard for Odoo 18</h1>
+    
+    <p><strong>Transform your Odoo Community Edition with an Enterprise-grade Accounting Dashboard!</strong></p>
+    
+    <h2>Overview</h2>
+    <p>The MZ Accounting Dashboard brings the power and elegance of Odoo Enterprise's accounting dashboard to the Community Edition. Built specifically for Odoo 18 with the latest OWL 2.0 framework, this module provides real-time financial insights and streamlined accounting operations.</p>
+    
+    <h2>Key Features</h2>
+    <div class="feature-grid">
+        <div class="feature-card">
+            <h4>Real-time Financial KPIs</h4>
+            <p>Monitor your financial health with live metrics that update automatically every 60 seconds.</p>
+        </div>
+        <div class="feature-card">
+            <h4>Interactive Journal Cards</h4>
+            <p>Beautiful, color-coded cards for each accounting journal with drill-down capabilities.</p>
+        </div>
+        <div class="feature-card">
+            <h4>Smart Invoice Tracking</h4>
+            <p>Track draft, overdue, and pending invoices with automatic calculations and alerts.</p>
+        </div>
+        <div class="feature-card">
+            <h4>Vendor Bill Management</h4>
+            <p>Complete visibility of payables, approvals, and document uploads.</p>
+        </div>
+        <div class="feature-card">
+            <h4>Bank Reconciliation</h4>
+            <p>One-click access to reconciliation with outstanding items clearly displayed.</p>
+        </div>
+        <div class="feature-card">
+            <h4>Visual Analytics</h4>
+            <p>Mini graphs showing 30-day trends for sales and purchase journals.</p>
+        </div>
+    </div>
+    
+    <h2>Dashboard Components</h2>
+    
+    <h3>Customer Invoices Card</h3>
+    <ul>
+        <li>Draft invoices with total amounts</li>
+        <li>Invoices pending to be sent</li>
+        <li>Overdue invoices with aging</li>
+        <li>Invoices requiring review</li>
+        <li>Monthly revenue comparison</li>
+    </ul>
+    
+    <h3>Vendor Bills Card</h3>
+    <ul>
+        <li>Draft bills tracking</li>
+        <li>Bills awaiting payment</li>
+        <li>Late payment alerts</li>
+        <li>Bills pending approval</li>
+        <li>Monthly expense tracking</li>
+    </ul>
+    
+    <h3>Bank & Cash Cards</h3>
+    <ul>
+        <li>Real-time balance display</li>
+        <li>Last synchronization status</li>
+        <li>Pending reconciliation items</li>
+        <li>Outstanding payments and receipts</li>
+        <li>Daily cash flow tracking</li>
+    </ul>
+    
+    <h2>Technical Excellence</h2>
+    <div class="tech-stack">
+        <h4>Built with Modern Technology:</h4>
+        <p>
+            <span class="badge">OWL 2.0</span>
+            <span class="badge">ES6 Modules</span>
+            <span class="badge">PostgreSQL Optimized</span>
+            <span class="badge">Responsive Design</span>
+            <span class="badge">Decimal Precision</span>
+            <span class="badge">Multi-company</span>
+        </p>
+    </div>
+    
+    <h2>Benefits</h2>
+    <ul>
+        <li>Save hours with streamlined accounting workflows</li>
+        <li>Reduce errors with automated calculations</li>
+        <li>Improve cash flow with better visibility</li>
+        <li>Make informed decisions with real-time data</li>
+        <li>Enhance compliance with audit trails</li>
+        <li>Scale effortlessly with your business growth</li>
+    </ul>
+    
+    <h2>Installation</h2>
+    <ol>
+        <li>Download the module to your custom-addons folder</li>
+        <li>Update the apps list in Odoo</li>
+        <li>Install "MZ Accounting Dashboard"</li>
+        <li>Access via Accounting → Dashboard menu</li>
+    </ol>
+    
+    <h2>Requirements</h2>
+    <ul>
+        <li>Odoo 18.0 Community or Enterprise</li>
+        <li>Account module installed</li>
+        <li>Proper user permissions (Account User or Manager)</li>
+    </ul>
+    
+    <h2>Support</h2>
+    <p>For support, customization, or implementation assistance, contact us at:</p>
+    <p><strong>Email:</strong> support@mzsolutions.com<br>
+    <strong>Website:</strong> www.mzsolutions.com</p>
+    
+    <hr>
+    <p><em>© 2024 MZ Solutions. All rights reserved. Licensed under LGPL-3.</em></p>
+</body>
+</html>
