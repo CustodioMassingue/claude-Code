@@ -1,0 +1,530 @@
+// Professional Dashboard Styles - Odoo Enterprise Style
+
+// Color Variables
+$primary-purple: #7c4dff;
+$primary-purple-dark: #6200ea;
+$primary-purple-light: #b388ff;
+$gradient-start: #7c4dff;
+$gradient-end: #b388ff;
+$success-green: #00c853;
+$warning-orange: #ff6d00;
+$danger-red: #d50000;
+$info-blue: #2196f3;
+$card-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+$card-hover-shadow: 0 4px 25px rgba(0, 0, 0, 0.15);
+
+// Dashboard Container
+.o_mz_dashboard_container {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+// Kanban Dashboard Styles
+.o_kanban_dashboard.o_mz_professional_dashboard {
+    .o_kanban_record {
+        background: white;
+        border-radius: 12px;
+        box-shadow: $card-shadow;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: none;
+        overflow: hidden;
+        margin: 10px;
+        
+        &:hover {
+            transform: translateY(-5px);
+            box-shadow: $card-hover-shadow;
+        }
+        
+        @media (max-width: 767px) {
+            margin: 10px 5px;
+        }
+    }
+    
+    // Card Header
+    .o_kanban_card_header {
+        background: linear-gradient(135deg, $gradient-start 0%, $gradient-end 100%);
+        color: white;
+        padding: 20px;
+        position: relative;
+        
+        .o_kanban_card_header_title {
+            .o_primary {
+                font-size: 1.25rem;
+                font-weight: 600;
+                margin-bottom: 5px;
+                
+                strong {
+                    color: white;
+                }
+            }
+            
+            .o_secondary {
+                font-size: 0.875rem;
+                opacity: 0.9;
+                
+                .text-muted {
+                    color: rgba(255, 255, 255, 0.8) !important;
+                }
+            }
+        }
+        
+        .o_kanban_manage_button_section {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            
+            .o_kanban_manage_toggle_button {
+                color: white;
+                opacity: 0.8;
+                padding: 5px;
+                border-radius: 50%;
+                transition: all 0.2s;
+                
+                &:hover {
+                    opacity: 1;
+                    background: rgba(255, 255, 255, 0.2);
+                }
+                
+                i {
+                    font-size: 18px;
+                }
+            }
+        }
+    }
+    
+    // Card Content
+    .o_kanban_card_content {
+        padding: 20px;
+        
+        // Stat Rows
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s;
+            
+            &:hover {
+                background: #f8f9fa;
+                margin: 0 -20px;
+                padding: 12px 20px;
+            }
+            
+            &:last-child {
+                border-bottom: none;
+            }
+            
+            .stat-label {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                
+                .stat-icon {
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 8px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 16px;
+                    
+                    &.icon-draft {
+                        background: rgba(108, 117, 125, 0.1);
+                        color: #6c757d;
+                    }
+                    
+                    &.icon-warning {
+                        background: rgba(255, 109, 0, 0.1);
+                        color: $warning-orange;
+                    }
+                    
+                    &.icon-danger {
+                        background: rgba(213, 0, 0, 0.1);
+                        color: $danger-red;
+                    }
+                    
+                    &.icon-success {
+                        background: rgba(0, 200, 83, 0.1);
+                        color: $success-green;
+                    }
+                    
+                    &.icon-info {
+                        background: rgba(33, 150, 243, 0.1);
+                        color: $info-blue;
+                    }
+                }
+                
+                .stat-text {
+                    font-size: 0.95rem;
+                    color: #495057;
+                    font-weight: 500;
+                    
+                    .stat-count {
+                        font-weight: 700;
+                        color: #212529;
+                    }
+                }
+            }
+            
+            .stat-value {
+                text-align: right;
+                
+                .amount {
+                    font-size: 1rem;
+                    font-weight: 600;
+                    color: #212529;
+                    
+                    &.text-danger {
+                        color: $danger-red !important;
+                    }
+                    
+                    &.text-warning {
+                        color: $warning-orange !important;
+                    }
+                    
+                    &.text-success {
+                        color: $success-green !important;
+                    }
+                }
+                
+                .badge {
+                    font-size: 0.75rem;
+                    padding: 4px 8px;
+                    border-radius: 12px;
+                    font-weight: 600;
+                }
+            }
+        }
+        
+        // Balance Display
+        .balance-display {
+            text-align: center;
+            padding: 25px 0;
+            
+            .balance-amount {
+                font-size: 2.5rem;
+                font-weight: 700;
+                background: linear-gradient(135deg, $gradient-start 0%, $gradient-end 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                margin-bottom: 5px;
+            }
+            
+            .balance-label {
+                font-size: 0.875rem;
+                color: #6c757d;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+        }
+        
+        // Summary Section
+        .summary-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+            
+            .summary-item {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 10px;
+                
+                .summary-label {
+                    font-size: 0.875rem;
+                    color: #6c757d;
+                }
+                
+                .summary-value {
+                    font-size: 1rem;
+                    font-weight: 600;
+                    color: #212529;
+                }
+            }
+        }
+    }
+    
+    // Chart Section
+    .o_kanban_chart_section {
+        padding: 20px;
+        border-top: 1px solid #e9ecef;
+        background: #f8f9fa;
+        min-height: 200px;
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            
+            .chart-title {
+                font-size: 0.875rem;
+                font-weight: 600;
+                color: #495057;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+            
+            .chart-controls {
+                display: flex;
+                gap: 5px;
+                
+                .btn-chart-control {
+                    padding: 4px 10px;
+                    font-size: 0.75rem;
+                    border: 1px solid #dee2e6;
+                    background: white;
+                    color: #6c757d;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                    
+                    &.active,
+                    &:hover {
+                        background: $primary-purple;
+                        color: white;
+                        border-color: $primary-purple;
+                    }
+                }
+            }
+        }
+        
+        .o_dashboard_chart_container {
+            height: 180px;
+            position: relative;
+            
+            .o_dashboard_chart {
+                width: 100% !important;
+                height: 100% !important;
+            }
+        }
+    }
+    
+    // Action Buttons
+    .action-buttons {
+        padding: 15px 20px;
+        background: #f8f9fa;
+        border-top: 1px solid #e9ecef;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        
+        .btn-action {
+            flex: 1;
+            min-width: 120px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            
+            &.btn-primary {
+                background: linear-gradient(135deg, $gradient-start 0%, $gradient-end 100%);
+                color: white;
+                
+                &:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 5px 15px rgba(124, 77, 255, 0.3);
+                }
+            }
+            
+            &.btn-secondary {
+                background: white;
+                color: $primary-purple;
+                border-color: $primary-purple;
+                
+                &:hover {
+                    background: $primary-purple;
+                    color: white;
+                }
+            }
+            
+            i {
+                margin-right: 5px;
+            }
+        }
+    }
+    
+    // Upload Area for Vendor Bills
+    .upload-area {
+        margin: 20px;
+        padding: 30px;
+        border: 2px dashed #dee2e6;
+        border-radius: 12px;
+        text-align: center;
+        background: #f8f9fa;
+        cursor: pointer;
+        transition: all 0.3s;
+        
+        &:hover,
+        &.drag-over {
+            border-color: $primary-purple;
+            background: rgba(124, 77, 255, 0.05);
+            
+            .upload-icon {
+                transform: scale(1.1);
+            }
+        }
+        
+        .upload-icon {
+            font-size: 48px;
+            color: #adb5bd;
+            margin-bottom: 15px;
+            transition: transform 0.3s;
+        }
+        
+        .upload-text {
+            color: #6c757d;
+            font-size: 1rem;
+            margin-bottom: 10px;
+            
+            strong {
+                color: $primary-purple;
+                font-weight: 600;
+            }
+        }
+        
+        .upload-hint {
+            font-size: 0.875rem;
+            color: #adb5bd;
+        }
+    }
+    
+    // Reconciliation Counter
+    .reconciliation-counter {
+        display: inline-flex;
+        align-items: center;
+        background: linear-gradient(135deg, $warning-orange 0%, #ff9100 100%);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        
+        .counter-value {
+            font-size: 1rem;
+            margin-right: 5px;
+        }
+    }
+    
+    // Empty State
+    .empty-state {
+        padding: 40px 20px;
+        text-align: center;
+        
+        .empty-icon {
+            font-size: 64px;
+            color: #dee2e6;
+            margin-bottom: 20px;
+        }
+        
+        .empty-title {
+            font-size: 1.25rem;
+            color: #495057;
+            margin-bottom: 10px;
+        }
+        
+        .empty-text {
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+    }
+}
+
+// Mobile Responsiveness
+@media (max-width: 768px) {
+    .o_kanban_dashboard.o_mz_professional_dashboard {
+        .o_kanban_record {
+            margin: 10px 0;
+        }
+        
+        .o_kanban_card_header {
+            padding: 15px;
+            
+            .o_kanban_card_header_title {
+                .o_primary {
+                    font-size: 1.1rem;
+                }
+            }
+        }
+        
+        .o_kanban_card_content {
+            padding: 15px;
+            
+            .balance-display {
+                .balance-amount {
+                    font-size: 2rem;
+                }
+            }
+        }
+        
+        .action-buttons {
+            .btn-action {
+                min-width: auto;
+                flex: 1 1 calc(50% - 5px);
+            }
+        }
+    }
+}
+
+// Animation Classes
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.o_kanban_dashboard.o_mz_professional_dashboard {
+    .o_kanban_record {
+        animation: slideInUp 0.5s ease-out;
+        
+        @for $i from 1 through 10 {
+            &:nth-child(#{$i}) {
+                animation-delay: #{$i * 0.05}s;
+            }
+        }
+    }
+}
+
+// Loading States
+.o_mz_dashboard_loading {
+    .o_kanban_record {
+        position: relative;
+        overflow: hidden;
+        
+        &::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.4),
+                transparent
+            );
+            animation: shimmer 2s infinite;
+        }
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 100%;
+    }
+}

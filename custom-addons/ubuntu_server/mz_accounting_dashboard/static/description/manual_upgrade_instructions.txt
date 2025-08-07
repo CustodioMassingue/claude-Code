@@ -1,0 +1,66 @@
+MANUAL UPGRADE INSTRUCTIONS FOR MZ ACCOUNTING DASHBOARD
+========================================================
+
+The professional styling has been applied to the module. To see the changes:
+
+1. RESTART ODOO SERVER:
+   - Stop the Odoo server
+   - Start it again with: python odoo-bin -c odoo.conf
+
+2. UPGRADE THE MODULE:
+   Option A - Via UI:
+   - Go to Apps menu
+   - Remove the "Apps" filter
+   - Search for "MZ Accounting Dashboard"
+   - Click the three dots menu
+   - Select "Upgrade"
+
+   Option B - Via Command Line:
+   python odoo-bin -c odoo.conf -u mz_accounting_dashboard -d postgres
+
+3. CLEAR BROWSER CACHE:
+   - Press Ctrl+F5 (Windows/Linux) or Cmd+Shift+R (Mac)
+   - Or go to browser settings and clear cache
+
+4. ACCESS THE DASHBOARD:
+   - Navigate to: MZ Accounting > Dashboard
+   - Or go to: Accounting > MZ Dashboard
+
+WHAT YOU SHOULD SEE:
+====================
+✓ Purple gradient headers for Customer Invoices
+✓ Light purple gradient for Vendor Bills
+✓ Blue gradient for Bank journals
+✓ Green gradient for Cash journals
+✓ Gray gradient for Miscellaneous journals
+✓ Card shadows with hover effects
+✓ Rounded corners (12px radius)
+✓ Professional stat boxes with gradients
+✓ Modern buttons with gradient backgrounds
+✓ Responsive layout that adapts to screen size
+
+TROUBLESHOOTING:
+================
+If styles don't appear:
+
+1. Check browser console (F12) for errors
+2. Try incognito/private browsing mode
+3. Verify the module version is 18.0.2.0.0
+4. Ensure all XML files are properly loaded
+5. Check that inline styles are present in the HTML
+
+The styles are applied inline in the XML view, so they should appear immediately
+without needing asset compilation.
+
+FEATURES INCLUDED:
+==================
+- Inline CSS for immediate styling
+- Bootstrap classes for modern design
+- Gradient backgrounds for different journal types
+- Shadow effects on cards
+- Hover animations
+- Professional color scheme
+- Responsive grid layout
+- Icon integration with Font Awesome
+- Action buttons with custom styling
+- Dropdown menus with proper styling

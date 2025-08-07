@@ -6,13 +6,15 @@ import json
 from datetime import datetime, timedelta, date
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
+import calendar
+from collections import defaultdict
 
 
 class AccountJournal(models.Model):
     _inherit = 'account.journal'
     
     kanban_dashboard = fields.Text(compute='_compute_kanban_dashboard')
-    kanban_dashboard_graph = fields.Text(compute='_compute_kanban_dashboard_graph')
+    kanban_dashboard_graph = fields.Text(compute='_compute_kanban_dashboard_graph', string='Dashboard Graph')
     show_on_dashboard = fields.Boolean(string='Show on Dashboard', default=True)
     
     @api.depends('type', 'company_id')
@@ -136,12 +138,20 @@ class AccountJournal(models.Model):
             'title': _('Customer Invoices'),
             'number_draft': len(draft_invoices),
             'sum_draft': formatLang(self.env, draft_total, currency_obj=currency),
+            'sum_draft_str': formatLang(self.env, draft_total, currency_obj=currency),
             'number_to_send': len(to_send),
             'sum_to_send': formatLang(self.env, to_send_total, currency_obj=currency),
+            'sum_to_send_str': formatLang(self.env, to_send_total, currency_obj=currency),
             'number_overdue': len(overdue),
             'sum_overdue': formatLang(self.env, overdue_total, currency_obj=currency),
+            'sum_overdue_str': formatLang(self.env, overdue_total, currency_obj=currency),
             'number_to_check': len(to_check),
             'sum_to_check': formatLang(self.env, to_check_total, currency_obj=currency),
+            'sum_to_check_str': formatLang(self.env, to_check_total, currency_obj=currency),
+            'number_unpaid': len(to_send) + len(overdue),
+            'sum_unpaid_str': formatLang(self.env, to_send_total + overdue_total, currency_obj=currency),
+            'number_late': len(overdue),
+            'sum_late_str': formatLang(self.env, overdue_total, currency_obj=currency),
             'last_month_total': formatLang(self.env, last_month_total, currency_obj=currency),
             'this_month_total': formatLang(self.env, this_month_total, currency_obj=currency),
             'has_sequence_holes': self._check_sequence_holes('out_invoice'),
@@ -281,10 +291,13 @@ class AccountJournal(models.Model):
         return {
             'title': self.name,
             'balance': formatLang(self.env, account_balance, currency_obj=currency),
+            'bank_balance_str': formatLang(self.env, account_balance, currency_obj=currency),
             'last_sync': last_sync or _('Never'),
             'to_reconcile': unreconciled_count,
+            'number_to_reconcile': unreconciled_count,
             'outstanding_payments_count': len(outstanding_payments),
             'outstanding_payments_total': formatLang(self.env, outstanding_payments_total, currency_obj=currency),
+            'payments_amount_str': formatLang(self.env, outstanding_payments_total + outstanding_receipts_total, currency_obj=currency),
             'outstanding_receipts_count': len(outstanding_receipts),
             'outstanding_receipts_total': formatLang(self.env, outstanding_receipts_total, currency_obj=currency),
             'bank_account': self.bank_account_id.acc_number if self.bank_account_id else False,
@@ -337,6 +350,7 @@ class AccountJournal(models.Model):
         return {
             'title': self.name,
             'balance': formatLang(self.env, account_balance, currency_obj=currency),
+            'cash_balance_str': formatLang(self.env, account_balance, currency_obj=currency),
             'cash_in_today': formatLang(self.env, cash_in_today, currency_obj=currency),
             'cash_out_today': formatLang(self.env, cash_out_today, currency_obj=currency),
             'number_draft': len(pending_moves),
@@ -379,37 +393,116 @@ class AccountJournal(models.Model):
         }
     
     def _get_journal_dashboard_graph_data(self):
-        """Get graph data for the last 30 days"""
+        """Get enhanced graph data with multiple metrics"""
         self.ensure_one()
         
         data = []
         today = fields.Date.today()
+        currency = self.currency_id or self.company_id.currency_id
         
-        # Get data for last 30 days
-        for i in range(30, -1, -1):
-            current_date = today - timedelta(days=i)
-            
-            if self.type == 'sale':
-                # Count invoices created on this date
-                invoices = self.env['account.move'].search_count([
+        if self.type == 'sale':
+            # Get sales data for last 30 days with amounts
+            for i in range(30, -1, -1):
+                current_date = today - timedelta(days=i)
+                
+                invoices = self.env['account.move'].search([
                     ('journal_id', '=', self.id),
                     ('invoice_date', '=', current_date),
                     ('state', '!=', 'cancel'),
                     ('move_type', '=', 'out_invoice')
                 ])
-                data.append({'x': current_date.strftime('%Y-%m-%d'), 'y': invoices, 'name': _('Invoices')})
                 
-            elif self.type == 'purchase':
-                # Count bills created on this date
-                bills = self.env['account.move'].search_count([
+                daily_total = sum(invoices.mapped('amount_total'))
+                data.append({
+                    'x': current_date.strftime('%Y-%m-%d'),
+                    'y': len(invoices),
+                    'amount': daily_total,
+                    'name': _('Invoices'),
+                    'label': f"{len(invoices)} invoices - {formatLang(self.env, daily_total, currency_obj=currency)}"
+                })
+                
+        elif self.type == 'purchase':
+            # Get purchase data for last 30 days with amounts
+            for i in range(30, -1, -1):
+                current_date = today - timedelta(days=i)
+                
+                bills = self.env['account.move'].search([
                     ('journal_id', '=', self.id),
                     ('invoice_date', '=', current_date),
                     ('state', '!=', 'cancel'),
                     ('move_type', '=', 'in_invoice')
                 ])
-                data.append({'x': current_date.strftime('%Y-%m-%d'), 'y': bills, 'name': _('Bills')})
+                
+                daily_total = sum(bills.mapped('amount_total'))
+                data.append({
+                    'x': current_date.strftime('%Y-%m-%d'),
+                    'y': len(bills),
+                    'amount': daily_total,
+                    'name': _('Bills'),
+                    'label': f"{len(bills)} bills - {formatLang(self.env, daily_total, currency_obj=currency)}"
+                })
+                
+        elif self.type == 'bank':
+            # Get bank balance trend for last 30 days
+            if self.default_account_id:
+                for i in range(30, -1, -1):
+                    current_date = today - timedelta(days=i)
+                    
+                    # Calculate balance up to this date
+                    query = """
+                        SELECT COALESCE(SUM(balance), 0) as balance
+                        FROM account_move_line
+                        WHERE account_id = %s
+                        AND parent_state = 'posted'
+                        AND date <= %s
+                        AND company_id = %s
+                    """
+                    self.env.cr.execute(query, (
+                        self.default_account_id.id,
+                        current_date,
+                        self.company_id.id
+                    ))
+                    result = self.env.cr.dictfetchone()
+                    balance = result['balance'] if result else 0
+                    
+                    data.append({
+                        'x': current_date.strftime('%Y-%m-%d'),
+                        'y': balance,
+                        'name': _('Balance'),
+                        'label': formatLang(self.env, balance, currency_obj=currency)
+                    })
+                    
+        elif self.type == 'cash':
+            # Get cash flow trend for last 30 days
+            if self.default_account_id:
+                for i in range(30, -1, -1):
+                    current_date = today - timedelta(days=i)
+                    
+                    # Get cash movements for this date
+                    moves = self.env['account.move.line'].search([
+                        ('account_id', '=', self.default_account_id.id),
+                        ('date', '=', current_date),
+                        ('parent_state', '=', 'posted')
+                    ])
+                    
+                    cash_in = sum(moves.mapped('debit'))
+                    cash_out = sum(moves.mapped('credit'))
+                    net_flow = cash_in - cash_out
+                    
+                    data.append({
+                        'x': current_date.strftime('%Y-%m-%d'),
+                        'y': net_flow,
+                        'cash_in': cash_in,
+                        'cash_out': cash_out,
+                        'name': _('Net Cash Flow'),
+                        'label': f"In: {formatLang(self.env, cash_in, currency_obj=currency)} / Out: {formatLang(self.env, cash_out, currency_obj=currency)}"
+                    })
         
-        return {'values': data}
+        return {
+            'values': data,
+            'currency': currency.symbol,
+            'journal_type': self.type
+        }
     
     def _check_sequence_holes(self, move_type):
         """Check if there are sequence holes in posted moves"""
@@ -589,17 +682,94 @@ class AccountJournal(models.Model):
             }
     
     def action_upload_document(self):
-        """Upload document action"""
+        """Upload document action - creates vendor bill with attachment wizard"""
         self.ensure_one()
         
-        # This would typically open a document upload wizard
-        # For now, create a new draft bill/invoice for document attachment
         if self.type == 'purchase':
-            return self.action_create_purchase_bill()
+            # Open vendor bill creation with document upload capability
+            return {
+                'type': 'ir.actions.act_window',
+                'name': _('Upload Vendor Bill'),
+                'res_model': 'account.move',
+                'view_mode': 'form',
+                'context': {
+                    'default_move_type': 'in_invoice',
+                    'default_journal_id': self.id,
+                    'default_is_invoice': True,
+                },
+                'target': 'current',
+            }
         elif self.type == 'sale':
             return self.action_create_sale_invoice()
         
         return True
+    
+    def action_configure_journal(self):
+        """Open journal configuration"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Configure Journal'),
+            'res_model': 'account.journal',
+            'res_id': self.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
+    
+    def action_configure_bank(self):
+        """Open bank configuration"""
+        self.ensure_one()
+        if self.type in ['bank', 'cash']:
+            return {
+                'type': 'ir.actions.act_window',
+                'name': _('Bank Configuration'),
+                'res_model': 'account.journal',
+                'res_id': self.id,
+                'view_mode': 'form',
+                'target': 'current',
+                'context': {'form_view_ref': 'account.view_account_journal_form'},
+            }
+        return True
+    
+    def action_print_report(self):
+        """Print journal report"""
+        self.ensure_one()
+        # This would generate a PDF report based on journal type
+        return {
+            'type': 'ir.actions.report',
+            'report_name': 'account.report_journal',
+            'report_type': 'qweb-pdf',
+            'data': None,
+            'context': {
+                'journal_ids': [self.id],
+            },
+        }
+    
+    def action_export_data(self):
+        """Export journal data"""
+        self.ensure_one()
+        # Open export wizard for the relevant model
+        if self.type in ['sale', 'purchase']:
+            model = 'account.move'
+            domain = [
+                ('journal_id', '=', self.id),
+                ('move_type', 'in', ['out_invoice', 'out_refund'] if self.type == 'sale' else ['in_invoice', 'in_refund'])
+            ]
+        else:
+            model = 'account.move.line'
+            domain = [('journal_id', '=', self.id)]
+        
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Export Data'),
+            'res_model': model,
+            'view_mode': 'list',
+            'domain': domain,
+            'context': {
+                'search_default_journal_id': self.id,
+            },
+            'target': 'current',
+        }
     
     def get_journal_dashboard_datas(self):
         """Get all dashboard data for journals - called by JS"""
@@ -614,3 +784,190 @@ class AccountJournal(models.Model):
             }
         
         return result
+    
+    def get_weekly_data(self, weeks=12):
+        """Get weekly aggregated data for charts"""
+        self.ensure_one()
+        
+        weekly_data = []
+        today = fields.Date.today()
+        currency = self.currency_id or self.company_id.currency_id
+        
+        # Calculate start of current week (Monday)
+        days_since_monday = today.weekday()
+        current_week_start = today - timedelta(days=days_since_monday)
+        
+        for week in range(weeks - 1, -1, -1):
+            week_start = current_week_start - timedelta(weeks=week)
+            week_end = week_start + timedelta(days=6)
+            
+            if self.type == 'sale':
+                invoices = self.env['account.move'].search([
+                    ('journal_id', '=', self.id),
+                    ('invoice_date', '>=', week_start),
+                    ('invoice_date', '<=', week_end),
+                    ('state', '!=', 'cancel'),
+                    ('move_type', '=', 'out_invoice')
+                ])
+                
+                weekly_total = sum(invoices.mapped('amount_total'))
+                weekly_data.append({
+                    'week': f"W{week_start.isocalendar()[1]}",
+                    'period': f"{week_start.strftime('%b %d')} - {week_end.strftime('%b %d')}",
+                    'count': len(invoices),
+                    'total': weekly_total,
+                    'formatted_total': formatLang(self.env, weekly_total, currency_obj=currency)
+                })
+                
+            elif self.type == 'purchase':
+                bills = self.env['account.move'].search([
+                    ('journal_id', '=', self.id),
+                    ('invoice_date', '>=', week_start),
+                    ('invoice_date', '<=', week_end),
+                    ('state', '!=', 'cancel'),
+                    ('move_type', '=', 'in_invoice')
+                ])
+                
+                weekly_total = sum(bills.mapped('amount_total'))
+                weekly_data.append({
+                    'week': f"W{week_start.isocalendar()[1]}",
+                    'period': f"{week_start.strftime('%b %d')} - {week_end.strftime('%b %d')}",
+                    'count': len(bills),
+                    'total': weekly_total,
+                    'formatted_total': formatLang(self.env, weekly_total, currency_obj=currency)
+                })
+        
+        return weekly_data
+    
+    def get_monthly_data(self, months=12):
+        """Get monthly aggregated data for charts"""
+        self.ensure_one()
+        
+        monthly_data = []
+        today = fields.Date.today()
+        currency = self.currency_id or self.company_id.currency_id
+        
+        for month_offset in range(months - 1, -1, -1):
+            month_date = today - relativedelta(months=month_offset)
+            month_start = month_date.replace(day=1)
+            month_end = month_start + relativedelta(months=1) - timedelta(days=1)
+            
+            if self.type == 'sale':
+                invoices = self.env['account.move'].search([
+                    ('journal_id', '=', self.id),
+                    ('invoice_date', '>=', month_start),
+                    ('invoice_date', '<=', month_end),
+                    ('state', '!=', 'cancel'),
+                    ('move_type', '=', 'out_invoice')
+                ])
+                
+                monthly_total = sum(invoices.mapped('amount_total'))
+                monthly_data.append({
+                    'month': month_date.strftime('%B %Y'),
+                    'month_short': month_date.strftime('%b'),
+                    'count': len(invoices),
+                    'total': monthly_total,
+                    'formatted_total': formatLang(self.env, monthly_total, currency_obj=currency),
+                    'avg_invoice': monthly_total / len(invoices) if invoices else 0
+                })
+                
+            elif self.type == 'purchase':
+                bills = self.env['account.move'].search([
+                    ('journal_id', '=', self.id),
+                    ('invoice_date', '>=', month_start),
+                    ('invoice_date', '<=', month_end),
+                    ('state', '!=', 'cancel'),
+                    ('move_type', '=', 'in_invoice')
+                ])
+                
+                monthly_total = sum(bills.mapped('amount_total'))
+                monthly_data.append({
+                    'month': month_date.strftime('%B %Y'),
+                    'month_short': month_date.strftime('%b'),
+                    'count': len(bills),
+                    'total': monthly_total,
+                    'formatted_total': formatLang(self.env, monthly_total, currency_obj=currency),
+                    'avg_bill': monthly_total / len(bills) if bills else 0
+                })
+        
+        return monthly_data
+    
+    @api.model
+    def get_dashboard_chart_data(self, journal_id, period='30'):
+        """API endpoint for fetching chart data with different periods"""
+        journal = self.browse(journal_id)
+        
+        if period == '7':
+            # Last 7 days
+            return journal._get_journal_dashboard_graph_data()
+        elif period == '30':
+            # Last 30 days (default)
+            return journal._get_journal_dashboard_graph_data()
+        elif period == '90':
+            # Weekly for last 3 months
+            weekly_data = journal.get_weekly_data(weeks=12)
+            return {
+                'values': [
+                    {
+                        'x': item['period'],
+                        'y': item['count'],
+                        'amount': item['total'],
+                        'label': f"{item['count']} - {item['formatted_total']}"
+                    }
+                    for item in weekly_data
+                ],
+                'period_type': 'weekly'
+            }
+        elif period == '365':
+            # Monthly for last year
+            monthly_data = journal.get_monthly_data(months=12)
+            return {
+                'values': [
+                    {
+                        'x': item['month_short'],
+                        'y': item['count'],
+                        'amount': item['total'],
+                        'label': f"{item['count']} - {item['formatted_total']}"
+                    }
+                    for item in monthly_data
+                ],
+                'period_type': 'monthly'
+            }
+        
+        return {'values': []}
+    
+    @api.model
+    def ensure_dashboard_journals(self):
+        """Ensure all journals show on dashboard and create missing ones if needed"""
+        company = self.env.company
+        
+        # Define required journal types with their properties
+        required_journals = [
+            {'name': 'Customer Invoices', 'code': 'SAL', 'type': 'sale'},
+            {'name': 'Vendor Bills', 'code': 'PUR', 'type': 'purchase'},
+            {'name': 'Bank', 'code': 'BNK1', 'type': 'bank'},
+            {'name': 'Cash', 'code': 'CSH1', 'type': 'cash'},
+            {'name': 'Miscellaneous Operations', 'code': 'MISC', 'type': 'general'},
+        ]
+        
+        for journal_data in required_journals:
+            # Try to find existing journal by type
+            existing = self.search([
+                ('type', '=', journal_data['type']),
+                ('company_id', '=', company.id)
+            ], limit=1)
+            
+            if existing:
+                # Update existing journal to show on dashboard
+                existing.write({'show_on_dashboard': True})
+            else:
+                # Create new journal if none exists
+                self.create({
+                    'name': journal_data['name'],
+                    'code': journal_data['code'],
+                    'type': journal_data['type'],
+                    'company_id': company.id,
+                    'show_on_dashboard': True,
+                })
+        
+        return True

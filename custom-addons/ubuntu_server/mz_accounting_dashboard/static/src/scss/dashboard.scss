@@ -1,0 +1,243 @@
+// ================================================
+// MZ Accounting Dashboard Styles
+// Replica of Odoo Enterprise Dashboard
+// ================================================
+
+.o_accounting_dashboard {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    padding: 24px;
+    
+    .o_kanban_record {
+        width: 380px;
+        height: 420px;
+        margin: 16px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        overflow: hidden;
+        display: inline-block;
+        vertical-align: top;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+    }
+    
+    // Customer Invoices Header (Purple gradient)
+    .o_kanban_card_header_sale {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        position: relative;
+        
+        &::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .o_kanban_card_header_title {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            
+            i {
+                opacity: 0.9;
+            }
+        }
+    }
+    
+    // Vendor Bills Header (Light purple)
+    .o_kanban_card_header_purchase {
+        background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+        padding: 20px;
+        border-bottom: 1px solid rgba(124, 58, 237, 0.1);
+        
+        .o_kanban_card_header_title {
+            color: #7c3aed;
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+    }
+    
+    // Default Header (Bank, Cash, Misc)
+    .o_kanban_card_header {
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        padding: 20px;
+        border-bottom: 1px solid #e2e8f0;
+        
+        .o_kanban_card_header_title {
+            color: #1e293b;
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+    }
+    
+    .o_kanban_card_content {
+        padding: 24px;
+        height: calc(100% - 80px);
+        display: flex;
+        flex-direction: column;
+        
+        // Primary buttons
+        .btn-primary, .btn-purple {
+            background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            
+            &:hover {
+                background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 100%);
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+            }
+        }
+        
+        .btn-lg {
+            padding: 16px 32px;
+            font-size: 16px;
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+            border: none;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .btn-link {
+            color: #7c3aed;
+            padding: 8px 0;
+            margin-right: 16px;
+            font-weight: 500;
+            text-decoration: none;
+            
+            &:hover {
+                color: #6d28d9;
+                text-decoration: underline;
+            }
+        }
+        
+        // Invoice Statistics
+        .invoice-stat {
+            padding: 8px;
+            
+            .stat-number {
+                font-size: 28px;
+                font-weight: 700;
+                line-height: 1;
+                margin-bottom: 4px;
+            }
+            
+            .stat-label {
+                font-size: 12px;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                color: #64748b;
+                margin-bottom: 2px;
+            }
+            
+            .stat-amount {
+                font-size: 14px;
+                font-weight: 500;
+            }
+        }
+    }
+    
+    // Drag and Drop Area
+    .o_kanban_drag_area {
+        border: 2px dashed #c8d3f0;
+        border-radius: 12px;
+        padding: 32px 24px;
+        margin: 16px 0;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        text-align: center;
+        transition: all 0.2s ease;
+        
+        &:hover {
+            border-color: #7c3aed;
+            background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+        }
+        
+        .drag-icon {
+            margin-bottom: 16px;
+            
+            i {
+                color: #7c3aed;
+            }
+        }
+        
+        .drag-text {
+            strong {
+                color: #1e293b;
+                font-size: 16px;
+            }
+            
+            small {
+                color: #64748b;
+                font-size: 12px;
+            }
+        }
+    }
+    
+    // Text Utilities
+    .text-decoration-underline {
+        text-decoration: underline !important;
+        color: #7c3aed;
+        
+        &:hover {
+            color: #6d28d9;
+        }
+    }
+    
+    // Bootstrap Grid Enhancements
+    .row {
+        margin-left: -8px;
+        margin-right: -8px;
+        
+        [class*="col-"] {
+            padding-left: 8px;
+            padding-right: 8px;
+        }
+    }
+    
+    // Border utilities
+    .border-top {
+        border-top: 1px solid #e2e8f0 !important;
+    }
+    
+    // Responsive Design
+    @media (max-width: 1200px) {
+        .o_kanban_record {
+            width: 340px;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        padding: 16px;
+        
+        .o_kanban_record {
+            width: 100%;
+            margin: 8px 0;
+        }
+    }
+}

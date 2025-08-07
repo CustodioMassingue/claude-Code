@@ -8,6 +8,264 @@
             <kanban class="o_kanban_dashboard o_account_kanban o_kanban_mobile" 
                     create="false" 
                     sample="0">
+                <!-- Add inline CSS for immediate styling -->
+                <style>
+                    .o_kanban_dashboard {
+                        background: linear-gradient(135deg, #f5f7fa 0%, #e8eaf6 100%) !important;
+                        min-height: 100vh;
+                        padding: 20px;
+                    }
+                    
+                    .o_kanban_dashboard .o_kanban_record {
+                        width: 380px !important;
+                        min-height: 420px !important;
+                        margin: 12px !important;
+                        background: white !important;
+                        border-radius: 12px !important;
+                        box-shadow: 0 4px 20px rgba(0,0,0,0.08) !important;
+                        overflow: hidden !important;
+                        transition: all 0.3s ease !important;
+                        border: none !important;
+                    }
+                    
+                    .o_kanban_dashboard .o_kanban_record:hover {
+                        transform: translateY(-3px) !important;
+                        box-shadow: 0 8px 30px rgba(0,0,0,0.15) !important;
+                    }
+                    
+                    .o_kanban_card_header {
+                        padding: 20px !important;
+                        position: relative !important;
+                        min-height: 80px !important;
+                    }
+                    
+                    /* Sales Journal - Purple Gradient */
+                    .journal_type_sale .o_kanban_card_header {
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+                        color: white !important;
+                    }
+                    
+                    .journal_type_sale .o_kanban_card_header .o_primary,
+                    .journal_type_sale .o_kanban_card_header .o_secondary {
+                        color: white !important;
+                    }
+                    
+                    /* Purchase Journal - Light Purple */
+                    .journal_type_purchase .o_kanban_card_header {
+                        background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%) !important;
+                        color: white !important;
+                    }
+                    
+                    .journal_type_purchase .o_kanban_card_header .o_primary,
+                    .journal_type_purchase .o_kanban_card_header .o_secondary {
+                        color: white !important;
+                    }
+                    
+                    /* Bank Journal - Blue Gradient */
+                    .journal_type_bank .o_kanban_card_header {
+                        background: linear-gradient(135deg, #667eea 0%, #4299e1 100%) !important;
+                        color: white !important;
+                    }
+                    
+                    .journal_type_bank .o_kanban_card_header .o_primary,
+                    .journal_type_bank .o_kanban_card_header .o_secondary {
+                        color: white !important;
+                    }
+                    
+                    /* Cash Journal - Green Gradient */
+                    .journal_type_cash .o_kanban_card_header {
+                        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%) !important;
+                        color: white !important;
+                    }
+                    
+                    .journal_type_cash .o_kanban_card_header .o_primary,
+                    .journal_type_cash .o_kanban_card_header .o_secondary {
+                        color: white !important;
+                    }
+                    
+                    /* General Journal - Gray Gradient */
+                    .journal_type_general .o_kanban_card_header {
+                        background: linear-gradient(135deg, #718096 0%, #4a5568 100%) !important;
+                        color: white !important;
+                    }
+                    
+                    .journal_type_general .o_kanban_card_header .o_primary,
+                    .journal_type_general .o_kanban_card_header .o_secondary {
+                        color: white !important;
+                    }
+                    
+                    .o_kanban_card_header_title {
+                        display: flex !important;
+                        justify-content: space-between !important;
+                        align-items: center !important;
+                        width: 100% !important;
+                    }
+                    
+                    .o_kanban_card_header_title .o_primary {
+                        font-size: 18px !important;
+                        font-weight: 600 !important;
+                        letter-spacing: 0.5px !important;
+                    }
+                    
+                    .o_kanban_card_header_title .o_secondary {
+                        font-size: 12px !important;
+                        opacity: 0.9 !important;
+                        margin-top: 4px !important;
+                    }
+                    
+                    .o_kanban_manage_button_section {
+                        position: absolute !important;
+                        right: 16px !important;
+                        top: 20px !important;
+                    }
+                    
+                    .o_kanban_manage_toggle_button {
+                        color: white !important;
+                        opacity: 0.8 !important;
+                        font-size: 18px !important;
+                    }
+                    
+                    .o_kanban_manage_toggle_button:hover {
+                        opacity: 1 !important;
+                    }
+                    
+                    .o_kanban_card_content {
+                        padding: 24px !important;
+                        background: white !important;
+                    }
+                    
+                    .o_kanban_card_content .row {
+                        margin-bottom: 12px !important;
+                        align-items: center !important;
+                    }
+                    
+                    .o_kanban_card_content .btn-link {
+                        color: #667eea !important;
+                        font-weight: 500 !important;
+                        text-decoration: none !important;
+                        transition: all 0.2s ease !important;
+                    }
+                    
+                    .o_kanban_card_content .btn-link:hover {
+                        color: #764ba2 !important;
+                        text-decoration: underline !important;
+                    }
+                    
+                    .stat-box {
+                        background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%) !important;
+                        border-radius: 8px !important;
+                        padding: 16px !important;
+                        margin-bottom: 12px !important;
+                        border: 1px solid #e2e8f0 !important;
+                    }
+                    
+                    .stat-number {
+                        font-size: 28px !important;
+                        font-weight: 700 !important;
+                        color: #2d3748 !important;
+                        line-height: 1 !important;
+                    }
+                    
+                    .stat-label {
+                        font-size: 12px !important;
+                        font-weight: 600 !important;
+                        text-transform: uppercase !important;
+                        color: #718096 !important;
+                        letter-spacing: 0.5px !important;
+                        margin-top: 4px !important;
+                    }
+                    
+                    .badge {
+                        padding: 4px 12px !important;
+                        font-size: 12px !important;
+                        font-weight: 600 !important;
+                        border-radius: 12px !important;
+                    }
+                    
+                    .text-bg-warning {
+                        background: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%) !important;
+                        color: white !important;
+                    }
+                    
+                    .text-bg-info {
+                        background: linear-gradient(135deg, #63b3ed 0%, #4299e1 100%) !important;
+                        color: white !important;
+                    }
+                    
+                    .text-bg-danger {
+                        background: linear-gradient(135deg, #fc8181 0%, #f56565 100%) !important;
+                        color: white !important;
+                    }
+                    
+                    .text-bg-success {
+                        background: linear-gradient(135deg, #68d391 0%, #48bb78 100%) !important;
+                        color: white !important;
+                    }
+                    
+                    .o_kanban_graph_section {
+                        margin-top: 20px !important;
+                        padding-top: 20px !important;
+                        border-top: 1px solid #e2e8f0 !important;
+                        min-height: 120px !important;
+                        background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%) !important;
+                        border-radius: 8px !important;
+                        padding: 16px !important;
+                    }
+                    
+                    .balance-display {
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+                        color: white !important;
+                        border-radius: 12px !important;
+                        padding: 20px !important;
+                        text-align: center !important;
+                        margin-bottom: 20px !important;
+                        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3) !important;
+                    }
+                    
+                    .balance-amount {
+                        font-size: 32px !important;
+                        font-weight: 700 !important;
+                        margin-bottom: 4px !important;
+                    }
+                    
+                    .balance-label {
+                        font-size: 14px !important;
+                        opacity: 0.9 !important;
+                        text-transform: uppercase !important;
+                        letter-spacing: 1px !important;
+                    }
+                    
+                    .action-buttons {
+                        display: flex !important;
+                        gap: 12px !important;
+                        margin-top: 20px !important;
+                    }
+                    
+                    .btn-primary-custom {
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+                        color: white !important;
+                        border: none !important;
+                        padding: 12px 24px !important;
+                        border-radius: 8px !important;
+                        font-weight: 600 !important;
+                        transition: all 0.3s ease !important;
+                        text-align: center !important;
+                        flex: 1 !important;
+                    }
+                    
+                    .btn-primary-custom:hover {
+                        transform: translateY(-2px) !important;
+                        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4) !important;
+                    }
+                    
+                    @media (max-width: 768px) {
+                        .o_kanban_dashboard .o_kanban_record {
+                            width: 100% !important;
+                            margin: 8px 0 !important;
+                        }
+                    }
+                </style>
+                
                 <field name="id"/>
                 <field name="name"/>
                 <field name="type"/>
@@ -20,19 +278,22 @@
                 
                 <templates>
                     <t t-name="card">
-                        <div t-attf-class="#{kanban_color(record.color.raw_value)} oe_kanban_global_click">
+                        <div t-attf-class="#{kanban_color(record.color.raw_value)} oe_kanban_global_click journal_type_#{record.type.raw_value}">
                             <t t-set="dashboard" t-value="record.kanban_dashboard.raw_value ? JSON.parse(record.kanban_dashboard.raw_value) : {}"/>
                             
-                            <!-- Card Header -->
+                            <!-- Card Header with Gradient -->
                             <div class="o_kanban_card_header">
                                 <div class="o_kanban_card_header_title">
                                     <div class="o_primary">
+                                        <i t-if="record.type.raw_value == 'sale'" class="fa fa-file-text-o me-2"/>
+                                        <i t-if="record.type.raw_value == 'purchase'" class="fa fa-file-o me-2"/>
+                                        <i t-if="record.type.raw_value == 'bank'" class="fa fa-university me-2"/>
+                                        <i t-if="record.type.raw_value == 'cash'" class="fa fa-money me-2"/>
+                                        <i t-if="record.type.raw_value == 'general'" class="fa fa-book me-2"/>
                                         <strong><field name="name"/></strong>
-                                    </div>
-                                    <div class="o_secondary">
-                                        <span t-if="dashboard.bank_account" class="text-muted small">
+                                        <div class="o_secondary" t-if="dashboard.bank_account">
                                             <t t-esc="dashboard.bank_account"/>
-                                        </span>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="o_kanban_manage_button_section">
@@ -42,251 +303,261 @@
                                 </div>
                             </div>
                             
-                            <!-- Card Content based on Journal Type -->
+                            <!-- Card Content with Professional Styling -->
                             <div class="container o_kanban_card_content">
                                 
-                                <!-- Sales Journal -->
+                                <!-- Sales Journal - Customer Invoices -->
                                 <t t-if="record.type.raw_value == 'sale'">
-                                    <div class="row mb-2" t-if="dashboard.number_draft">
+                                    <div class="row">
                                         <div class="col-6">
-                                            <button class="btn btn-link p-0 text-start" name="action_view_all" type="object">
-                                                <span t-esc="dashboard.number_draft"/> Draft
-                                            </button>
+                                            <div class="stat-box text-center">
+                                                <div class="stat-number text-primary">
+                                                    <t t-esc="dashboard.number_draft or 0"/>
+                                                </div>
+                                                <div class="stat-label">Draft</div>
+                                                <div class="text-muted small">
+                                                    <t t-esc="dashboard.sum_draft or '$0.00'"/>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="col-6 text-end">
-                                            <span class="text-muted" t-esc="dashboard.sum_draft"/>
+                                        <div class="col-6">
+                                            <div class="stat-box text-center">
+                                                <div class="stat-number text-warning">
+                                                    <t t-esc="dashboard.number_to_send or 0"/>
+                                                </div>
+                                                <div class="stat-label">To Send</div>
+                                                <div class="text-muted small">
+                                                    <t t-esc="dashboard.sum_to_send or '$0.00'"/>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     
-                                    <div class="row mb-2" t-if="dashboard.number_to_send">
+                                    <div class="row mt-2">
                                         <div class="col-6">
-                                            <button class="btn btn-link p-0 text-start text-warning" name="action_view_all" type="object">
-                                                <span t-esc="dashboard.number_to_send"/> To Send
-                                            </button>
+                                            <div class="stat-box text-center">
+                                                <div class="stat-number text-danger">
+                                                    <t t-esc="dashboard.number_overdue or 0"/>
+                                                </div>
+                                                <div class="stat-label">Overdue</div>
+                                                <div class="text-danger small">
+                                                    <t t-esc="dashboard.sum_overdue or '$0.00'"/>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="col-6 text-end">
-                                            <span class="text-muted" t-esc="dashboard.sum_to_send"/>
+                                        <div class="col-6">
+                                            <div class="stat-box text-center">
+                                                <div class="stat-number text-info">
+                                                    <t t-esc="dashboard.number_to_check or 0"/>
+                                                </div>
+                                                <div class="stat-label">To Check</div>
+                                                <div class="text-muted small">
+                                                    <t t-esc="dashboard.sum_to_check or '$0.00'"/>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     
-                                    <div class="row mb-2" t-if="dashboard.number_overdue">
-                                        <div class="col-6">
-                                            <button class="btn btn-link p-0 text-start text-danger" name="action_view_all" type="object">
-                                                <span t-esc="dashboard.number_overdue"/> Overdue
-                                            </button>
-                                        </div>
-                                        <div class="col-6 text-end">
-                                            <span class="text-danger" t-esc="dashboard.sum_overdue"/>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="row mb-2" t-if="dashboard.number_to_check">
-                                        <div class="col-6">
-                                            <button class="btn btn-link p-0 text-start text-info" name="action_view_all" type="object">
-                                                <span t-esc="dashboard.number_to_check"/> To Check
-                                            </button>
-                                        </div>
-                                        <div class="col-6 text-end">
-                                            <span class="text-muted" t-esc="dashboard.sum_to_check"/>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="row mt-3 border-top pt-2">
-                                        <div class="col-12">
-                                            <small class="text-muted">This Month: <strong t-esc="dashboard.this_month_total"/></small>
-                                        </div>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-primary-custom" name="action_create_new" type="object">
+                                            <i class="fa fa-plus me-2"/> New Invoice
+                                        </button>
                                     </div>
                                 </t>
                                 
-                                <!-- Purchase Journal -->
+                                <!-- Purchase Journal - Vendor Bills -->
                                 <t t-if="record.type.raw_value == 'purchase'">
-                                    <div class="row mb-2" t-if="dashboard.number_draft">
+                                    <div class="row">
                                         <div class="col-6">
-                                            <button class="btn btn-link p-0 text-start" name="action_view_all" type="object">
-                                                <span t-esc="dashboard.number_draft"/> Draft
-                                            </button>
+                                            <div class="stat-box text-center">
+                                                <div class="stat-number text-primary">
+                                                    <t t-esc="dashboard.number_draft or 0"/>
+                                                </div>
+                                                <div class="stat-label">Draft</div>
+                                                <div class="text-muted small">
+                                                    <t t-esc="dashboard.sum_draft or '$0.00'"/>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="col-6 text-end">
-                                            <span class="text-muted" t-esc="dashboard.sum_draft"/>
+                                        <div class="col-6">
+                                            <div class="stat-box text-center">
+                                                <div class="stat-number text-warning">
+                                                    <t t-esc="dashboard.number_to_pay or 0"/>
+                                                </div>
+                                                <div class="stat-label">To Pay</div>
+                                                <div class="text-warning small">
+                                                    <t t-esc="dashboard.sum_to_pay or '$0.00'"/>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     
-                                    <div class="row mb-2" t-if="dashboard.number_to_pay">
+                                    <div class="row mt-2">
                                         <div class="col-6">
-                                            <button class="btn btn-link p-0 text-start text-warning" name="action_view_all" type="object">
-                                                <span t-esc="dashboard.number_to_pay"/> To Pay
-                                            </button>
+                                            <div class="stat-box text-center">
+                                                <div class="stat-number text-danger">
+                                                    <t t-esc="dashboard.number_late or 0"/>
+                                                </div>
+                                                <div class="stat-label">Late</div>
+                                                <div class="text-danger small">
+                                                    <t t-esc="dashboard.sum_late or '$0.00'"/>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="col-6 text-end">
-                                            <span class="text-warning" t-esc="dashboard.sum_to_pay"/>
+                                        <div class="col-6">
+                                            <div class="stat-box text-center">
+                                                <div class="stat-number text-info">
+                                                    <t t-esc="dashboard.number_to_approve or 0"/>
+                                                </div>
+                                                <div class="stat-label">To Approve</div>
+                                                <div class="text-muted small">
+                                                    <t t-esc="dashboard.sum_to_approve or '$0.00'"/>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     
-                                    <div class="row mb-2" t-if="dashboard.number_late">
-                                        <div class="col-6">
-                                            <button class="btn btn-link p-0 text-start text-danger" name="action_view_all" type="object">
-                                                <span t-esc="dashboard.number_late"/> Late
-                                            </button>
-                                        </div>
-                                        <div class="col-6 text-end">
-                                            <span class="text-danger" t-esc="dashboard.sum_late"/>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="row mb-2" t-if="dashboard.number_to_approve">
-                                        <div class="col-6">
-                                            <button class="btn btn-link p-0 text-start text-info" name="action_view_all" type="object">
-                                                <span t-esc="dashboard.number_to_approve"/> To Approve
-                                            </button>
-                                        </div>
-                                        <div class="col-6 text-end">
-                                            <span class="text-muted" t-esc="dashboard.sum_to_approve"/>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="row mt-3 border-top pt-2">
-                                        <div class="col-12">
-                                            <small class="text-muted">This Month: <strong t-esc="dashboard.this_month_total"/></small>
-                                        </div>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-primary-custom" name="action_create_new" type="object">
+                                            <i class="fa fa-plus me-2"/> New Bill
+                                        </button>
+                                        <button class="btn btn-primary-custom" name="action_upload_document" type="object">
+                                            <i class="fa fa-upload me-2"/> Upload
+                                        </button>
                                     </div>
                                 </t>
                                 
                                 <!-- Bank Journal -->
                                 <t t-if="record.type.raw_value == 'bank'">
-                                    <div class="row mb-3">
-                                        <div class="col-12 text-center">
-                                            <h4 class="mb-0">
-                                                <strong t-esc="dashboard.balance"/>
-                                            </h4>
-                                            <small class="text-muted">Current Balance</small>
+                                    <div class="balance-display">
+                                        <div class="balance-amount">
+                                            <t t-esc="dashboard.balance or '$0.00'"/>
+                                        </div>
+                                        <div class="balance-label">Current Balance</div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-12 mb-3">
+                                            <div class="d-flex justify-content-between align-items-center p-2 border rounded">
+                                                <span class="text-muted small">Last Sync:</span>
+                                                <span class="small"><t t-esc="dashboard.last_sync or 'Never'"/></span>
+                                            </div>
                                         </div>
                                     </div>
                                     
-                                    <div class="row mb-2">
-                                        <div class="col-6">
-                                            <small class="text-muted">Last Sync:</small>
-                                        </div>
-                                        <div class="col-6 text-end">
-                                            <small t-esc="dashboard.last_sync"/>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="row mb-2" t-if="dashboard.to_reconcile">
-                                        <div class="col-6">
-                                            <button class="btn btn-link p-0 text-start text-warning" name="action_open_reconcile" type="object">
-                                                To Reconcile
-                                            </button>
-                                        </div>
-                                        <div class="col-6 text-end">
-                                            <span class="badge rounded-pill text-bg-warning" t-esc="dashboard.to_reconcile"/>
+                                    <div class="row" t-if="dashboard.to_reconcile">
+                                        <div class="col-12">
+                                            <div class="alert alert-warning d-flex justify-content-between align-items-center p-2">
+                                                <span class="fw-bold">To Reconcile</span>
+                                                <span class="badge text-bg-warning">
+                                                    <t t-esc="dashboard.to_reconcile"/>
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                     
-                                    <div class="row mb-2" t-if="dashboard.outstanding_receipts_count">
-                                        <div class="col-6">
-                                            <small class="text-success">Outstanding Receipts</small>
-                                        </div>
-                                        <div class="col-6 text-end">
-                                            <small class="text-success" t-esc="dashboard.outstanding_receipts_total"/>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="row mb-2" t-if="dashboard.outstanding_payments_count">
-                                        <div class="col-6">
-                                            <small class="text-danger">Outstanding Payments</small>
-                                        </div>
-                                        <div class="col-6 text-end">
-                                            <small class="text-danger" t-esc="dashboard.outstanding_payments_total"/>
-                                        </div>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-primary-custom" name="action_open_reconcile" type="object">
+                                            <i class="fa fa-exchange me-2"/> Reconcile
+                                        </button>
+                                        <button class="btn btn-primary-custom" name="action_view_all" type="object">
+                                            <i class="fa fa-download me-2"/> Import
+                                        </button>
                                     </div>
                                 </t>
                                 
                                 <!-- Cash Journal -->
                                 <t t-if="record.type.raw_value == 'cash'">
-                                    <div class="row mb-3">
-                                        <div class="col-12 text-center">
-                                            <h4 class="mb-0">
-                                                <strong t-esc="dashboard.balance"/>
-                                            </h4>
-                                            <small class="text-muted">Current Balance</small>
+                                    <div class="balance-display" style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%) !important;">
+                                        <div class="balance-amount">
+                                            <t t-esc="dashboard.balance or '$0.00'"/>
+                                        </div>
+                                        <div class="balance-label">Cash Balance</div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <div class="stat-box text-center">
+                                                <div class="stat-number text-success">
+                                                    <t t-esc="dashboard.cash_in_today or '$0.00'"/>
+                                                </div>
+                                                <div class="stat-label">Cash In</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="stat-box text-center">
+                                                <div class="stat-number text-danger">
+                                                    <t t-esc="dashboard.cash_out_today or '$0.00'"/>
+                                                </div>
+                                                <div class="stat-label">Cash Out</div>
+                                            </div>
                                         </div>
                                     </div>
                                     
-                                    <div class="row mb-2">
-                                        <div class="col-6">
-                                            <small class="text-success">Cash In Today</small>
-                                        </div>
-                                        <div class="col-6 text-end">
-                                            <small class="text-success" t-esc="dashboard.cash_in_today"/>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="row mb-2">
-                                        <div class="col-6">
-                                            <small class="text-danger">Cash Out Today</small>
-                                        </div>
-                                        <div class="col-6 text-end">
-                                            <small class="text-danger" t-esc="dashboard.cash_out_today"/>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="row mb-2" t-if="dashboard.number_draft">
-                                        <div class="col-6">
-                                            <button class="btn btn-link p-0 text-start" name="action_view_all" type="object">
-                                                <span t-esc="dashboard.number_draft"/> Pending
-                                            </button>
-                                        </div>
-                                        <div class="col-6 text-end">
-                                            <span class="badge rounded-pill text-bg-secondary" t-esc="dashboard.today_transactions"/> Today
-                                        </div>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-primary-custom" style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%) !important;" name="action_create_new" type="object">
+                                            <i class="fa fa-plus me-2"/> New Transaction
+                                        </button>
                                     </div>
                                 </t>
                                 
                                 <!-- General Journal -->
                                 <t t-if="record.type.raw_value == 'general'">
-                                    <div class="row mb-2">
-                                        <div class="col-6">
-                                            <button class="btn btn-link p-0 text-start" name="action_view_entries" type="object">
-                                                <span t-esc="dashboard.number_draft or 0"/> Draft Entries
-                                            </button>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="stat-box text-center">
+                                                <div class="stat-number">
+                                                    <t t-esc="dashboard.number_draft or 0"/>
+                                                </div>
+                                                <div class="stat-label">Draft Entries</div>
+                                            </div>
                                         </div>
                                     </div>
                                     
-                                    <div class="row mb-2">
-                                        <div class="col-6">
-                                            <span class="text-muted">Posted This Month</span>
-                                        </div>
-                                        <div class="col-6 text-end">
-                                            <strong t-esc="dashboard.entries_this_month or 0"/>
+                                    <div class="row mt-3">
+                                        <div class="col-12">
+                                            <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded">
+                                                <span class="fw-bold">Posted This Month</span>
+                                                <span class="badge text-bg-info">
+                                                    <t t-esc="dashboard.entries_this_month or 0"/>
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                     
-                                    <div class="row mb-2" t-if="dashboard.number_to_review">
-                                        <div class="col-6">
-                                            <button class="btn btn-link p-0 text-start text-info" name="action_view_entries" type="object">
-                                                To Review
-                                            </button>
+                                    <div class="row mt-2" t-if="dashboard.number_to_review">
+                                        <div class="col-12">
+                                            <div class="alert alert-info d-flex justify-content-between align-items-center p-2">
+                                                <span>To Review</span>
+                                                <span class="badge text-bg-info">
+                                                    <t t-esc="dashboard.number_to_review"/>
+                                                </span>
+                                            </div>
                                         </div>
-                                        <div class="col-6 text-end">
-                                            <span class="badge rounded-pill text-bg-info" t-esc="dashboard.number_to_review"/>
-                                        </div>
+                                    </div>
+                                    
+                                    <div class="action-buttons">
+                                        <button class="btn btn-primary-custom" style="background: linear-gradient(135deg, #718096 0%, #4a5568 100%) !important;" name="action_create_new" type="object">
+                                            <i class="fa fa-plus me-2"/> New Entry
+                                        </button>
                                     </div>
                                 </t>
                                 
-                                <!-- Graph placeholder for sales/purchase journals -->
-                                <t t-if="record.type.raw_value in ['sale', 'purchase']">
-                                    <div class="o_kanban_graph_section mt-3 pt-3 border-top">
+                                <!-- Graph Section -->
+                                <t t-if="record.type.raw_value in ['sale', 'purchase', 'bank', 'cash']">
+                                    <div class="o_kanban_graph_section">
                                         <field name="kanban_dashboard_graph" widget="mz_dashboard_graph"/>
                                     </div>
                                 </t>
                             </div>
                             
-                            <!-- Card Footer Actions -->
+                            <!-- Card Footer Actions (Dropdown Menu) -->
                             <div class="o_kanban_card_manage_pane dropdown-menu" role="menu">
                                 <div class="o_kanban_card_manage_section o_kanban_manage_view">
-                                    <h5>View</h5>
+                                    <h5 class="text-muted">View</h5>
                                     <div>
-                                        <a name="action_view_all" type="object">
+                                        <a name="action_view_all" type="object" class="dropdown-item">
+                                            <i class="fa fa-eye me-2"/>
                                             <t t-if="record.type.raw_value == 'sale'">Customer Invoices</t>
                                             <t t-elif="record.type.raw_value == 'purchase'">Vendor Bills</t>
                                             <t t-elif="record.type.raw_value == 'bank'">Bank Transactions</t>
@@ -295,16 +566,17 @@
                                         </a>
                                     </div>
                                     <div t-if="record.type.raw_value in ['sale', 'purchase']">
-                                        <a name="action_view_all" type="object" context="{'search_default_draft': 1}">
-                                            Draft Entries
+                                        <a name="action_view_all" type="object" context="{'search_default_draft': 1}" class="dropdown-item">
+                                            <i class="fa fa-file-o me-2"/> Draft Entries
                                         </a>
                                     </div>
                                 </div>
                                 
                                 <div class="o_kanban_card_manage_section o_kanban_manage_new">
-                                    <h5>New</h5>
+                                    <h5 class="text-muted">New</h5>
                                     <div>
-                                        <a name="action_create_new" type="object">
+                                        <a name="action_create_new" type="object" class="dropdown-item">
+                                            <i class="fa fa-plus me-2"/>
                                             <t t-if="record.type.raw_value == 'sale'">Invoice</t>
                                             <t t-elif="record.type.raw_value == 'purchase'">Bill</t>
                                             <t t-elif="record.type.raw_value in ['bank', 'cash']">Payment</t>
@@ -312,31 +584,37 @@
                                         </a>
                                     </div>
                                     <div t-if="record.type.raw_value == 'sale'">
-                                        <a name="action_create_new" type="object" context="{'default_move_type': 'out_refund'}">
-                                            Credit Note
+                                        <a name="action_create_new" type="object" context="{'default_move_type': 'out_refund'}" class="dropdown-item">
+                                            <i class="fa fa-undo me-2"/> Credit Note
                                         </a>
                                     </div>
                                     <div t-if="record.type.raw_value == 'purchase'">
-                                        <a name="action_upload_document" type="object">
-                                            Upload Document
+                                        <a name="action_upload_document" type="object" class="dropdown-item">
+                                            <i class="fa fa-upload me-2"/> Upload Document
                                         </a>
                                     </div>
                                 </div>
                                 
                                 <div class="o_kanban_card_manage_section o_kanban_manage_operations" t-if="record.type.raw_value in ['bank', 'cash']">
-                                    <h5>Operations</h5>
+                                    <h5 class="text-muted">Operations</h5>
                                     <div>
-                                        <a name="action_open_reconcile" type="object">Reconcile</a>
+                                        <a name="action_open_reconcile" type="object" class="dropdown-item">
+                                            <i class="fa fa-exchange me-2"/> Reconcile
+                                        </a>
                                     </div>
                                     <div t-if="record.type.raw_value == 'bank'">
-                                        <a name="action_view_all" type="object">Import Statement</a>
+                                        <a name="action_view_all" type="object" class="dropdown-item">
+                                            <i class="fa fa-download me-2"/> Import Statement
+                                        </a>
                                     </div>
                                 </div>
                                 
                                 <div class="o_kanban_card_manage_section o_kanban_manage_settings">
-                                    <h5>Configuration</h5>
+                                    <h5 class="text-muted">Configuration</h5>
                                     <div>
-                                        <a name="action_configure_journal" type="object">Journal Settings</a>
+                                        <a name="action_configure_journal" type="object" class="dropdown-item">
+                                            <i class="fa fa-cog me-2"/> Journal Settings
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -355,13 +633,13 @@
             <search string="Journals">
                 <field name="name" string="Journal"/>
                 <field name="type"/>
-                <filter string="Sales" name="sales" domain="[('type', '=', 'sale')]"/>
-                <filter string="Purchases" name="purchases" domain="[('type', '=', 'purchase')]"/>
-                <filter string="Bank" name="bank" domain="[('type', '=', 'bank')]"/>
-                <filter string="Cash" name="cash" domain="[('type', '=', 'cash')]"/>
-                <filter string="Miscellaneous" name="general" domain="[('type', '=', 'general')]"/>
+                <filter string="Sales" name="sales" domain="[('type', '=', 'sale')]" icon="fa-file-text-o"/>
+                <filter string="Purchases" name="purchases" domain="[('type', '=', 'purchase')]" icon="fa-file-o"/>
+                <filter string="Bank" name="bank" domain="[('type', '=', 'bank')]" icon="fa-university"/>
+                <filter string="Cash" name="cash" domain="[('type', '=', 'cash')]" icon="fa-money"/>
+                <filter string="Miscellaneous" name="general" domain="[('type', '=', 'general')]" icon="fa-book"/>
                 <separator/>
-                <filter string="Favorited" name="favorites" domain="[('show_on_dashboard', '=', True)]"/>
+                <filter string="Favorited" name="favorites" domain="[('show_on_dashboard', '=', True)]" icon="fa-star"/>
                 <group expand="0" string="Group By">
                     <filter string="Type" name="group_by_type" domain="[]" context="{'group_by': 'type'}"/>
                     <filter string="Company" name="group_by_company" domain="[]" context="{'group_by': 'company_id'}" groups="base.group_multi_company"/>
@@ -370,22 +648,28 @@
         </field>
     </record>
     
-    <!-- Dashboard Action - Simple Version -->
+    <!-- Dashboard Action - Professional Version -->
     <record id="action_mz_dashboard_simple" model="ir.actions.act_window">
-        <field name="name">MZ Dashboard</field>
+        <field name="name">Accounting Dashboard</field>
         <field name="res_model">account.journal</field>
         <field name="view_mode">kanban,list,form</field>
         <field name="view_id" ref="account_journal_dashboard_kanban_view"/>
         <field name="search_view_id" ref="view_account_journal_dashboard_search"/>
         <field name="domain">[('show_on_dashboard', '=', True)]</field>
-        <field name="context">{'search_default_favorites': 1}</field>
+        <field name="context">{'search_default_favorites': 1, 'dashboard_view': True}</field>
         <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                No accounting journals found
-            </p>
-            <p>
-                Create journals in the configuration menu to start managing your accounting.
-            </p>
+            <div class="text-center p-5">
+                <h2 class="mb-3">
+                    <i class="fa fa-tachometer fa-2x text-primary"></i>
+                </h2>
+                <h3 class="text-muted">No accounting journals configured yet!</h3>
+                <p class="mt-3">
+                    Create journals in the configuration menu to start managing your accounting.
+                </p>
+                <a class="btn btn-primary btn-lg mt-3" href="#">
+                    <i class="fa fa-plus me-2"></i> Configure Journals
+                </a>
+            </div>
         </field>
     </record>
     

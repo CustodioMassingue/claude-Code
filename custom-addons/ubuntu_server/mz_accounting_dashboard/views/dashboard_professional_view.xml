@@ -1,0 +1,422 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Professional Dashboard Kanban View - Odoo Enterprise Style -->
+    <record id="account_journal_dashboard_professional_kanban" model="ir.ui.view">
+        <field name="name">account.journal.dashboard.professional.kanban</field>
+        <field name="model">account.journal</field>
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_dashboard o_mz_professional_dashboard o_kanban_mobile" 
+                    create="false" 
+                    sample="0">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="type"/>
+                <field name="color"/>
+                <field name="kanban_dashboard"/>
+                <field name="kanban_dashboard_graph"/>
+                <field name="show_on_dashboard"/>
+                <field name="currency_id"/>
+                <field name="company_id"/>
+                
+                <templates>
+                    <t t-name="card">
+                        <div t-attf-class="#{kanban_color(record.color.raw_value)} oe_kanban_global_click">
+                            <t t-set="dashboard" t-value="record.kanban_dashboard.raw_value ? JSON.parse(record.kanban_dashboard.raw_value) : {}"/>
+                            <t t-set="graph_data" t-value="record.kanban_dashboard_graph.raw_value ? JSON.parse(record.kanban_dashboard_graph.raw_value) : {}"/>
+                            
+                            <!-- Card Header with Gradient -->
+                            <div class="o_kanban_card_header">
+                                <div class="o_kanban_card_header_title">
+                                    <div class="o_primary">
+                                        <t t-if="record.type.raw_value == 'sale'">
+                                            <i class="fa fa-file-invoice-dollar me-2"/> Customer Invoices
+                                        </t>
+                                        <t t-elif="record.type.raw_value == 'purchase'">
+                                            <i class="fa fa-file-invoice me-2"/> Vendor Bills
+                                        </t>
+                                        <t t-elif="record.type.raw_value == 'bank'">
+                                            <i class="fa fa-university me-2"/> <t t-esc="record.name.value"/>
+                                        </t>
+                                        <t t-elif="record.type.raw_value == 'cash'">
+                                            <i class="fa fa-money-bill-wave me-2"/> <t t-esc="record.name.value"/>
+                                        </t>
+                                        <t t-else="">
+                                            <i class="fa fa-book me-2"/> <t t-esc="record.name.value"/>
+                                        </t>
+                                    </div>
+                                    <div class="o_secondary" t-if="dashboard.bank_account">
+                                        <span class="text-muted small">
+                                            <i class="fa fa-credit-card me-1"/>
+                                            <t t-esc="dashboard.bank_account"/>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_manage_button_section">
+                                    <a class="o_kanban_manage_toggle_button" href="#">
+                                        <i class="fa fa-ellipsis-v" aria-label="Manage" title="Manage"/>
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <!-- Card Content based on Journal Type -->
+                            <div class="o_kanban_card_content">
+                                
+                                <!-- Customer Invoices Dashboard -->
+                                <t t-if="record.type.raw_value == 'sale'">
+                                    <div class="stat-row" t-if="dashboard.number_draft">
+                                        <div class="stat-label">
+                                            <div class="stat-icon icon-draft">
+                                                <i class="fa fa-pencil-alt"/>
+                                            </div>
+                                            <button class="btn btn-link p-0 stat-text" name="action_view_all" type="object">
+                                                <span class="stat-count" t-esc="dashboard.number_draft"/> Draft
+                                            </button>
+                                        </div>
+                                        <div class="stat-value">
+                                            <span class="amount text-muted" t-esc="dashboard.sum_draft"/>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="stat-row" t-if="dashboard.number_to_send">
+                                        <div class="stat-label">
+                                            <div class="stat-icon icon-warning">
+                                                <i class="fa fa-paper-plane"/>
+                                            </div>
+                                            <button class="btn btn-link p-0 stat-text" name="action_view_all" type="object">
+                                                <span class="stat-count" t-esc="dashboard.number_to_send"/> To Send
+                                            </button>
+                                        </div>
+                                        <div class="stat-value">
+                                            <span class="amount text-warning" t-esc="dashboard.sum_to_send"/>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="stat-row" t-if="dashboard.number_overdue">
+                                        <div class="stat-label">
+                                            <div class="stat-icon icon-danger">
+                                                <i class="fa fa-exclamation-triangle"/>
+                                            </div>
+                                            <button class="btn btn-link p-0 stat-text" name="action_view_all" type="object">
+                                                <span class="stat-count" t-esc="dashboard.number_overdue"/> Overdue
+                                            </button>
+                                        </div>
+                                        <div class="stat-value">
+                                            <span class="amount text-danger" t-esc="dashboard.sum_overdue"/>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="summary-section">
+                                        <div class="summary-item">
+                                            <span class="summary-label">This Month</span>
+                                            <span class="summary-value" t-esc="dashboard.this_month_total"/>
+                                        </div>
+                                        <div class="summary-item">
+                                            <span class="summary-label">Last Month</span>
+                                            <span class="summary-value" t-esc="dashboard.last_month_total"/>
+                                        </div>
+                                    </div>
+                                </t>
+                                
+                                <!-- Vendor Bills Dashboard with Upload -->
+                                <t t-if="record.type.raw_value == 'purchase'">
+                                    <!-- Upload Area -->
+                                    <div class="upload-area" t-attf-data-journal-id="#{record.id.raw_value}">
+                                        <div class="upload-icon">
+                                            <i class="fa fa-cloud-upload-alt"/>
+                                        </div>
+                                        <div class="upload-text">
+                                            <strong>Drop files here</strong> or click to upload
+                                        </div>
+                                        <div class="upload-hint">
+                                            PDF, images (max 10MB)
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="stat-row" t-if="dashboard.number_draft">
+                                        <div class="stat-label">
+                                            <div class="stat-icon icon-draft">
+                                                <i class="fa fa-pencil-alt"/>
+                                            </div>
+                                            <button class="btn btn-link p-0 stat-text" name="action_view_all" type="object">
+                                                <span class="stat-count" t-esc="dashboard.number_draft"/> Draft
+                                            </button>
+                                        </div>
+                                        <div class="stat-value">
+                                            <span class="amount text-muted" t-esc="dashboard.sum_draft"/>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="stat-row" t-if="dashboard.number_to_pay">
+                                        <div class="stat-label">
+                                            <div class="stat-icon icon-warning">
+                                                <i class="fa fa-clock"/>
+                                            </div>
+                                            <button class="btn btn-link p-0 stat-text" name="action_view_all" type="object">
+                                                <span class="stat-count" t-esc="dashboard.number_to_pay"/> To Pay
+                                            </button>
+                                        </div>
+                                        <div class="stat-value">
+                                            <span class="amount text-warning" t-esc="dashboard.sum_to_pay"/>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="stat-row" t-if="dashboard.number_late">
+                                        <div class="stat-label">
+                                            <div class="stat-icon icon-danger">
+                                                <i class="fa fa-exclamation-circle"/>
+                                            </div>
+                                            <button class="btn btn-link p-0 stat-text" name="action_view_all" type="object">
+                                                <span class="stat-count" t-esc="dashboard.number_late"/> Late
+                                            </button>
+                                        </div>
+                                        <div class="stat-value">
+                                            <span class="amount text-danger" t-esc="dashboard.sum_late"/>
+                                        </div>
+                                    </div>
+                                </t>
+                                
+                                <!-- Bank Journal Dashboard -->
+                                <t t-if="record.type.raw_value == 'bank'">
+                                    <div class="balance-display">
+                                        <div class="balance-amount" t-esc="dashboard.balance"/>
+                                        <div class="balance-label">Current Balance</div>
+                                    </div>
+                                    
+                                    <div class="stat-row">
+                                        <div class="stat-label">
+                                            <div class="stat-icon icon-info">
+                                                <i class="fa fa-sync"/>
+                                            </div>
+                                            <span class="stat-text">Last Sync</span>
+                                        </div>
+                                        <div class="stat-value">
+                                            <span class="text-muted" t-esc="dashboard.last_sync"/>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="stat-row" t-if="dashboard.to_reconcile">
+                                        <div class="stat-label">
+                                            <div class="stat-icon icon-warning">
+                                                <i class="fa fa-balance-scale"/>
+                                            </div>
+                                            <button class="btn btn-link p-0 stat-text" name="action_open_reconcile" type="object">
+                                                To Reconcile
+                                            </button>
+                                        </div>
+                                        <div class="stat-value">
+                                            <span class="reconciliation-counter">
+                                                <span class="counter-value" t-esc="dashboard.to_reconcile"/>
+                                                items
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Action Buttons -->
+                                    <div class="action-buttons">
+                                        <button class="btn-action btn-primary" name="action_register_payment" type="object">
+                                            <i class="fa fa-plus"/> New Transaction
+                                        </button>
+                                        <button class="btn-action btn-secondary" name="action_open_reconcile" type="object">
+                                            <i class="fa fa-check"/> Reconcile
+                                        </button>
+                                    </div>
+                                </t>
+                                
+                                <!-- Cash Journal Dashboard -->
+                                <t t-if="record.type.raw_value == 'cash'">
+                                    <div class="balance-display">
+                                        <div class="balance-amount" t-esc="dashboard.balance"/>
+                                        <div class="balance-label">Cash Balance</div>
+                                    </div>
+                                    
+                                    <div class="stat-row">
+                                        <div class="stat-label">
+                                            <div class="stat-icon icon-success">
+                                                <i class="fa fa-arrow-down"/>
+                                            </div>
+                                            <span class="stat-text">Cash In Today</span>
+                                        </div>
+                                        <div class="stat-value">
+                                            <span class="amount text-success" t-esc="dashboard.cash_in_today"/>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="stat-row">
+                                        <div class="stat-label">
+                                            <div class="stat-icon icon-danger">
+                                                <i class="fa fa-arrow-up"/>
+                                            </div>
+                                            <span class="stat-text">Cash Out Today</span>
+                                        </div>
+                                        <div class="stat-value">
+                                            <span class="amount text-danger" t-esc="dashboard.cash_out_today"/>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Action Buttons -->
+                                    <div class="action-buttons">
+                                        <button class="btn-action btn-primary" name="action_register_payment" type="object">
+                                            <i class="fa fa-plus"/> Register Cash
+                                        </button>
+                                    </div>
+                                </t>
+                                
+                                <!-- Miscellaneous Operations -->
+                                <t t-if="record.type.raw_value == 'general'">
+                                    <div class="stat-row">
+                                        <div class="stat-label">
+                                            <div class="stat-icon icon-draft">
+                                                <i class="fa fa-file-alt"/>
+                                            </div>
+                                            <button class="btn btn-link p-0 stat-text" name="action_view_entries" type="object">
+                                                <span class="stat-count" t-esc="dashboard.number_draft or 0"/> Draft Entries
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="stat-row">
+                                        <div class="stat-label">
+                                            <div class="stat-icon icon-success">
+                                                <i class="fa fa-check-circle"/>
+                                            </div>
+                                            <span class="stat-text">Posted This Month</span>
+                                        </div>
+                                        <div class="stat-value">
+                                            <span class="badge rounded-pill text-bg-success" t-esc="dashboard.entries_this_month or 0"/>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Action Button -->
+                                    <div class="action-buttons">
+                                        <button class="btn-action btn-primary" name="action_create_journal_entry" type="object">
+                                            <i class="fa fa-plus"/> New Entry
+                                        </button>
+                                    </div>
+                                </t>
+                            </div>
+                            
+                            <!-- Chart Section for journals with graphs -->
+                            <t t-if="record.type.raw_value in ['sale', 'purchase', 'bank', 'cash']">
+                                <div class="o_kanban_chart_section">
+                                    <div class="chart-header">
+                                        <div class="chart-title">
+                                            <t t-if="record.type.raw_value == 'sale'">Revenue Trend</t>
+                                            <t t-elif="record.type.raw_value == 'purchase'">Expense Trend</t>
+                                            <t t-elif="record.type.raw_value == 'bank'">Balance History</t>
+                                            <t t-elif="record.type.raw_value == 'cash'">Cash Flow</t>
+                                        </div>
+                                        <div class="chart-controls">
+                                            <button class="btn-chart-control active" data-period="30">30D</button>
+                                            <button class="btn-chart-control" data-period="90">90D</button>
+                                            <button class="btn-chart-control" data-period="365">1Y</button>
+                                        </div>
+                                    </div>
+                                    <field name="kanban_dashboard_graph" widget="mz_dashboard_graph"/>
+                                </div>
+                            </t>
+                            
+                            <!-- Card Dropdown Menu -->
+                            <div class="o_kanban_card_manage_pane dropdown-menu" role="menu">
+                                <div class="o_kanban_card_manage_section o_kanban_manage_view">
+                                    <h5>View</h5>
+                                    <div>
+                                        <a name="action_view_all" type="object">
+                                            <i class="fa fa-list me-2"/>
+                                            <t t-if="record.type.raw_value == 'sale'">All Invoices</t>
+                                            <t t-elif="record.type.raw_value == 'purchase'">All Bills</t>
+                                            <t t-elif="record.type.raw_value == 'bank'">Bank Transactions</t>
+                                            <t t-elif="record.type.raw_value == 'cash'">Cash Transactions</t>
+                                            <t t-else="">Journal Entries</t>
+                                        </a>
+                                    </div>
+                                    <div t-if="record.type.raw_value in ['sale', 'purchase']">
+                                        <a name="action_view_all" type="object" context="{'search_default_draft': 1}">
+                                            <i class="fa fa-pencil-alt me-2"/> Draft Entries
+                                        </a>
+                                    </div>
+                                    <div t-if="record.type.raw_value == 'sale'">
+                                        <a name="action_view_all" type="object" context="{'search_default_overdue': 1}">
+                                            <i class="fa fa-exclamation-triangle me-2"/> Overdue Invoices
+                                        </a>
+                                    </div>
+                                </div>
+                                
+                                <div class="o_kanban_card_manage_section o_kanban_manage_new">
+                                    <h5>New</h5>
+                                    <div>
+                                        <a name="action_create_new" type="object">
+                                            <i class="fa fa-plus me-2"/>
+                                            <t t-if="record.type.raw_value == 'sale'">Customer Invoice</t>
+                                            <t t-elif="record.type.raw_value == 'purchase'">Vendor Bill</t>
+                                            <t t-elif="record.type.raw_value in ['bank', 'cash']">Payment</t>
+                                            <t t-else="">Journal Entry</t>
+                                        </a>
+                                    </div>
+                                    <div t-if="record.type.raw_value == 'sale'">
+                                        <a name="action_create_new" type="object" context="{'default_move_type': 'out_refund'}">
+                                            <i class="fa fa-undo me-2"/> Credit Note
+                                        </a>
+                                    </div>
+                                    <div t-if="record.type.raw_value == 'purchase'">
+                                        <a name="action_upload_document" type="object">
+                                            <i class="fa fa-upload me-2"/> Upload Document
+                                        </a>
+                                    </div>
+                                </div>
+                                
+                                <div class="o_kanban_card_manage_section o_kanban_manage_reports">
+                                    <h5>Reports</h5>
+                                    <div>
+                                        <a name="action_print_report" type="object">
+                                            <i class="fa fa-print me-2"/> Print Report
+                                        </a>
+                                    </div>
+                                    <div>
+                                        <a name="action_export_data" type="object">
+                                            <i class="fa fa-download me-2"/> Export Data
+                                        </a>
+                                    </div>
+                                </div>
+                                
+                                <div class="o_kanban_card_manage_section o_kanban_manage_settings">
+                                    <h5>Configuration</h5>
+                                    <div>
+                                        <a name="action_configure_journal" type="object">
+                                            <i class="fa fa-cog me-2"/> Journal Settings
+                                        </a>
+                                    </div>
+                                    <div t-if="record.type.raw_value in ['bank', 'cash']">
+                                        <a name="action_configure_bank" type="object">
+                                            <i class="fa fa-university me-2"/> Bank Configuration
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+    
+    <!-- Professional Dashboard Action -->
+    <record id="action_mz_dashboard_professional" model="ir.actions.act_window">
+        <field name="name">Accounting Dashboard</field>
+        <field name="res_model">account.journal</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="view_id" ref="account_journal_dashboard_professional_kanban"/>
+        <field name="search_view_id" ref="view_account_journal_dashboard_search"/>
+        <field name="domain">[('show_on_dashboard', '=', True)]</field>
+        <field name="context">{'search_default_favorites': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Welcome to your Accounting Dashboard
+            </p>
+            <p>
+                Your accounting journals will appear here once configured.
+                Start by creating journals for Customer Invoices, Vendor Bills, Bank, and Cash.
+            </p>
+        </field>
+    </record>
+</odoo>

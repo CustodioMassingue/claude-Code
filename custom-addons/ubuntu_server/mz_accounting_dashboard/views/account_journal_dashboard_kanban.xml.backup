@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="account_journal_dashboard_kanban_view" model="ir.ui.view">
+        <field name="name">account.journal.dashboard.kanban</field>
+        <field name="model">account.journal</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_dashboard o_accounting_dashboard" 
+                    create="0" group_create="false" quick_create="false">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="type"/>
+                <field name="show_on_dashboard" invisible="1"/>
+                <field name="kanban_dashboard"/>
+                
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="o_kanban_record">
+                            <t t-set="dashboard" t-value="JSON.parse(record.kanban_dashboard.raw_value || '{}')"/>
+                            
+                            <!-- Customer Invoices -->
+                            <t t-if="record.type.raw_value === 'sale'">
+                                <div class="o_kanban_card_header_sale">
+                                    <div class="o_kanban_card_header_title">
+                                        <i class="fa fa-file-text-o me-2"/>
+                                        <span>Customer Invoices</span>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_card_content">
+                                    <div class="row mb-3">
+                                        <div class="col-12">
+                                            <button type="object" name="action_create_new" class="btn btn-primary btn-lg w-100">
+                                                <i class="fa fa-plus me-1"/> New
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-6 text-center">
+                                            <div class="invoice-stat">
+                                                <div class="stat-number text-primary">
+                                                    <t t-esc="dashboard.number_draft || 0"/>
+                                                </div>
+                                                <div class="stat-label">Draft</div>
+                                                <div class="stat-amount text-muted">
+                                                    <t t-esc="dashboard.sum_draft_str || 'MZN 0.00'"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6 text-center">
+                                            <div class="invoice-stat">
+                                                <div class="stat-number text-warning">
+                                                    <t t-esc="dashboard.number_to_send || 0"/>
+                                                </div>
+                                                <div class="stat-label">To Send</div>
+                                                <div class="stat-amount text-muted">
+                                                    <t t-esc="dashboard.sum_to_send_str || 'MZN 0.00'"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mt-2">
+                                        <div class="col-6 text-center">
+                                            <div class="invoice-stat">
+                                                <div class="stat-number text-danger">
+                                                    <t t-esc="dashboard.number_overdue || 0"/>
+                                                </div>
+                                                <div class="stat-label">Late</div>
+                                                <div class="stat-amount text-muted">
+                                                    <t t-esc="dashboard.sum_overdue_str || 'MZN 0.00'"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6 text-center">
+                                            <div class="invoice-stat">
+                                                <div class="stat-number text-info">
+                                                    <t t-esc="dashboard.number_to_check || 0"/>
+                                                </div>
+                                                <div class="stat-label">To Check</div>
+                                                <div class="stat-amount text-muted">
+                                                    <t t-esc="dashboard.sum_to_check_str || 'MZN 0.00'"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mt-3 pt-3 border-top">
+                                        <div class="d-flex justify-content-between">
+                                            <small class="text-muted">Last Month</small>
+                                            <small class="text-muted"><t t-esc="dashboard.last_month_total || 'MZN 0.00'"/></small>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <small class="text-muted">This Month</small>
+                                            <small><t t-esc="dashboard.this_month_total || 'MZN 0.00'"/></small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </t>
+                            
+                            <!-- Vendor Bills -->
+                            <t t-if="record.type.raw_value === 'purchase'">
+                                <div class="o_kanban_card_header_purchase">
+                                    <div class="o_kanban_card_header_title">
+                                        <i class="fa fa-shopping-cart me-2"/>
+                                        <span>Vendor Bills</span>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_card_content text-center">
+                                    <div class="mb-3">
+                                        <button type="object" name="action_upload_document" class="btn btn-purple btn-lg">
+                                            <i class="fa fa-upload me-1"/> Upload
+                                        </button>
+                                    </div>
+                                    
+                                    <p class="text-muted mb-4">
+                                        Let artificial intelligence scan your bill.<br/>
+                                        Pay easily.
+                                    </p>
+                                    
+                                    <div class="o_kanban_drag_area">
+                                        <div class="drag-icon">
+                                            <i class="fa fa-cloud-upload fa-3x text-primary"/>
+                                        </div>
+                                        <div class="drag-text">
+                                            <strong>Drag and drop</strong><br/>
+                                            <small class="text-muted">or click to browse files</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mt-3">
+                                        <a type="object" name="action_create_new" class="text-decoration-underline">
+                                            Create a bill manually
+                                        </a>
+                                    </div>
+                                </div>
+                            </t>
+                            
+                            <!-- Bank -->
+                            <t t-if="record.type.raw_value === 'bank'">
+                                <div class="o_kanban_card_header">
+                                    <div class="o_kanban_card_header_title">
+                                        <span>Bank</span>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_card_content">
+                                    <button type="object" name="action_configure_bank" class="btn btn-link">Bank Setup</button>
+                                    <button type="object" name="action_open_transactions" class="btn btn-link">Transactions</button>
+                                    <button type="object" name="action_open_reconcile" class="btn btn-warning btn-sm">
+                                        <t t-esc="dashboard.number_to_reconcile || 0"/> to reconcile
+                                    </button>
+                                    <div class="mt-3">
+                                        <div>Balance: <t t-esc="dashboard.bank_balance_str || '₹0.00'"/></div>
+                                        <div>Payments: <t t-esc="dashboard.payments_amount_str || '₹0.00'"/></div>
+                                    </div>
+                                </div>
+                            </t>
+                            
+                            <!-- Cash -->
+                            <t t-if="record.type.raw_value === 'cash'">
+                                <div class="o_kanban_card_header">
+                                    <div class="o_kanban_card_header_title">
+                                        <span>Cash</span>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_card_content">
+                                    <button type="object" name="action_open_transactions" class="btn btn-primary">Transactions</button>
+                                    <div class="mt-3">
+                                        <h3><t t-esc="dashboard.cash_balance_str || '₹0.00'"/></h3>
+                                    </div>
+                                </div>
+                            </t>
+                            
+                            <!-- Miscellaneous -->
+                            <t t-if="record.type.raw_value === 'general'">
+                                <div class="o_kanban_card_header">
+                                    <div class="o_kanban_card_header_title">
+                                        <span>Miscellaneous Operations</span>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_card_content">
+                                    <button type="object" name="action_create_new" class="btn btn-primary">New</button>
+                                    <div class="mt-3">
+                                        <div>GSTR-1 (IN): July 2025 - 08/07/2025</div>
+                                        <div>TCS Report (IN): June 2025 - 07/07/2025</div>
+                                        <div>Tax return: July 2025 - 08/07/2025</div>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+</odoo>

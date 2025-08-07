@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Main Dashboard Menu -->
+    <menuitem id="menu_accounting_dashboard_root"
+              name="Accounting Dashboard"
+              sequence="1"
+              web_icon="mz_accounting_dashboard,static/description/icon.png"/>
+    
+    <menuitem id="menu_accounting_dashboard"
+              name="Dashboard"
+              parent="menu_accounting_dashboard_root"
+              action="action_mz_dashboard_professional"
+              sequence="10"/>
+</odoo>
