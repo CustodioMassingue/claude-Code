@@ -20,7 +20,11 @@
       "Bash(dir \"C:\\Users\\custodio.massingue\\Documents\\GitHub\\claude-Code\\custom-addons\\ubuntu_server\\mz_accounting_dashboard\" /b)",
       "Bash(cmd.exe:*)",
       "Bash(xcopy:*)",
-      "Bash(cp:*)"
+      "Bash(cp:*)",
+      "Bash(find:*)",
+      "Bash(curl:*)",
+      "Bash(powershell:*)",
+      "Bash(cmd /c \"C:\\Users\\custodio.massingue\\Documents\\GitHub\\claude-Code\\update_mz_dashboard.bat\")"
     ],
     "deny": []
   }

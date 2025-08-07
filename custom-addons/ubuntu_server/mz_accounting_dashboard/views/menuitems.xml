@@ -1,14 +1,1031 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- Main Dashboard Menu -->
-    <menuitem id="menu_accounting_dashboard_root"
-              name="Accounting Dashboard"
-              sequence="1"
-              web_icon="mz_accounting_dashboard,static/description/icon.png"/>
+    <menuitem id="menu_mz_accounting_dashboard_root"
+              name="MZ Accounting Dashboard"
+              sequence="30"
+              web_icon="mz_accounting_dashboard,static/description/icon.png"
+              groups="base.group_user"/>
     
-    <menuitem id="menu_accounting_dashboard"
+    <menuitem id="menu_mz_accounting_dashboard"
               name="Dashboard"
-              parent="menu_accounting_dashboard_root"
+              parent="menu_mz_accounting_dashboard_root"
               action="action_mz_dashboard_professional"
+              sequence="10"
+              groups="base.group_user"/>
+
+    <!-- ============================================= -->
+    <!-- MAIN ACCOUNTING MENU (ROOT)                  -->
+    <!-- ============================================= -->
+    <menuitem id="menu_mz_accounting_root"
+              name="MZ Accounting"
+              sequence="40"
+              groups="base.group_user"
+              web_icon="mz_accounting_dashboard,static/description/icon.png"/>
+
+    <!-- ============================================= -->
+    <!-- 1. DASHBOARD                                  -->
+    <!-- ============================================= -->
+    <record id="action_mz_accounting_dashboard" model="ir.actions.act_window">
+        <field name="name">Accounting Dashboard</field>
+        <field name="res_model">account.journal</field>
+        <field name="view_mode">kanban</field>
+        <field name="domain">[('show_on_dashboard', '=', True)]</field>
+        <field name="context">{'dashboard_mode': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Your accounting dashboard is empty!
+            </p>
+            <p>
+                Add a journal to get started with accounting.
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_dashboard"
+              name="Dashboard"
+              parent="menu_accounting_root"
+              action="action_mz_accounting_dashboard"
+              sequence="1"/>
+
+    <!-- ============================================= -->
+    <!-- 2. CUSTOMERS                                  -->
+    <!-- ============================================= -->
+    <menuitem id="menu_customers"
+              name="Customers"
+              parent="menu_accounting_root"
+              sequence="2"/>
+
+    <!-- Customer Invoices -->
+    <record id="action_customer_invoices" model="ir.actions.act_window">
+        <field name="name">Customer Invoices</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
+        <field name="domain">[('move_type', '=', 'out_invoice')]</field>
+        <field name="context">{'default_move_type': 'out_invoice', 'move_type': 'out_invoice', 'journal_type': 'sale'}</field>
+        <field name="search_view_id" ref="account.view_account_invoice_filter"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first customer invoice
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_customer_invoices"
+              name="Invoices"
+              parent="menu_customers"
+              action="action_customer_invoices"
+              sequence="1"/>
+
+    <!-- Customer Credit Notes -->
+    <record id="action_customer_credit_notes" model="ir.actions.act_window">
+        <field name="name">Credit Notes</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
+        <field name="domain">[('move_type', '=', 'out_refund')]</field>
+        <field name="context">{'default_move_type': 'out_refund', 'move_type': 'out_refund', 'journal_type': 'sale'}</field>
+        <field name="search_view_id" ref="account.view_account_invoice_filter"/>
+    </record>
+
+    <menuitem id="menu_customer_credit_notes"
+              name="Credit Notes"
+              parent="menu_customers"
+              action="action_customer_credit_notes"
+              sequence="2"/>
+
+    <!-- Customer Receipts -->
+    <record id="action_customer_receipts" model="ir.actions.act_window">
+        <field name="name">Customer Receipts</field>
+        <field name="res_model">account.payment</field>
+        <field name="view_mode">tree,kanban,form,calendar,pivot,graph</field>
+        <field name="domain">[('payment_type', '=', 'inbound'), ('partner_type', '=', 'customer')]</field>
+        <field name="context">{'default_payment_type': 'inbound', 'default_partner_type': 'customer'}</field>
+    </record>
+
+    <menuitem id="menu_customer_receipts"
+              name="Receipts"
+              parent="menu_customers"
+              action="action_customer_receipts"
+              sequence="3"/>
+
+    <!-- Customer Products -->
+    <record id="action_customer_products" model="ir.actions.act_window">
+        <field name="name">Products</field>
+        <field name="res_model">product.product</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="context">{'search_default_services': 1, 'search_default_consumable': 1, 'default_type': 'service'}</field>
+    </record>
+
+    <menuitem id="menu_customer_products"
+              name="Products"
+              parent="menu_customers"
+              action="action_customer_products"
+              sequence="4"/>
+
+    <!-- Customers List -->
+    <record id="action_customers_list" model="ir.actions.act_window">
+        <field name="name">Customers</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="domain">[('customer_rank', '>', 0)]</field>
+        <field name="context">{'default_customer_rank': 1, 'res_partner_search_mode': 'customer'}</field>
+    </record>
+
+    <menuitem id="menu_customers_list"
+              name="Customers"
+              parent="menu_customers"
+              action="action_customers_list"
+              sequence="5"/>
+
+    <!-- ============================================= -->
+    <!-- 3. VENDORS                                    -->
+    <!-- ============================================= -->
+    <menuitem id="menu_vendors"
+              name="Vendors"
+              parent="menu_accounting_root"
+              sequence="3"/>
+
+    <!-- Vendor Bills -->
+    <record id="action_vendor_bills" model="ir.actions.act_window">
+        <field name="name">Vendor Bills</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
+        <field name="domain">[('move_type', '=', 'in_invoice')]</field>
+        <field name="context">{'default_move_type': 'in_invoice', 'move_type': 'in_invoice', 'journal_type': 'purchase'}</field>
+        <field name="search_view_id" ref="account.view_account_invoice_filter"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Record your first vendor bill
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_vendor_bills"
+              name="Bills"
+              parent="menu_vendors"
+              action="action_vendor_bills"
+              sequence="1"/>
+
+    <!-- Vendor Refunds -->
+    <record id="action_vendor_refunds" model="ir.actions.act_window">
+        <field name="name">Refunds</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
+        <field name="domain">[('move_type', '=', 'in_refund')]</field>
+        <field name="context">{'default_move_type': 'in_refund', 'move_type': 'in_refund', 'journal_type': 'purchase'}</field>
+        <field name="search_view_id" ref="account.view_account_invoice_filter"/>
+    </record>
+
+    <menuitem id="menu_vendor_refunds"
+              name="Refunds"
+              parent="menu_vendors"
+              action="action_vendor_refunds"
+              sequence="2"/>
+
+    <!-- Vendor Payments -->
+    <record id="action_vendor_payments" model="ir.actions.act_window">
+        <field name="name">Vendor Payments</field>
+        <field name="res_model">account.payment</field>
+        <field name="view_mode">tree,kanban,form,calendar,pivot,graph</field>
+        <field name="domain">[('payment_type', '=', 'outbound'), ('partner_type', '=', 'supplier')]</field>
+        <field name="context">{'default_payment_type': 'outbound', 'default_partner_type': 'supplier'}</field>
+    </record>
+
+    <menuitem id="menu_vendor_payments"
+              name="Payments"
+              parent="menu_vendors"
+              action="action_vendor_payments"
+              sequence="3"/>
+
+    <!-- Vendor Products -->
+    <record id="action_vendor_products" model="ir.actions.act_window">
+        <field name="name">Products</field>
+        <field name="res_model">product.product</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="context">{'default_purchase_ok': True}</field>
+    </record>
+
+    <menuitem id="menu_vendor_products"
+              name="Products"
+              parent="menu_vendors"
+              action="action_vendor_products"
+              sequence="4"/>
+
+    <!-- Vendors List -->
+    <record id="action_vendors_list" model="ir.actions.act_window">
+        <field name="name">Vendors</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="domain">[('supplier_rank', '>', 0)]</field>
+        <field name="context">{'default_supplier_rank': 1, 'res_partner_search_mode': 'supplier'}</field>
+    </record>
+
+    <menuitem id="menu_vendors_list"
+              name="Vendors"
+              parent="menu_vendors"
+              action="action_vendors_list"
+              sequence="5"/>
+
+    <!-- ============================================= -->
+    <!-- 4. BANKS AND CASH                            -->
+    <!-- ============================================= -->
+    <menuitem id="menu_banks_cash"
+              name="Banks and Cash"
+              parent="menu_accounting_root"
+              sequence="4"/>
+
+    <!-- Bank Statements -->
+    <record id="action_bank_statements" model="ir.actions.act_window">
+        <field name="name">Bank Statements</field>
+        <field name="res_model">account.bank.statement.line</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
+        <field name="domain">[('journal_id.type', '=', 'bank')]</field>
+        <field name="context">{'journal_type': 'bank'}</field>
+    </record>
+
+    <menuitem id="menu_bank_statements"
+              name="Bank → View Account Statement"
+              parent="menu_banks_cash"
+              action="action_bank_statements"
+              sequence="1"/>
+
+    <!-- Cash Registers -->
+    <record id="action_cash_registers" model="ir.actions.act_window">
+        <field name="name">Cash Registers</field>
+        <field name="res_model">account.bank.statement.line</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
+        <field name="domain">[('journal_id.type', '=', 'cash')]</field>
+        <field name="context">{'journal_type': 'cash'}</field>
+    </record>
+
+    <menuitem id="menu_cash_registers"
+              name="Cash → Cash Registers"
+              parent="menu_banks_cash"
+              action="action_cash_registers"
+              sequence="2"/>
+
+    <!-- Manage submenu -->
+    <menuitem id="menu_banks_cash_manage"
+              name="Manage"
+              parent="menu_banks_cash"
               sequence="10"/>
+
+    <!-- Bank Accounts -->
+    <record id="action_bank_accounts" model="ir.actions.act_window">
+        <field name="name">Bank Accounts</field>
+        <field name="res_model">account.journal</field>
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="domain">[('type', '=', 'bank')]</field>
+        <field name="context">{'default_type': 'bank'}</field>
+    </record>
+
+    <menuitem id="menu_bank_accounts"
+              name="Bank Accounts"
+              parent="menu_banks_cash_manage"
+              action="action_bank_accounts"
+              sequence="1"/>
+
+    <!-- Cash Journals -->
+    <record id="action_cash_journals" model="ir.actions.act_window">
+        <field name="name">Cash Journals</field>
+        <field name="res_model">account.journal</field>
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="domain">[('type', '=', 'cash')]</field>
+        <field name="context">{'default_type': 'cash'}</field>
+    </record>
+
+    <menuitem id="menu_cash_journals"
+              name="Cash Registers"
+              parent="menu_banks_cash_manage"
+              action="action_cash_journals"
+              sequence="2"/>
+
+    <!-- ============================================= -->
+    <!-- 5. ACCOUNTING                                 -->
+    <!-- ============================================= -->
+    <menuitem id="menu_accounting"
+              name="Accounting"
+              parent="menu_accounting_root"
+              sequence="5"/>
+
+    <!-- Journal Entries -->
+    <record id="action_journal_entries" model="ir.actions.act_window">
+        <field name="name">Journal Entries</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">tree,kanban,form,pivot,graph</field>
+        <field name="domain">[('move_type', '=', 'entry')]</field>
+        <field name="context">{'default_move_type': 'entry'}</field>
+    </record>
+
+    <menuitem id="menu_journal_entries"
+              name="Journal Entries"
+              parent="menu_accounting"
+              action="action_journal_entries"
+              sequence="1"/>
+
+    <!-- Journal Items -->
+    <record id="action_journal_items" model="ir.actions.act_window">
+        <field name="name">Journal Items</field>
+        <field name="res_model">account.move.line</field>
+        <field name="view_mode">tree,pivot,graph,form</field>
+        <field name="context">{'search_default_posted': 1}</field>
+    </record>
+
+    <menuitem id="menu_journal_items"
+              name="Journal Items"
+              parent="menu_accounting"
+              action="action_journal_items"
+              sequence="2"/>
+
+    <!-- Chart of Accounts -->
+    <record id="action_chart_of_accounts" model="ir.actions.act_window">
+        <field name="name">Chart of Accounts</field>
+        <field name="res_model">account.account</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="account.view_account_search"/>
+        <field name="context">{'search_default_account_type': 1}</field>
+    </record>
+
+    <menuitem id="menu_chart_of_accounts"
+              name="Chart of Accounts"
+              parent="menu_accounting"
+              action="action_chart_of_accounts"
+              sequence="3"/>
+
+    <!-- Taxes -->
+    <record id="action_taxes" model="ir.actions.act_window">
+        <field name="name">Taxes</field>
+        <field name="res_model">account.tax</field>
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="context">{'search_default_sale': 1, 'search_default_purchase': 1}</field>
+    </record>
+
+    <menuitem id="menu_taxes"
+              name="Taxes"
+              parent="menu_accounting"
+              action="action_taxes"
+              sequence="4"/>
+
+    <!-- Management submenu -->
+    <menuitem id="menu_accounting_management"
+              name="Management"
+              parent="menu_accounting"
+              sequence="10"/>
+
+    <!-- Analytic Accounts -->
+    <record id="action_analytic_accounts" model="ir.actions.act_window">
+        <field name="name">Analytic Accounts</field>
+        <field name="res_model">account.analytic.account</field>
+        <field name="view_mode">tree,kanban,form</field>
+    </record>
+
+    <menuitem id="menu_analytic_accounts"
+              name="Analytic Accounts"
+              parent="menu_accounting_management"
+              action="action_analytic_accounts"
+              sequence="1"/>
+
+    <!-- Analytic Lines -->
+    <record id="action_analytic_lines" model="ir.actions.act_window">
+        <field name="name">Analytic Items</field>
+        <field name="res_model">account.analytic.line</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
+    </record>
+
+    <menuitem id="menu_analytic_lines"
+              name="Analytic Items"
+              parent="menu_accounting_management"
+              action="action_analytic_lines"
+              sequence="2"/>
+
+    <!-- Assets (placeholder - requires asset module) -->
+    <menuitem id="menu_assets"
+              name="Assets"
+              parent="menu_accounting"
+              sequence="11"/>
+
+    <!-- Periodical Processing -->
+    <menuitem id="menu_periodical_processing"
+              name="Periodical Processing"
+              parent="menu_accounting"
+              sequence="12"/>
+
+    <!-- Lock Dates -->
+    <record id="action_lock_dates" model="ir.actions.act_window">
+        <field name="name">Lock Dates</field>
+        <field name="res_model">res.company</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_lock_dates"
+              name="Lock Dates"
+              parent="menu_periodical_processing"
+              action="action_lock_dates"
+              sequence="1"/>
+
+    <!-- Reconciliation -->
+    <record id="action_reconciliation" model="ir.actions.client">
+        <field name="name">Reconciliation</field>
+        <field name="tag">account_reconciliation_widget</field>
+    </record>
+
+    <menuitem id="menu_reconciliation"
+              name="Reconciliation"
+              parent="menu_accounting"
+              action="action_reconciliation"
+              sequence="13"/>
+
+    <!-- ============================================= -->
+    <!-- 6. REPORTING                                  -->
+    <!-- ============================================= -->
+    <menuitem id="menu_reporting"
+              name="Reporting"
+              parent="menu_accounting_root"
+              sequence="6"/>
+
+    <!-- Management Reports -->
+    <menuitem id="menu_management_reports"
+              name="Management Reports"
+              parent="menu_reporting"
+              sequence="1"/>
+
+    <!-- Invoice Analysis -->
+    <record id="action_invoice_analysis" model="ir.actions.act_window">
+        <field name="name">Invoices Analysis</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">pivot,graph,tree</field>
+        <field name="domain">[('move_type', 'in', ['out_invoice', 'out_refund', 'in_invoice', 'in_refund'])]</field>
+        <field name="context">{'search_default_current': 1}</field>
+    </record>
+
+    <menuitem id="menu_invoice_analysis"
+              name="Invoices Analysis"
+              parent="menu_management_reports"
+              action="action_invoice_analysis"
+              sequence="1"/>
+
+    <!-- Partner Reports -->
+    <record id="action_partner_ledger" model="ir.actions.act_window">
+        <field name="name">Partner Ledger</field>
+        <field name="res_model">account.move.line</field>
+        <field name="view_mode">tree,pivot,graph</field>
+        <field name="domain">[('partner_id', '!=', False)]</field>
+        <field name="context">{'search_default_posted': 1, 'search_default_groupby_partner': 1}</field>
+    </record>
+
+    <menuitem id="menu_partner_ledger"
+              name="Partner Reports"
+              parent="menu_management_reports"
+              action="action_partner_ledger"
+              sequence="2"/>
+
+    <!-- Aged Receivable -->
+    <record id="action_aged_receivable" model="ir.actions.act_window">
+        <field name="name">Aged Receivable</field>
+        <field name="res_model">account.move.line</field>
+        <field name="view_mode">tree,pivot</field>
+        <field name="domain">[('account_id.account_type', '=', 'asset_receivable'), ('reconciled', '=', False)]</field>
+        <field name="context">{'search_default_groupby_partner': 1}</field>
+    </record>
+
+    <menuitem id="menu_aged_receivable"
+              name="Aged Receivable"
+              parent="menu_management_reports"
+              action="action_aged_receivable"
+              sequence="3"/>
+
+    <!-- Aged Payable -->
+    <record id="action_aged_payable" model="ir.actions.act_window">
+        <field name="name">Aged Payable</field>
+        <field name="res_model">account.move.line</field>
+        <field name="view_mode">tree,pivot</field>
+        <field name="domain">[('account_id.account_type', '=', 'liability_payable'), ('reconciled', '=', False)]</field>
+        <field name="context">{'search_default_groupby_partner': 1}</field>
+    </record>
+
+    <menuitem id="menu_aged_payable"
+              name="Aged Payable"
+              parent="menu_management_reports"
+              action="action_aged_payable"
+              sequence="4"/>
+
+    <!-- Cash Flow Statement -->
+    <record id="action_cash_flow" model="ir.actions.act_window">
+        <field name="name">Cash Flow Statement</field>
+        <field name="res_model">account.move.line</field>
+        <field name="view_mode">pivot,graph</field>
+        <field name="domain">[('account_id.account_type', 'in', ['asset_cash', 'liability_credit_card'])]</field>
+        <field name="context">{'search_default_posted': 1, 'search_default_groupby_date': 1}</field>
+    </record>
+
+    <menuitem id="menu_cash_flow"
+              name="Cash Flow"
+              parent="menu_management_reports"
+              action="action_cash_flow"
+              sequence="5"/>
+
+    <!-- Legal Reports (Financial Statements) -->
+    <menuitem id="menu_legal_reports"
+              name="Legal Reports"
+              parent="menu_reporting"
+              sequence="2"/>
+
+    <!-- Balance Sheet -->
+    <record id="action_balance_sheet" model="ir.actions.act_window">
+        <field name="name">Balance Sheet</field>
+        <field name="res_model">account.move.line</field>
+        <field name="view_mode">pivot,tree</field>
+        <field name="domain">[('account_id.account_type', 'in', ['asset_fixed', 'asset_current', 'asset_non_current', 'asset_prepayments', 'asset_receivable', 'asset_cash', 'liability_current', 'liability_non_current', 'liability_payable', 'liability_credit_card', 'equity', 'equity_unaffected'])]</field>
+        <field name="context">{'search_default_posted': 1, 'search_default_groupby_account': 1}</field>
+    </record>
+
+    <menuitem id="menu_balance_sheet"
+              name="Balance Sheet"
+              parent="menu_legal_reports"
+              action="action_balance_sheet"
+              sequence="1"/>
+
+    <!-- Profit and Loss -->
+    <record id="action_profit_loss" model="ir.actions.act_window">
+        <field name="name">Profit and Loss</field>
+        <field name="res_model">account.move.line</field>
+        <field name="view_mode">pivot,tree</field>
+        <field name="domain">[('account_id.account_type', 'in', ['income', 'income_other', 'expense', 'expense_depreciation', 'expense_direct_cost'])]</field>
+        <field name="context">{'search_default_posted': 1, 'search_default_groupby_account': 1, 'search_default_current_year': 1}</field>
+    </record>
+
+    <menuitem id="menu_profit_loss"
+              name="Profit and Loss"
+              parent="menu_legal_reports"
+              action="action_profit_loss"
+              sequence="2"/>
+
+    <!-- General Ledger -->
+    <record id="action_general_ledger" model="ir.actions.act_window">
+        <field name="name">General Ledger</field>
+        <field name="res_model">account.move.line</field>
+        <field name="view_mode">tree,pivot,graph</field>
+        <field name="context">{'search_default_posted': 1, 'search_default_groupby_account': 1}</field>
+    </record>
+
+    <menuitem id="menu_general_ledger"
+              name="General Ledger"
+              parent="menu_legal_reports"
+              action="action_general_ledger"
+              sequence="3"/>
+
+    <!-- Trial Balance -->
+    <record id="action_trial_balance" model="ir.actions.act_window">
+        <field name="name">Trial Balance</field>
+        <field name="res_model">account.move.line</field>
+        <field name="view_mode">pivot,tree</field>
+        <field name="context">{'search_default_posted': 1, 'search_default_groupby_account': 1, 'pivot_measures': ['debit', 'credit', 'balance']}</field>
+    </record>
+
+    <menuitem id="menu_trial_balance"
+              name="Trial Balance"
+              parent="menu_legal_reports"
+              action="action_trial_balance"
+              sequence="4"/>
+
+    <!-- Audit Reports -->
+    <menuitem id="menu_audit_reports"
+              name="Audit Reports"
+              parent="menu_reporting"
+              sequence="3"/>
+
+    <!-- Journal Audit -->
+    <record id="action_journal_audit" model="ir.actions.act_window">
+        <field name="name">Journal Audit</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[]</field>
+        <field name="context">{'search_default_posted': 1}</field>
+    </record>
+
+    <menuitem id="menu_journal_audit"
+              name="Journal Audit"
+              parent="menu_audit_reports"
+              action="action_journal_audit"
+              sequence="1"/>
+
+    <!-- Tax Reports (Mozambique specific) -->
+    <menuitem id="menu_tax_reports"
+              name="Tax Reports"
+              parent="menu_reporting"
+              sequence="4"/>
+
+    <!-- IVA Report -->
+    <record id="action_iva_report" model="ir.actions.act_window">
+        <field name="name">IVA Report (Mozambique)</field>
+        <field name="res_model">account.move.line</field>
+        <field name="view_mode">tree,pivot</field>
+        <field name="domain">[('tax_ids', '!=', False)]</field>
+        <field name="context">{'search_default_posted': 1, 'search_default_groupby_tax': 1}</field>
+    </record>
+
+    <menuitem id="menu_iva_report"
+              name="IVA Report"
+              parent="menu_tax_reports"
+              action="action_iva_report"
+              sequence="1"/>
+
+    <!-- IRPC Report -->
+    <record id="action_irpc_report" model="ir.actions.act_window">
+        <field name="name">IRPC Report (Mozambique)</field>
+        <field name="res_model">account.move.line</field>
+        <field name="view_mode">pivot,tree</field>
+        <field name="domain">[('account_id.account_type', 'in', ['income', 'expense'])]</field>
+        <field name="context">{'search_default_posted': 1, 'search_default_current_year': 1}</field>
+    </record>
+
+    <menuitem id="menu_irpc_report"
+              name="IRPC Report"
+              parent="menu_tax_reports"
+              action="action_irpc_report"
+              sequence="2"/>
+
+    <!-- IRPS Withholding Report -->
+    <record id="action_irps_withholding" model="ir.actions.act_window">
+        <field name="name">IRPS Withholding</field>
+        <field name="res_model">account.move.line</field>
+        <field name="view_mode">tree,pivot</field>
+        <field name="domain">[('account_id.code', '=like', '24%')]</field>
+        <field name="context">{'search_default_posted': 1}</field>
+    </record>
+
+    <menuitem id="menu_irps_withholding"
+              name="IRPS Withholding"
+              parent="menu_tax_reports"
+              action="action_irps_withholding"
+              sequence="3"/>
+
+    <!-- Consolidation -->
+    <menuitem id="menu_consolidation"
+              name="Consolidation"
+              parent="menu_reporting"
+              sequence="5"/>
+
+    <!-- Consolidation Accounts -->
+    <record id="action_consolidation_accounts" model="ir.actions.act_window">
+        <field name="name">Consolidation Accounts</field>
+        <field name="res_model">account.account</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('company_id', '!=', False)]</field>
+        <field name="context">{'search_default_groupby_company': 1}</field>
+    </record>
+
+    <menuitem id="menu_consolidation_accounts"
+              name="Consolidation Chart"
+              parent="menu_consolidation"
+              action="action_consolidation_accounts"
+              sequence="1"/>
+
+    <!-- ============================================= -->
+    <!-- 7. CONFIGURATION                              -->
+    <!-- ============================================= -->
+    <menuitem id="menu_configuration"
+              name="Configuration"
+              parent="menu_accounting_root"
+              groups="account.group_account_manager"
+              sequence="99"/>
+
+    <!-- Settings -->
+    <record id="action_account_settings" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module': 'account'}</field>
+    </record>
+
+    <menuitem id="menu_account_settings"
+              name="Settings"
+              parent="menu_configuration"
+              action="action_account_settings"
+              sequence="1"/>
+
+    <!-- Accounting Configuration -->
+    <menuitem id="menu_accounting_config"
+              name="Accounting"
+              parent="menu_configuration"
+              sequence="10"/>
+
+    <!-- Tax Configuration -->
+    <record id="action_tax_config" model="ir.actions.act_window">
+        <field name="name">Taxes Configuration</field>
+        <field name="res_model">account.tax</field>
+        <field name="view_mode">tree,kanban,form</field>
+    </record>
+
+    <menuitem id="menu_tax_config"
+              name="Taxes"
+              parent="menu_accounting_config"
+              action="action_tax_config"
+              sequence="2"/>
+
+    <!-- Fiscal Positions -->
+    <record id="action_fiscal_positions" model="ir.actions.act_window">
+        <field name="name">Fiscal Positions</field>
+        <field name="res_model">account.fiscal.position</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_fiscal_positions"
+              name="Fiscal Positions"
+              parent="menu_accounting_config"
+              action="action_fiscal_positions"
+              sequence="3"/>
+
+    <!-- Journals Configuration -->
+    <record id="action_journals_config" model="ir.actions.act_window">
+        <field name="name">Journals</field>
+        <field name="res_model">account.journal</field>
+        <field name="view_mode">tree,kanban,form</field>
+    </record>
+
+    <menuitem id="menu_journals_config"
+              name="Journals"
+              parent="menu_accounting_config"
+              action="action_journals_config"
+              sequence="4"/>
+
+    <!-- Account Types -->
+    <record id="action_account_types" model="ir.actions.act_window">
+        <field name="name">Account Types</field>
+        <field name="res_model">account.account</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_groupby_account_type': 1}</field>
+    </record>
+
+    <menuitem id="menu_account_types"
+              name="Account Types"
+              parent="menu_accounting_config"
+              action="action_account_types"
+              sequence="5"/>
+
+    <!-- Management Configuration -->
+    <menuitem id="menu_management_config"
+              name="Management"
+              parent="menu_configuration"
+              sequence="20"/>
+
+    <!-- Analytic Plans -->
+    <record id="action_analytic_plans" model="ir.actions.act_window">
+        <field name="name">Analytic Plans</field>
+        <field name="res_model">account.analytic.plan</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_analytic_plans"
+              name="Analytic Plans"
+              parent="menu_management_config"
+              action="action_analytic_plans"
+              sequence="1"/>
+
+    <!-- Analytic Accounts Config -->
+    <record id="action_analytic_accounts_config" model="ir.actions.act_window">
+        <field name="name">Analytic Accounts</field>
+        <field name="res_model">account.analytic.account</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_analytic_accounts_config"
+              name="Analytic Accounts"
+              parent="menu_management_config"
+              action="action_analytic_accounts_config"
+              sequence="2"/>
+
+    <!-- Invoicing Configuration -->
+    <menuitem id="menu_invoicing_config"
+              name="Invoicing"
+              parent="menu_configuration"
+              sequence="30"/>
+
+    <!-- Payment Terms -->
+    <record id="action_payment_terms" model="ir.actions.act_window">
+        <field name="name">Payment Terms</field>
+        <field name="res_model">account.payment.term</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_payment_terms"
+              name="Payment Terms"
+              parent="menu_invoicing_config"
+              action="action_payment_terms"
+              sequence="1"/>
+
+    <!-- Payment Methods -->
+    <record id="action_payment_methods" model="ir.actions.act_window">
+        <field name="name">Payment Methods</field>
+        <field name="res_model">account.payment.method</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_payment_methods"
+              name="Payment Methods"
+              parent="menu_invoicing_config"
+              action="action_payment_methods"
+              sequence="2"/>
+
+    <!-- Incoterms -->
+    <record id="action_incoterms" model="ir.actions.act_window">
+        <field name="name">Incoterms</field>
+        <field name="res_model">account.incoterms</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_incoterms"
+              name="Incoterms"
+              parent="menu_invoicing_config"
+              action="action_incoterms"
+              sequence="3"/>
+
+    <!-- Online Synchronization -->
+    <menuitem id="menu_online_sync"
+              name="Online Synchronization"
+              parent="menu_configuration"
+              sequence="40"/>
+
+    <!-- Bank Synchronization -->
+    <record id="action_bank_sync" model="ir.actions.act_window">
+        <field name="name">Bank Synchronization</field>
+        <field name="res_model">account.journal</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="domain">[('type', '=', 'bank')]</field>
+    </record>
+
+    <menuitem id="menu_bank_sync"
+              name="Bank Feeds"
+              parent="menu_online_sync"
+              action="action_bank_sync"
+              sequence="1"/>
+
+    <!-- Banks Configuration -->
+    <menuitem id="menu_banks_config"
+              name="Banks"
+              parent="menu_configuration"
+              sequence="50"/>
+
+    <!-- Bank List -->
+    <record id="action_banks_list" model="ir.actions.act_window">
+        <field name="name">Banks</field>
+        <field name="res_model">res.bank</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_banks_list"
+              name="Banks List"
+              parent="menu_banks_config"
+              action="action_banks_list"
+              sequence="1"/>
+
+    <!-- Bank Accounts Configuration -->
+    <record id="action_bank_accounts_config" model="ir.actions.act_window">
+        <field name="name">Bank Accounts Configuration</field>
+        <field name="res_model">res.partner.bank</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_bank_accounts_config"
+              name="Bank Accounts"
+              parent="menu_banks_config"
+              action="action_bank_accounts_config"
+              sequence="2"/>
+
+    <!-- ============================================= -->
+    <!-- MOZAMBIQUE SPECIFIC FEATURES                  -->
+    <!-- ============================================= -->
+    
+    <!-- Mozambique Reports submenu -->
+    <menuitem id="menu_mozambique_reports"
+              name="Mozambique Reports"
+              parent="menu_reporting"
+              sequence="10"/>
+
+    <!-- Modelo 10 -->
+    <record id="action_modelo_10" model="ir.actions.act_window">
+        <field name="name">Modelo 10 - Annual Declaration</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">pivot,tree</field>
+        <field name="domain">[]</field>
+        <field name="context">{'search_default_posted': 1, 'search_default_current_year': 1}</field>
+    </record>
+
+    <menuitem id="menu_modelo_10"
+              name="Modelo 10"
+              parent="menu_mozambique_reports"
+              action="action_modelo_10"
+              sequence="1"/>
+
+    <!-- Modelo 22 -->
+    <record id="action_modelo_22" model="ir.actions.act_window">
+        <field name="name">Modelo 22 - IRPC Declaration</field>
+        <field name="res_model">account.move.line</field>
+        <field name="view_mode">pivot,tree</field>
+        <field name="domain">[('account_id.account_type', 'in', ['income', 'expense'])]</field>
+        <field name="context">{'search_default_posted': 1, 'search_default_current_year': 1}</field>
+    </record>
+
+    <menuitem id="menu_modelo_22"
+              name="Modelo 22"
+              parent="menu_mozambique_reports"
+              action="action_modelo_22"
+              sequence="2"/>
+
+    <!-- DMR Declaration -->
+    <record id="action_dmr_declaration" model="ir.actions.act_window">
+        <field name="name">DMR - Monthly Remuneration Declaration</field>
+        <field name="res_model">account.move.line</field>
+        <field name="view_mode">tree,pivot</field>
+        <field name="domain">[('account_id.code', '=like', '64%')]</field>
+        <field name="context">{'search_default_posted': 1, 'search_default_current_month': 1}</field>
+    </record>
+
+    <menuitem id="menu_dmr_declaration"
+              name="DMR Declaration"
+              parent="menu_mozambique_reports"
+              action="action_dmr_declaration"
+              sequence="3"/>
+
+    <!-- INSS Reports -->
+    <record id="action_inss_reports" model="ir.actions.act_window">
+        <field name="name">INSS Contributions</field>
+        <field name="res_model">account.move.line</field>
+        <field name="view_mode">tree,pivot</field>
+        <field name="domain">[('account_id.code', '=like', '645%')]</field>
+        <field name="context">{'search_default_posted': 1}</field>
+    </record>
+
+    <menuitem id="menu_inss_reports"
+              name="INSS Reports"
+              parent="menu_mozambique_reports"
+              action="action_inss_reports"
+              sequence="4"/>
+
+    <!-- SAF-T(MZ) Export -->
+    <record id="action_saft_mz_export" model="ir.actions.act_window">
+        <field name="name">SAF-T(MZ) Export</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">tree</field>
+        <field name="context">{'search_default_posted': 1}</field>
+    </record>
+
+    <menuitem id="menu_saft_mz_export"
+              name="SAF-T(MZ) Export"
+              parent="menu_mozambique_reports"
+              action="action_saft_mz_export"
+              sequence="5"/>
+
+    <!-- PGC-NIRF Configuration -->
+    <menuitem id="menu_pgc_nirf"
+              name="PGC-NIRF"
+              parent="menu_configuration"
+              sequence="60"/>
+
+    <!-- PGC Chart Template -->
+    <record id="action_pgc_chart_template" model="ir.actions.act_window">
+        <field name="name">PGC-NIRF Chart Template</field>
+        <field name="res_model">account.chart.template</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_pgc_chart_template"
+              name="PGC-NIRF Template"
+              parent="menu_pgc_nirf"
+              action="action_pgc_chart_template"
+              sequence="1"/>
+
+    <!-- AT Configuration -->
+    <menuitem id="menu_at_config"
+              name="AT - Tax Authority"
+              parent="menu_configuration"
+              sequence="70"/>
+
+    <!-- e-Tributação Settings -->
+    <record id="action_e_tributacao" model="ir.actions.act_window">
+        <field name="name">e-Tributação Configuration</field>
+        <field name="res_model">res.company</field>
+        <field name="view_mode">form</field>
+    </record>
+
+    <menuitem id="menu_e_tributacao"
+              name="e-Tributação"
+              parent="menu_at_config"
+              action="action_e_tributacao"
+              sequence="1"/>
+
+    <!-- QR Code Settings -->
+    <record id="action_qr_code_config" model="ir.actions.act_window">
+        <field name="name">QR Code Fiscal Configuration</field>
+        <field name="res_model">res.company</field>
+        <field name="view_mode">form</field>
+    </record>
+
+    <menuitem id="menu_qr_code_config"
+              name="QR Code Fiscal"
+              parent="menu_at_config"
+              action="action_qr_code_config"
+              sequence="2"/>
 </odoo>

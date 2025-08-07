@@ -26,10 +26,11 @@
     'data': [
         'security/ir.model.access.csv',
         'data/default_journals.xml',
+        'views/account_journal_dashboard_search.xml',
         'views/account_journal_dashboard_view.xml',
         'views/dashboard_professional_view.xml',
         'views/account_dashboard_views.xml',
-        'views/menuitems.xml',
+        'views/menuitems_simple.xml',
     ],
     'assets': {
         'web.assets_backend': [

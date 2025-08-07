@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Search View for Account Journal Dashboard -->
+    <record id="view_account_journal_dashboard_search" model="ir.ui.view">
+        <field name="name">account.journal.dashboard.search</field>
+        <field name="model">account.journal</field>
+        <field name="arch" type="xml">
+            <search string="Search Journals">
+                <!-- Search fields -->
+                <field name="name" string="Journal Name"/>
+                <field name="code" string="Short Code"/>
+                <field name="type" string="Type"/>
+                <field name="company_id" string="Company"/>
+                
+                <!-- Filters -->
+                <filter string="Favorites" 
+                        name="favorites" 
+                        domain="[('show_on_dashboard', '=', True)]"
+                        help="Show favorite journals on dashboard"/>
+                
+                <separator/>
+                
+                <filter string="Sales" 
+                        name="sales" 
+                        domain="[('type', '=', 'sale')]"
+                        help="Customer Invoices"/>
+                        
+                <filter string="Purchases" 
+                        name="purchases" 
+                        domain="[('type', '=', 'purchase')]"
+                        help="Vendor Bills"/>
+                        
+                <filter string="Bank" 
+                        name="bank" 
+                        domain="[('type', '=', 'bank')]"
+                        help="Bank Journals"/>
+                        
+                <filter string="Cash" 
+                        name="cash" 
+                        domain="[('type', '=', 'cash')]"
+                        help="Cash Journals"/>
+                        
+                <filter string="Miscellaneous" 
+                        name="general" 
+                        domain="[('type', '=', 'general')]"
+                        help="Miscellaneous Operations"/>
+                
+                <separator/>
+                
+                <!-- Group By -->
+                <group expand="0" string="Group By">
+                    <filter string="Type" 
+                            name="groupby_type" 
+                            domain="[]" 
+                            context="{'group_by': 'type'}"/>
+                            
+                    <filter string="Company" 
+                            name="groupby_company" 
+                            domain="[]" 
+                            context="{'group_by': 'company_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>

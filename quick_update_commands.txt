@@ -1,0 +1,90 @@
+========================================
+COMANDOS RÁPIDOS PARA ATUALIZAR O MÓDULO MZ ACCOUNTING DASHBOARD
+========================================
+
+OPÇÃO 1 - COMANDO ÚNICO (copie e cole no terminal):
+----------------------------------------------------
+docker-compose exec -T web bash -c "rm -rf /var/lib/odoo/.local/share/Odoo/filestore/teste/*.cache && find /mnt/extra-addons -name '*.pyc' -delete && find /mnt/extra-addons -name '__pycache__' -type d -exec rm -rf {} + 2>/dev/null || true" && docker-compose restart web && timeout /t 10 && docker-compose exec -T web odoo shell -d teste --no-http -c /etc/odoo/odoo.conf <<< "env['ir.module.module'].search([('name', '=', 'mz_accounting_dashboard')]).button_immediate_upgrade()"
+
+
+OPÇÃO 2 - COMANDOS SEPARADOS (execute um por vez):
+---------------------------------------------------
+
+1. Limpar cache:
+docker-compose exec -T web rm -rf /var/lib/odoo/.local/share/Odoo/filestore/teste/*.cache
+
+2. Limpar arquivos Python compilados:
+docker-compose exec -T web find /mnt/extra-addons -name "*.pyc" -delete
+
+3. Parar o container:
+docker-compose stop web
+
+4. Atualizar o módulo:
+docker-compose run --rm web odoo --database=teste --update=mz_accounting_dashboard --stop-after-init
+
+5. Iniciar o container:
+docker-compose start web
+
+
+OPÇÃO 3 - FORÇAR REINSTALAÇÃO COMPLETA:
+----------------------------------------
+
+1. Desinstalar o módulo (se instalado):
+docker-compose exec -T web odoo shell -d teste --no-http <<< "env['ir.module.module'].search([('name', '=', 'mz_accounting_dashboard')]).button_immediate_uninstall()"
+
+2. Limpar todos os dados do módulo:
+docker-compose exec -T web psql -U odoo -d teste -c "DELETE FROM ir_ui_menu WHERE name LIKE '%MZ Accounting%';"
+
+3. Reinstalar o módulo:
+docker-compose exec -T web odoo shell -d teste --no-http <<< "env['ir.module.module'].search([('name', '=', 'mz_accounting_dashboard')]).button_immediate_install()"
+
+
+OPÇÃO 4 - COMANDO PYTHON DIRETO NO ODOO SHELL:
+-----------------------------------------------
+
+docker-compose exec -T web odoo shell -d teste --no-http << 'EOF'
+# Buscar o módulo
+module = env['ir.module.module'].search([('name', '=', 'mz_accounting_dashboard')])
+if module:
+    print(f"Módulo encontrado: {module.name} - Estado: {module.state}")
+    if module.state == 'installed':
+        module.button_immediate_upgrade()
+        print("Módulo atualizado!")
+    else:
+        module.button_immediate_install()
+        print("Módulo instalado!")
+    
+    # Ativar todos os menus
+    menus = env['ir.ui.menu'].search([('name', 'ilike', 'MZ Accounting')])
+    for menu in menus:
+        menu.active = True
+    env.cr.commit()
+    print(f"Ativados {len(menus)} menus")
+else:
+    print("Módulo não encontrado!")
+EOF
+
+
+VERIFICAÇÃO - Ver se os menus foram criados:
+---------------------------------------------
+docker-compose exec -T web psql -U odoo -d teste -c "SELECT name, active, sequence FROM ir_ui_menu WHERE name LIKE '%MZ%' OR name LIKE '%Dashboard%';"
+
+
+========================================
+SOLUÇÃO DE PROBLEMAS
+========================================
+
+Se os menus ainda não aparecerem:
+
+1. Verificar se o módulo está instalado:
+docker-compose exec -T web psql -U odoo -d teste -c "SELECT name, state FROM ir_module_module WHERE name = 'mz_accounting_dashboard';"
+
+2. Ver logs de erro:
+docker-compose logs --tail=100 web | grep -i error
+
+3. Forçar limpeza completa e reinstalação:
+docker-compose down
+docker-compose up -d
+docker-compose exec -T web odoo --database=teste --init=mz_accounting_dashboard
+
+========================================
