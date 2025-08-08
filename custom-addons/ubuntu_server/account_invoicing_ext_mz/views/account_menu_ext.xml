@@ -1,0 +1,285 @@
+<odoo>
+  <!-- ========================================================= -->
+  <!-- ===============  ACCOUNTING → ENTRIES  ================== -->
+  <!-- Pai confirmado no teu DB: account.menu_finance_entries    -->
+  <!-- ========================================================= -->
+
+  <!-- Analytic Items -->
+  <record id="action_analytic_items_mz" model="ir.actions.act_window">
+    <field name="name">Analytic Items</field>
+    <field name="res_model">account.analytic.line</field>
+    <field name="view_mode">tree,form</field>
+  </record>
+  <menuitem id="menu_analytic_items_mz"
+            name="Analytic Items"
+            parent="account.menu_finance_entries"
+            action="action_analytic_items_mz"
+            groups="account.group_account_user"
+            sequence="35"/>
+
+  <!-- Assets (modelo simples do teu addon; troque res_model se usar OCA/account-asset) -->
+  <record id="action_assets_simple_mz" model="ir.actions.act_window">
+    <field name="name">Assets</field>
+    <field name="res_model">account.asset.simple</field>
+    <field name="view_mode">tree,form</field>
+  </record>
+  <menuitem id="menu_assets_simple_mz"
+            name="Assets"
+            parent="account.menu_finance_entries"
+            action="action_assets_simple_mz"
+            groups="account.group_account_user"
+            sequence="36"/>
+
+  <!-- Reconcile -->
+  <record id="action_reconcile_like_mz" model="ir.actions.act_window">
+    <field name="name">Reconcile</field>
+    <field name="res_model">account.bank.statement.line</field>
+    <field name="view_mode">tree,form</field>
+    <field name="domain">[('is_reconciled','=',False)]</field>
+  </record>
+  <menuitem id="menu_reconcile_like_mz"
+            name="Reconcile"
+            parent="account.menu_finance_entries"
+            action="action_reconcile_like_mz"
+            groups="account.group_account_user"
+            sequence="37"/>
+
+  <!-- Lock Dates / Secure Entries → atalho p/ Settings -->
+  <record id="action_open_account_settings_mz" model="ir.actions.act_window">
+    <field name="name">Accounting Settings</field>
+    <field name="res_model">res.config.settings</field>
+    <field name="view_mode">form</field>
+    <field name="target">new</field>
+    <field name="context">{'module': 'account'}</field>
+  </record>
+  <menuitem id="menu_lock_dates_mz"
+            name="Lock Dates"
+            parent="account.menu_finance_entries"
+            action="action_open_account_settings_mz"
+            groups="account.group_account_user"
+            sequence="38"/>
+  <menuitem id="menu_secure_entries_mz"
+            name="Secure Entries"
+            parent="account.menu_finance_entries"
+            action="action_open_account_settings_mz"
+            groups="account.group_account_user"
+            sequence="39"/>
+
+  <!-- ========================================================= -->
+  <!-- =====================  REPORTING  ======================= -->
+  <!-- Pai padrão: account.menu_finance_reports                  -->
+  <!-- NÃO criamos novo "Reporting"; só filhos e headers.       -->
+  <!-- ========================================================= -->
+
+  <!-- Headers/Seções -->
+  <menuitem id="menu_mz_reporting_statement"
+            name="Statement Reports"
+            parent="account.menu_finance_reports"
+            sequence="110"
+            groups="account.group_account_user"/>
+  <menuitem id="menu_mz_reporting_audit"
+            name="Audit Reports"
+            parent="account.menu_finance_reports"
+            sequence="120"
+            groups="account.group_account_user"/>
+  <menuitem id="menu_mz_reporting_partner"
+            name="Partner Reports"
+            parent="account.menu_finance_reports"
+            sequence="130"
+            groups="account.group_account_user"/>
+  <menuitem id="menu_mz_reporting_mgmt"
+            name="Management"
+            parent="account.menu_finance_reports"
+            sequence="140"
+            groups="account.group_account_user"/>
+
+  <!-- Statement Reports -->
+  <record id="act_mz_balance_sheet" model="ir.actions.act_window">
+    <field name="name">Balance Sheet</field>
+    <field name="res_model">account.account</field>
+    <field name="view_mode">tree,form</field>
+    <field name="domain">[('account_type','in',('asset_current','asset_non_current','liability_current','liability_non_current','equity'))]</field>
+    <field name="context">{'search_default_group_by_account_type':1}</field>
+  </record>
+  <menuitem id="menu_mz_balance_sheet" name="Balance Sheet"
+            parent="menu_mz_reporting_statement" action="act_mz_balance_sheet"
+            groups="account.group_account_user" sequence="111"/>
+
+  <record id="act_mz_profit_loss" model="ir.actions.act_window">
+    <field name="name">Profit and Loss</field>
+    <field name="res_model">account.move.line</field>
+    <field name="view_mode">tree,form</field>
+    <field name="domain">[('account_id.account_type','in',('income','expense'))]</field>
+    <field name="context">{'search_default_group_by_account':1}</field>
+  </record>
+  <menuitem id="menu_mz_profit_loss" name="Profit and Loss"
+            parent="menu_mz_reporting_statement" action="act_mz_profit_loss"
+            groups="account.group_account_user" sequence="112"/>
+
+  <record id="act_mz_cash_flow" model="ir.actions.act_window">
+    <field name="name">Cash Flow Statement</field>
+    <field name="res_model">account.move.line</field>
+    <field name="view_mode">tree,form</field>
+    <field name="domain">[('journal_id.type','=','bank')]</field>
+    <field name="context">{'search_default_group_by_date':1}</field>
+  </record>
+  <menuitem id="menu_mz_cash_flow" name="Cash Flow Statement"
+            parent="menu_mz_reporting_statement" action="act_mz_cash_flow"
+            groups="account.group_account_user" sequence="113"/>
+
+  <record id="act_mz_exec_summary" model="ir.actions.act_window">
+    <field name="name">Executive Summary</field>
+    <field name="res_model">account.move</field>
+    <field name="view_mode">tree,form</field>
+    <field name="context">{'search_default_this_month':1}</field>
+  </record>
+  <menuitem id="menu_mz_exec_summary" name="Executive Summary"
+            parent="menu_mz_reporting_statement" action="act_mz_exec_summary"
+            groups="account.group_account_user" sequence="114"/>
+
+  <record id="act_mz_tax_return" model="ir.actions.act_window">
+    <field name="name">Tax Return</field>
+    <field name="res_model">account.move.line</field>
+    <field name="view_mode">tree,form</field>
+    <field name="domain">[('tax_line_id','!=',False)]</field>
+  </record>
+  <menuitem id="menu_mz_tax_return" name="Tax Return"
+            parent="menu_mz_reporting_statement" action="act_mz_tax_return"
+            groups="account.group_account_user" sequence="115"/>
+
+  <!-- Audit Reports -->
+  <record id="act_mz_general_ledger" model="ir.actions.act_window">
+    <field name="name">General Ledger</field>
+    <field name="res_model">account.move.line</field>
+    <field name="view_mode">tree,form</field>
+    <field name="context">{'search_default_group_by_account':1,'search_default_posted':1}</field>
+  </record>
+  <menuitem id="menu_mz_general_ledger" name="General Ledger"
+            parent="menu_mz_reporting_audit" action="act_mz_general_ledger"
+            groups="account.group_account_user" sequence="121"/>
+
+  <record id="act_mz_trial_balance" model="ir.actions.act_window">
+    <field name="name">Trial Balance</field>
+    <field name="res_model">account.account</field>
+    <field name="view_mode">tree,form</field>
+    <field name="context">{'search_default_group_by_code':1}</field>
+  </record>
+  <menuitem id="menu_mz_trial_balance" name="Trial Balance"
+            parent="menu_mz_reporting_audit" action="act_mz_trial_balance"
+            groups="account.group_account_user" sequence="122"/>
+
+  <record id="act_mz_journal_audit" model="ir.actions.act_window">
+    <field name="name">Journal Audit</field>
+    <field name="res_model">account.move</field>
+    <field name="view_mode">tree,form</field>
+    <field name="context">{'search_default_group_by_journal':1,'search_default_posted':1}</field>
+  </record>
+  <menuitem id="menu_mz_journal_audit" name="Journal Audit"
+            parent="menu_mz_reporting_audit" action="act_mz_journal_audit"
+            groups="account.group_account_user" sequence="123"/>
+
+  <!-- Partner Reports -->
+  <record id="act_mz_partner_ledger" model="ir.actions.act_window">
+    <field name="name">Partner Ledger</field>
+    <field name="res_model">account.move.line</field>
+    <field name="view_mode">tree,form</field>
+    <field name="domain">[('account_id.account_type','in',('asset_receivable','liability_payable'))]</field>
+    <field name="context">{'search_default_group_by_partner':1,'search_default_posted':1}</field>
+  </record>
+  <menuitem id="menu_mz_partner_ledger" name="Partner Ledger"
+            parent="menu_mz_reporting_partner" action="act_mz_partner_ledger"
+            groups="account.group_account_user" sequence="131"/>
+
+  <record id="act_mz_aged_receivable" model="ir.actions.act_window">
+    <field name="name">Aged Receivable</field>
+    <field name="res_model">account.move.line</field>
+    <field name="view_mode">tree,form</field>
+    <field name="domain">[('account_id.account_type','=','asset_receivable'),('reconciled','=',False)]</field>
+    <field name="context">{'search_default_group_by_partner':1}</field>
+  </record>
+  <menuitem id="menu_mz_aged_receivable" name="Aged Receivable"
+            parent="menu_mz_reporting_partner" action="act_mz_aged_receivable"
+            groups="account.group_account_user" sequence="132"/>
+
+  <record id="act_mz_aged_payable" model="ir.actions.act_window">
+    <field name="name">Aged Payable</field>
+    <field name="res_model">account.move.line</field>
+    <field name="view_mode">tree,form</field>
+    <field name="domain">[('account_id.account_type','=','liability_payable'),('reconciled','=',False)]</field>
+    <field name="context">{'search_default_group_by_partner':1}</field>
+  </record>
+  <menuitem id="menu_mz_aged_payable" name="Aged Payable"
+            parent="menu_mz_reporting_partner" action="act_mz_aged_payable"
+            groups="account.group_account_user" sequence="133"/>
+
+  <!-- Management -->
+  <record id="act_mz_invoice_analysis" model="ir.actions.act_window">
+    <field name="name">Invoice Analysis</field>
+    <field name="res_model">account.move</field>
+    <field name="view_mode">pivot,tree,form,graph</field>
+    <field name="domain">[('move_type','in',('out_invoice','in_invoice'))]</field>
+  </record>
+  <menuitem id="menu_mz_invoice_analysis" name="Invoice Analysis"
+            parent="menu_mz_reporting_mgmt" action="act_mz_invoice_analysis"
+            groups="account.group_account_user" sequence="141"/>
+
+  <record id="act_mz_analytic_report" model="ir.actions.act_window">
+    <field name="name">Analytic Report</field>
+    <field name="res_model">account.analytic.line</field>
+    <field name="view_mode">pivot,tree,graph</field>
+  </record>
+  <menuitem id="menu_mz_analytic_report" name="Analytic Report"
+            parent="menu_mz_reporting_mgmt" action="act_mz_analytic_report"
+            groups="account.group_account_user" sequence="142"/>
+
+  <record id="act_mz_fx_unrealized" model="ir.actions.act_window">
+    <field name="name">Unrealized Currency Gains/Losses</field>
+    <field name="res_model">account.move.line</field>
+    <field name="view_mode">tree,form</field>
+    <field name="domain">[('amount_currency','!=',0)]</field>
+  </record>
+  <menuitem id="menu_mz_fx_unrealized" name="Unrealized Currency Gains/Losses"
+            parent="menu_mz_reporting_mgmt" action="act_mz_fx_unrealized"
+            groups="account.group_account_user" sequence="143"/>
+
+  <record id="act_mz_deferred_expense" model="ir.actions.act_window">
+    <field name="name">Deferred Expense</field>
+    <field name="res_model">account.move.line</field>
+    <field name="view_mode">tree,form</field>
+    <field name="domain">[('account_id.name','ilike','deferred')]</field>
+  </record>
+  <menuitem id="menu_mz_deferred_expense" name="Deferred Expense"
+            parent="menu_mz_reporting_mgmt" action="act_mz_deferred_expense"
+            groups="account.group_account_user" sequence="144"/>
+
+  <record id="act_mz_deferred_revenue" model="ir.actions.act_window">
+    <field name="name">Deferred Revenue</field>
+    <field name="res_model">account.move.line</field>
+    <field name="view_mode">tree,form</field>
+    <field name="domain">[('account_id.name','ilike','deferred')]</field>
+  </record>
+  <menuitem id="menu_mz_deferred_revenue" name="Deferred Revenue"
+            parent="menu_mz_reporting_mgmt" action="act_mz_deferred_revenue"
+            groups="account.group_account_user" sequence="145"/>
+
+  <record id="act_mz_depr_schedule" model="ir.actions.act_window">
+    <field name="name">Depreciation Schedule</field>
+    <field name="res_model">account.move.line</field>
+    <field name="view_mode">tree,form</field>
+    <field name="domain">[('name','ilike','Depreciation')]</field>
+  </record>
+  <menuitem id="menu_mz_depr_schedule" name="Depreciation Schedule"
+            parent="menu_mz_reporting_mgmt" action="act_mz_depr_schedule"
+            groups="account.group_account_user" sequence="146"/>
+
+  <record id="act_mz_product_margins" model="ir.actions.act_window">
+    <field name="name">Product Margins</field>
+    <field name="res_model">account.move.line</field>
+    <field name="view_mode">pivot,tree,graph</field>
+    <field name="domain">[('move_id.move_type','in',('out_invoice','out_refund'))]</field>
+    <field name="context">{'pivot_measures': ['price_total','balance']}</field>
+  </record>
+  <menuitem id="menu_mz_product_margins" name="Product Margins"
+            parent="menu_mz_reporting_mgmt" action="act_mz_product_margins"
+            groups="account.group_account_user" sequence="147"/>
+</odoo>

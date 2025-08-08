@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_enterprise_dashboard_tree" model="ir.ui.view">
+        <field name="name">account.enterprise.dashboard.tree</field>
+        <field name="model">account.enterprise.dashboard</field>
+        <field name="arch" type="xml">
+            <tree string="Dashboards">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="dashboard_type"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="active" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+    
+    <record id="view_account_enterprise_dashboard_form" model="ir.ui.view">
+        <field name="name">account.enterprise.dashboard.form</field>
+        <field name="model">account.enterprise.dashboard</field>
+        <field name="arch" type="xml">
+            <form string="Accounting Dashboard">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" invisible="active"/>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Dashboard Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="dashboard_type"/>
+                            <field name="period_type"/>
+                            <field name="comparison_type"/>
+                        </group>
+                        <group>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="currency_id"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Configuration">
+                            <group>
+                                <group string="Refresh Settings">
+                                    <field name="refresh_interval"/>
+                                    <field name="cache_duration"/>
+                                    <field name="last_refresh" readonly="1"/>
+                                </group>
+                                <group string="Performance">
+                                    <field name="avg_load_time" readonly="1"/>
+                                    <field name="total_loads" readonly="1"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Users">
+                            <field name="user_ids">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="login"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+    
+    <record id="action_account_enterprise_dashboard" model="ir.actions.act_window">
+        <field name="name">Enterprise Dashboards</field>
+        <field name="res_model">account.enterprise.dashboard</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'default_dashboard_type': 'executive'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first Enterprise Dashboard
+            </p>
+            <p>
+                Configure advanced accounting dashboards with real-time KPIs and analytics.
+            </p>
+        </field>
+    </record>
+    
+    <!-- Menu Principal em Invoicing -->
+    <menuitem id="menu_account_enterprise_main"
+              name="Enterprise Accounting"
+              parent="account.menu_finance"
+              sequence="1"
+              groups="base.group_user"/>
+              
+    <!-- Submenu Dashboard -->
+    <menuitem id="menu_account_enterprise_dashboard"
+              name="Dashboard"
+              parent="menu_account_enterprise_main"
+              action="action_account_enterprise_dashboard"
+              sequence="10"
+              groups="base.group_user"/>
+              
+    <!-- Outros Submenus -->
+    <menuitem id="menu_account_enterprise_consolidation"
+              name="Consolidation"
+              parent="menu_account_enterprise_main"
+              sequence="20"
+              groups="base.group_user"/>
+              
+    <menuitem id="menu_account_enterprise_cashflow"
+              name="Cash Flow"
+              parent="menu_account_enterprise_main"
+              sequence="30"
+              groups="base.group_user"/>
+              
+    <menuitem id="menu_account_enterprise_budgets"
+              name="Budgets"
+              parent="menu_account_enterprise_main"
+              sequence="40"
+              groups="base.group_user"/>
+              
+    <menuitem id="menu_account_enterprise_reports"
+              name="Reports"
+              parent="menu_account_enterprise_main"
+              sequence="50"
+              groups="base.group_user"/>
+</odoo>

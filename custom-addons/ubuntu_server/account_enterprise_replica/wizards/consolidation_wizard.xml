@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Consolidation Wizard Form -->
+    <record id="view_consolidation_wizard_form" model="ir.ui.view">
+        <field name="name">account.consolidation.wizard.form</field>
+        <field name="model">account.consolidation.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Run Consolidation">
+                <group>
+                    <group>
+                        <field name="chart_id" options="{'no_create': True}"/>
+                        <field name="period_id" domain="[('chart_id', '=', chart_id)]"/>
+                        <field name="consolidation_method"/>
+                    </group>
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                </group>
+                
+                <group string="Companies to Consolidate">
+                    <field name="company_ids" nolabel="1">
+                        <tree>
+                            <field name="subsidiary_id"/>
+                            <field name="ownership_percentage"/>
+                            <field name="consolidation_method"/>
+                        </tree>
+                    </field>
+                </group>
+                
+                <group string="Options">
+                    <group>
+                        <field name="include_eliminations"/>
+                        <field name="include_minority"/>
+                    </group>
+                    <group>
+                        <field name="currency_conversion"/>
+                        <field name="generate_report"/>
+                    </group>
+                </group>
+                
+                <footer>
+                    <button name="action_consolidate" type="object" 
+                            string="Run Consolidation" class="btn-primary"/>
+                    <button special="cancel" string="Cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Consolidation Wizard Action -->
+    <record id="action_consolidation_wizard" model="ir.actions.act_window">
+        <field name="name">Run Consolidation</field>
+        <field name="res_model">account.consolidation.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

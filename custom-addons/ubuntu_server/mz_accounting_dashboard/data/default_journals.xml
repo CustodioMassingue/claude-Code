@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<odoo>
-    <data noupdate="0">
-        
-        <!-- Make sure all default journals show on dashboard -->
-        <function model="account.journal" name="ensure_dashboard_journals"/>
-        
-    </data>
-</odoo>

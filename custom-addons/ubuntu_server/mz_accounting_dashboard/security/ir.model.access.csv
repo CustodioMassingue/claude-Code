@@ -1,6 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_account_journal_dashboard_user,account.journal.dashboard.user,account.model_account_journal,base.group_user,1,0,0,0
-access_account_journal_dashboard_manager,account.journal.dashboard.manager,account.model_account_journal,base.group_system,1,1,1,1
-access_account_move_user,account.move.user,account.model_account_move,base.group_user,1,0,0,0
-access_account_move_line_user,account.move.line.user,account.model_account_move_line,base.group_user,1,0,0,0
-access_account_payment_user,account.payment.user,account.model_account_payment,base.group_user,1,0,0,0

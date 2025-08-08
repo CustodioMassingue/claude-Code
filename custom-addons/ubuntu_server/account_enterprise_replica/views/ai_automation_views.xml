@@ -1,0 +1,600 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- AI Predictions Tree View -->
+    <record id="view_ai_prediction_tree" model="ir.ui.view">
+        <field name="name">ai.prediction.tree</field>
+        <field name="model">account.ai.prediction</field>
+        <field name="arch" type="xml">
+            <tree string="AI Predictions">
+                <field name="name"/>
+                <field name="prediction_type"/>
+                <field name="model_name"/>
+                <field name="accuracy_score" widget="percentage"/>
+                <field name="last_prediction_date"/>
+                <field name="status"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- AI Predictions Form View -->
+    <record id="view_ai_prediction_form" model="ir.ui.view">
+        <field name="name">ai.prediction.form</field>
+        <field name="model">account.ai.prediction</field>
+        <field name="arch" type="xml">
+            <form string="AI Prediction Model">
+                <header>
+                    <button name="train_model" string="Train Model" type="object" class="btn-primary"/>
+                    <button name="run_prediction" string="Run Prediction" type="object"/>
+                    <button name="evaluate_model" string="Evaluate" type="object"/>
+                    <field name="status" widget="statusbar" statusbar_visible="draft,training,ready,running"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Inactive" bg_color="bg-danger" invisible="active == True"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Model Configuration">
+                            <field name="prediction_type"/>
+                            <field name="model_name"/>
+                            <field name="algorithm"/>
+                            <field name="target_variable"/>
+                            <field name="active"/>
+                        </group>
+                        <group string="Performance">
+                            <field name="accuracy_score" widget="percentage"/>
+                            <field name="precision_score" widget="percentage"/>
+                            <field name="recall_score" widget="percentage"/>
+                            <field name="f1_score"/>
+                            <field name="last_training_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Features">
+                            <field name="feature_ids">
+                                <tree editable="bottom">
+                                    <field name="name"/>
+                                    <field name="field_name"/>
+                                    <field name="data_type"/>
+                                    <field name="importance" widget="percentage"/>
+                                    <field name="preprocessing"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Training Data">
+                            <group>
+                                <field name="training_dataset_size"/>
+                                <field name="validation_split" widget="percentage"/>
+                                <field name="test_split" widget="percentage"/>
+                                <field name="data_source"/>
+                            </group>
+                            <group string="Parameters">
+                                <field name="hyperparameters" widget="json"/>
+                            </group>
+                        </page>
+                        <page string="Predictions">
+                            <field name="recent_predictions">
+                                <tree>
+                                    <field name="prediction_date"/>
+                                    <field name="input_data"/>
+                                    <field name="predicted_value"/>
+                                    <field name="confidence" widget="percentage"/>
+                                    <field name="actual_value"/>
+                                    <field name="error"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Model Metrics">
+                            <group string="Confusion Matrix" invisible="prediction_type != 'classification'">
+                                <field name="confusion_matrix" widget="matrix"/>
+                            </group>
+                            <group string="Regression Metrics" invisible="prediction_type != 'regression'">
+                                <field name="mae"/>
+                                <field name="mse"/>
+                                <field name="rmse"/>
+                                <field name="r2_score"/>
+                            </group>
+                            <field name="roc_curve" widget="graph" options="{'graph_type': 'line'}"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- OCR Processor Tree View -->
+    <record id="view_ocr_processor_tree" model="ir.ui.view">
+        <field name="name">ocr.processor.tree</field>
+        <field name="model">account.ocr.processor</field>
+        <field name="arch" type="xml">
+            <tree string="OCR Documents" decoration-success="status=='processed'" decoration-warning="status=='processing'" decoration-danger="status=='error'">
+                <field name="name"/>
+                <field name="document_type"/>
+                <field name="upload_date"/>
+                <field name="status"/>
+                <field name="confidence_score" widget="percentage"/>
+                <field name="extracted_amount" widget="monetary"/>
+                <field name="move_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- OCR Processor Form View -->
+    <record id="view_ocr_processor_form" model="ir.ui.view">
+        <field name="name">ocr.processor.form</field>
+        <field name="model">account.ocr.processor</field>
+        <field name="arch" type="xml">
+            <form string="OCR Document Processing">
+                <header>
+                    <button name="process_document" string="Process Document" type="object" class="btn-primary" invisible="status != 'draft'"/>
+                    <button name="reprocess" string="Reprocess" type="object" invisible="status != 'error'"/>
+                    <button name="create_move" string="Create Entry" type="object" invisible="status != 'processed' or move_id != False"/>
+                    <field name="status" widget="statusbar" statusbar_visible="draft,processing,processed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Document Information">
+                            <field name="document_type"/>
+                            <field name="document_file" filename="file_name"/>
+                            <field name="file_name" invisible="1"/>
+                            <field name="upload_date"/>
+                            <field name="processing_date"/>
+                        </group>
+                        <group string="Processing Results">
+                            <field name="confidence_score" widget="percentage"/>
+                            <field name="language_detected"/>
+                            <field name="pages_count"/>
+                            <field name="processing_time"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Extracted Data">
+                            <group col="4">
+                                <field name="vendor_name"/>
+                                <field name="vendor_vat"/>
+                                <field name="invoice_number"/>
+                                <field name="invoice_date"/>
+                                <field name="due_date"/>
+                                <field name="currency_id"/>
+                                <field name="extracted_amount" widget="monetary"/>
+                                <field name="tax_amount" widget="monetary"/>
+                            </group>
+                            <separator string="Line Items"/>
+                            <field name="line_items">
+                                <tree editable="bottom">
+                                    <field name="description"/>
+                                    <field name="quantity"/>
+                                    <field name="unit_price"/>
+                                    <field name="tax_rate"/>
+                                    <field name="amount"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Raw Text">
+                            <field name="extracted_text" widget="text"/>
+                        </page>
+                        <page string="Validation">
+                            <group string="Data Validation">
+                                <field name="validation_errors" widget="html" readonly="1"/>
+                            </group>
+                            <group string="Manual Corrections">
+                                <field name="manual_corrections" widget="json"/>
+                            </group>
+                        </page>
+                        <page string="Accounting">
+                            <group>
+                                <field name="move_id" readonly="1"/>
+                                <field name="partner_id"/>
+                                <field name="account_id"/>
+                                <field name="journal_id"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Anomaly Detection Tree View -->
+    <record id="view_anomaly_detection_tree" model="ir.ui.view">
+        <field name="name">anomaly.detection.tree</field>
+        <field name="model">account.anomaly.detection</field>
+        <field name="arch" type="xml">
+            <tree string="Anomaly Detection" decoration-danger="severity=='critical'" decoration-warning="severity=='high'" decoration-info="severity=='medium'">
+                <field name="detection_date"/>
+                <field name="anomaly_type"/>
+                <field name="description"/>
+                <field name="severity"/>
+                <field name="confidence" widget="percentage"/>
+                <field name="status"/>
+                <field name="resolved"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Anomaly Detection Form View -->
+    <record id="view_anomaly_detection_form" model="ir.ui.view">
+        <field name="name">anomaly.detection.form</field>
+        <field name="model">account.anomaly.detection</field>
+        <field name="arch" type="xml">
+            <form string="Anomaly Detection">
+                <header>
+                    <button name="investigate" string="Investigate" type="object" class="btn-primary" invisible="status != 'detected'"/>
+                    <button name="mark_false_positive" string="False Positive" type="object" invisible="status != 'investigating'"/>
+                    <button name="create_action" string="Create Action" type="object" invisible="status != 'confirmed'"/>
+                    <field name="status" widget="statusbar" statusbar_visible="detected,investigating,confirmed,resolved"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Resolved" bg_color="bg-success" invisible="resolved == False"/>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Detection Details">
+                            <field name="anomaly_type"/>
+                            <field name="detection_date"/>
+                            <field name="severity"/>
+                            <field name="confidence" widget="percentage"/>
+                            <field name="algorithm_used"/>
+                        </group>
+                        <group string="Context">
+                            <field name="model_name"/>
+                            <field name="record_id"/>
+                            <field name="user_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <group string="Description">
+                        <field name="description" nolabel="1"/>
+                    </group>
+                    <notebook>
+                        <page string="Analysis">
+                            <group string="Statistical Analysis">
+                                <field name="baseline_value"/>
+                                <field name="detected_value"/>
+                                <field name="deviation" widget="percentage"/>
+                                <field name="z_score"/>
+                            </group>
+                            <separator string="Pattern Analysis"/>
+                            <field name="pattern_details" widget="html"/>
+                        </page>
+                        <page string="Investigation">
+                            <group>
+                                <field name="investigator_id"/>
+                                <field name="investigation_date"/>
+                                <field name="investigation_notes" widget="html"/>
+                            </group>
+                            <separator string="Root Cause"/>
+                            <field name="root_cause" nolabel="1"/>
+                        </page>
+                        <page string="Actions">
+                            <field name="corrective_actions">
+                                <tree editable="bottom">
+                                    <field name="action_type"/>
+                                    <field name="description"/>
+                                    <field name="responsible_id"/>
+                                    <field name="due_date"/>
+                                    <field name="status"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Related Anomalies">
+                            <field name="related_anomaly_ids"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ML Reconciliation Tree View -->
+    <record id="view_ml_reconciliation_tree" model="ir.ui.view">
+        <field name="name">ml.reconciliation.tree</field>
+        <field name="model">account.ml.reconciliation</field>
+        <field name="arch" type="xml">
+            <tree string="Smart Reconciliation">
+                <field name="name"/>
+                <field name="reconciliation_date"/>
+                <field name="model_type"/>
+                <field name="items_count"/>
+                <field name="matched_count"/>
+                <field name="success_rate" widget="percentage"/>
+                <field name="status"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- ML Reconciliation Form View -->
+    <record id="view_ml_reconciliation_form" model="ir.ui.view">
+        <field name="name">ml.reconciliation.form</field>
+        <field name="model">account.ml.reconciliation</field>
+        <field name="arch" type="xml">
+            <form string="Smart Reconciliation">
+                <header>
+                    <button name="run_reconciliation" string="Run Reconciliation" type="object" class="btn-primary"/>
+                    <button name="train_model" string="Train Model" type="object"/>
+                    <button name="validate_matches" string="Validate Matches" type="object"/>
+                    <field name="status" widget="statusbar" statusbar_visible="draft,running,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Configuration">
+                            <field name="model_type"/>
+                            <field name="journal_id"/>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="threshold" widget="percentage"/>
+                        </group>
+                        <group string="Results">
+                            <field name="items_count"/>
+                            <field name="matched_count"/>
+                            <field name="success_rate" widget="percentage"/>
+                            <field name="processing_time"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Matched Items">
+                            <field name="matched_items">
+                                <tree decoration-success="confidence > 0.9" decoration-warning="confidence > 0.7 and confidence &lt;= 0.9" decoration-danger="confidence &lt;= 0.7">
+                                    <field name="move_line_id"/>
+                                    <field name="statement_line_id"/>
+                                    <field name="confidence" widget="percentage"/>
+                                    <field name="match_reason"/>
+                                    <field name="validated"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Unmatched Items">
+                            <field name="unmatched_move_lines"/>
+                            <separator string="Unmatched Statement Lines"/>
+                            <field name="unmatched_statement_lines"/>
+                        </page>
+                        <page string="Model Performance">
+                            <group>
+                                <field name="accuracy" widget="percentage"/>
+                                <field name="precision" widget="percentage"/>
+                                <field name="recall" widget="percentage"/>
+                                <field name="training_samples"/>
+                            </group>
+                            <field name="performance_chart" widget="graph" options="{'graph_type': 'line'}"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Workflow Automation Tree View -->
+    <record id="view_workflow_automation_tree" model="ir.ui.view">
+        <field name="name">workflow.automation.tree</field>
+        <field name="model">account.workflow.automation</field>
+        <field name="arch" type="xml">
+            <tree string="Workflow Automation">
+                <field name="name"/>
+                <field name="model_id"/>
+                <field name="trigger_type"/>
+                <field name="execution_count"/>
+                <field name="last_execution"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Workflow Automation Form View -->
+    <record id="view_workflow_automation_form" model="ir.ui.view">
+        <field name="name">workflow.automation.form</field>
+        <field name="model">account.workflow.automation</field>
+        <field name="arch" type="xml">
+            <form string="Workflow Automation">
+                <header>
+                    <button name="test_workflow" string="Test Workflow" type="object" class="btn-primary"/>
+                    <button name="run_manually" string="Run Manually" type="object"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Inactive" bg_color="bg-danger" invisible="active == True"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Trigger Configuration">
+                            <field name="model_id"/>
+                            <field name="trigger_type"/>
+                            <field name="trigger_field" invisible="trigger_type != 'field_change'"/>
+                            <field name="schedule_cron" invisible="trigger_type != 'scheduled'"/>
+                            <field name="active"/>
+                        </group>
+                        <group string="Execution Stats">
+                            <field name="execution_count"/>
+                            <field name="last_execution"/>
+                            <field name="success_count"/>
+                            <field name="failure_count"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Conditions">
+                            <field name="condition_domain"/>
+                            <separator string="Python Condition"/>
+                            <field name="python_condition" widget="ace" options="{'mode': 'python'}"/>
+                        </page>
+                        <page string="Actions">
+                            <field name="action_ids">
+                                <tree editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="action_type"/>
+                                    <field name="model_id"/>
+                                    <field name="method_name"/>
+                                    <field name="field_updates"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Error Handling">
+                            <group>
+                                <field name="on_error"/>
+                                <field name="max_retries"/>
+                                <field name="retry_delay"/>
+                                <field name="notification_user_ids" widget="many2many_tags"/>
+                            </group>
+                        </page>
+                        <page string="Execution Log">
+                            <field name="execution_log_ids" readonly="1">
+                                <tree>
+                                    <field name="execution_date"/>
+                                    <field name="status"/>
+                                    <field name="duration"/>
+                                    <field name="error_message"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Auto-Post Configuration Tree View -->
+    <record id="view_auto_post_tree" model="ir.ui.view">
+        <field name="name">auto.post.config.tree</field>
+        <field name="model">account.auto.post.config</field>
+        <field name="arch" type="xml">
+            <tree string="Auto-Post Configuration">
+                <field name="name"/>
+                <field name="journal_id"/>
+                <field name="post_timing"/>
+                <field name="last_run_date"/>
+                <field name="next_run_date"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Auto-Post Configuration Form View -->
+    <record id="view_auto_post_form" model="ir.ui.view">
+        <field name="name">auto.post.config.form</field>
+        <field name="model">account.auto.post.config</field>
+        <field name="arch" type="xml">
+            <form string="Auto-Post Configuration">
+                <header>
+                    <button name="run_auto_post" string="Run Now" type="object" class="btn-primary"/>
+                    <button name="preview_entries" string="Preview Entries" type="object"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Inactive" bg_color="bg-danger" invisible="active == True"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Configuration">
+                            <field name="journal_id"/>
+                            <field name="post_timing"/>
+                            <field name="schedule_time" invisible="post_timing != 'scheduled'"/>
+                            <field name="active"/>
+                        </group>
+                        <group string="Schedule">
+                            <field name="last_run_date"/>
+                            <field name="next_run_date"/>
+                            <field name="entries_posted_count"/>
+                            <field name="entries_failed_count"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Filters">
+                            <group string="Entry Filters">
+                                <field name="filter_domain"/>
+                                <field name="include_draft" />
+                                <field name="validate_before_post"/>
+                            </group>
+                        </page>
+                        <page string="Validation Rules">
+                            <field name="validation_rules">
+                                <tree editable="bottom">
+                                    <field name="rule_type"/>
+                                    <field name="description"/>
+                                    <field name="python_code" widget="ace" options="{'mode': 'python'}"/>
+                                    <field name="active"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Post History">
+                            <field name="post_history_ids" readonly="1">
+                                <tree>
+                                    <field name="post_date"/>
+                                    <field name="entries_count"/>
+                                    <field name="success_count"/>
+                                    <field name="failure_count"/>
+                                    <field name="user_id"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Actions -->
+    <record id="action_ai_prediction" model="ir.actions.act_window">
+        <field name="name">AI Predictions</field>
+        <field name="res_model">account.ai.prediction</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="action_ocr_processor" model="ir.actions.act_window">
+        <field name="name">OCR Document Processing</field>
+        <field name="res_model">account.ocr.processor</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="action_anomaly_detection" model="ir.actions.act_window">
+        <field name="name">Anomaly Detection</field>
+        <field name="res_model">account.anomaly.detection</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="action_ml_reconciliation" model="ir.actions.act_window">
+        <field name="name">Smart Reconciliation</field>
+        <field name="res_model">account.ml.reconciliation</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="action_workflow_automation" model="ir.actions.act_window">
+        <field name="name">Workflow Automation</field>
+        <field name="res_model">account.workflow.automation</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="action_auto_post" model="ir.actions.act_window">
+        <field name="name">Auto-Post Configuration</field>
+        <field name="res_model">account.auto.post.config</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

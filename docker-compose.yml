@@ -1,4 +1,3 @@
-version: '3.9'  # Adicionado para clareza e compatibilidade
 services:
   odoo:
     build:
@@ -14,7 +13,7 @@ services:
       - DB_NAME=${POSTGRES_DB}
     depends_on:
       postgres:
-        condition: service_healthy  # Garante que o Postgres esteja pronto
+        condition: service_healthy  
     ports:
       - "8069:8069"
     volumes:

@@ -1,0 +1,597 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Balance Sheet Advanced View -->
+    <record id="view_balance_sheet_advanced_form" model="ir.ui.view">
+        <field name="name">balance.sheet.advanced.form</field>
+        <field name="model">account.balance.sheet.advanced</field>
+        <field name="arch" type="xml">
+            <form string="Balance Sheet" create="false" edit="false">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>Balance Sheet</h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="comparison_type"/>
+                            <field name="comparison_date" invisible="comparison_type == 'none'"/>
+                            <field name="target_move"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Assets">
+                            <group string="Current Assets">
+                                <field name="cash_and_equivalents" widget="monetary"/>
+                                <field name="accounts_receivable" widget="monetary"/>
+                                <field name="inventory" widget="monetary"/>
+                                <field name="prepaid_expenses" widget="monetary"/>
+                                <field name="other_current_assets" widget="monetary"/>
+                                <field name="total_current_assets" widget="monetary" class="oe_subtotal_footer"/>
+                            </group>
+                            <group string="Non-Current Assets">
+                                <field name="property_plant_equipment" widget="monetary"/>
+                                <field name="intangible_assets" widget="monetary"/>
+                                <field name="investments" widget="monetary"/>
+                                <field name="other_non_current_assets" widget="monetary"/>
+                                <field name="total_non_current_assets" widget="monetary" class="oe_subtotal_footer"/>
+                            </group>
+                            <group>
+                                <field name="total_assets" widget="monetary" class="oe_total_footer"/>
+                            </group>
+                        </page>
+                        <page string="Liabilities">
+                            <group string="Current Liabilities">
+                                <field name="accounts_payable" widget="monetary"/>
+                                <field name="short_term_debt" widget="monetary"/>
+                                <field name="accrued_expenses" widget="monetary"/>
+                                <field name="deferred_revenue" widget="monetary"/>
+                                <field name="other_current_liabilities" widget="monetary"/>
+                                <field name="total_current_liabilities" widget="monetary" class="oe_subtotal_footer"/>
+                            </group>
+                            <group string="Non-Current Liabilities">
+                                <field name="long_term_debt" widget="monetary"/>
+                                <field name="deferred_tax_liabilities" widget="monetary"/>
+                                <field name="other_non_current_liabilities" widget="monetary"/>
+                                <field name="total_non_current_liabilities" widget="monetary" class="oe_subtotal_footer"/>
+                            </group>
+                            <group>
+                                <field name="total_liabilities" widget="monetary" class="oe_total_footer"/>
+                            </group>
+                        </page>
+                        <page string="Equity">
+                            <group>
+                                <field name="share_capital" widget="monetary"/>
+                                <field name="retained_earnings" widget="monetary"/>
+                                <field name="other_comprehensive_income" widget="monetary"/>
+                                <field name="treasury_shares" widget="monetary"/>
+                                <field name="minority_interest" widget="monetary"/>
+                                <field name="total_equity" widget="monetary" class="oe_total_footer"/>
+                            </group>
+                        </page>
+                        <page string="Analysis">
+                            <group string="Financial Ratios">
+                                <field name="current_ratio"/>
+                                <field name="quick_ratio"/>
+                                <field name="debt_to_equity"/>
+                                <field name="working_capital" widget="monetary"/>
+                            </group>
+                            <separator string="Trend Analysis"/>
+                            <field name="trend_chart" widget="graph" options="{'graph_type': 'bar'}" nolabel="1"/>
+                        </page>
+                    </notebook>
+                    <footer>
+                        <button name="export_pdf" string="Export PDF" type="object" class="btn-primary"/>
+                        <button name="export_excel" string="Export Excel" type="object"/>
+                        <button name="print_report" string="Print" type="object"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Profit & Loss Advanced View -->
+    <record id="view_profit_loss_advanced_form" model="ir.ui.view">
+        <field name="name">profit.loss.advanced.form</field>
+        <field name="model">account.profit.loss.advanced</field>
+        <field name="arch" type="xml">
+            <form string="Profit &amp; Loss Statement" create="false" edit="false">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>Profit &amp; Loss Statement</h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="comparison_type"/>
+                            <field name="analytic_account_ids" widget="many2many_tags"/>
+                            <field name="cost_center_ids" widget="many2many_tags"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Revenue">
+                            <field name="revenue_lines">
+                                <tree>
+                                    <field name="account_id"/>
+                                    <field name="name"/>
+                                    <field name="current_period" widget="monetary"/>
+                                    <field name="comparison_period" widget="monetary"/>
+                                    <field name="variance" widget="monetary"/>
+                                    <field name="variance_percent" widget="percentage"/>
+                                </tree>
+                            </field>
+                            <group>
+                                <field name="total_revenue" widget="monetary" class="oe_subtotal_footer"/>
+                            </group>
+                        </page>
+                        <page string="Cost of Goods Sold">
+                            <field name="cogs_lines">
+                                <tree>
+                                    <field name="account_id"/>
+                                    <field name="name"/>
+                                    <field name="current_period" widget="monetary"/>
+                                    <field name="comparison_period" widget="monetary"/>
+                                    <field name="variance" widget="monetary"/>
+                                    <field name="variance_percent" widget="percentage"/>
+                                </tree>
+                            </field>
+                            <group>
+                                <field name="total_cogs" widget="monetary" class="oe_subtotal_footer"/>
+                                <field name="gross_profit" widget="monetary" class="oe_subtotal_footer"/>
+                                <field name="gross_margin" widget="percentage"/>
+                            </group>
+                        </page>
+                        <page string="Operating Expenses">
+                            <field name="expense_lines">
+                                <tree>
+                                    <field name="account_id"/>
+                                    <field name="name"/>
+                                    <field name="current_period" widget="monetary"/>
+                                    <field name="comparison_period" widget="monetary"/>
+                                    <field name="variance" widget="monetary"/>
+                                    <field name="variance_percent" widget="percentage"/>
+                                </tree>
+                            </field>
+                            <group>
+                                <field name="total_operating_expenses" widget="monetary" class="oe_subtotal_footer"/>
+                                <field name="operating_income" widget="monetary" class="oe_subtotal_footer"/>
+                                <field name="operating_margin" widget="percentage"/>
+                            </group>
+                        </page>
+                        <page string="Other Income/Expenses">
+                            <group>
+                                <field name="interest_income" widget="monetary"/>
+                                <field name="interest_expense" widget="monetary"/>
+                                <field name="other_income" widget="monetary"/>
+                                <field name="other_expenses" widget="monetary"/>
+                            </group>
+                        </page>
+                        <page string="Summary">
+                            <group>
+                                <field name="ebt" widget="monetary" string="Earnings Before Tax"/>
+                                <field name="tax_expense" widget="monetary"/>
+                                <field name="net_income" widget="monetary" class="oe_total_footer"/>
+                                <field name="net_margin" widget="percentage"/>
+                            </group>
+                            <separator string="EBITDA Calculation"/>
+                            <group>
+                                <field name="ebitda" widget="monetary"/>
+                                <field name="ebitda_margin" widget="percentage"/>
+                            </group>
+                        </page>
+                        <page string="Graphical Analysis">
+                            <field name="revenue_trend" widget="graph" options="{'graph_type': 'line'}"/>
+                            <field name="expense_breakdown" widget="graph" options="{'graph_type': 'pie'}"/>
+                        </page>
+                    </notebook>
+                    <footer>
+                        <button name="export_pdf" string="Export PDF" type="object" class="btn-primary"/>
+                        <button name="export_excel" string="Export Excel" type="object"/>
+                        <button name="drill_down" string="Drill Down" type="object"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Cash Flow Statement View -->
+    <record id="view_cash_flow_statement_form" model="ir.ui.view">
+        <field name="name">cash.flow.statement.form</field>
+        <field name="model">account.cash.flow.statement</field>
+        <field name="arch" type="xml">
+            <form string="Cash Flow Statement" create="false" edit="false">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>Cash Flow Statement</h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="method"/>
+                            <field name="include_unposted"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Operating Activities">
+                            <group string="Cash Flows from Operating Activities">
+                                <field name="net_income" widget="monetary"/>
+                                <field name="depreciation_amortization" widget="monetary"/>
+                                <field name="changes_in_working_capital" widget="monetary"/>
+                                <field name="changes_in_receivables" widget="monetary"/>
+                                <field name="changes_in_inventory" widget="monetary"/>
+                                <field name="changes_in_payables" widget="monetary"/>
+                                <field name="other_operating_activities" widget="monetary"/>
+                                <field name="net_cash_operating" widget="monetary" class="oe_subtotal_footer"/>
+                            </group>
+                        </page>
+                        <page string="Investing Activities">
+                            <group string="Cash Flows from Investing Activities">
+                                <field name="capital_expenditures" widget="monetary"/>
+                                <field name="acquisitions" widget="monetary"/>
+                                <field name="sale_of_assets" widget="monetary"/>
+                                <field name="investments" widget="monetary"/>
+                                <field name="other_investing_activities" widget="monetary"/>
+                                <field name="net_cash_investing" widget="monetary" class="oe_subtotal_footer"/>
+                            </group>
+                        </page>
+                        <page string="Financing Activities">
+                            <group string="Cash Flows from Financing Activities">
+                                <field name="debt_issuance" widget="monetary"/>
+                                <field name="debt_repayment" widget="monetary"/>
+                                <field name="equity_issuance" widget="monetary"/>
+                                <field name="dividends_paid" widget="monetary"/>
+                                <field name="other_financing_activities" widget="monetary"/>
+                                <field name="net_cash_financing" widget="monetary" class="oe_subtotal_footer"/>
+                            </group>
+                        </page>
+                        <page string="Summary">
+                            <group>
+                                <field name="net_change_in_cash" widget="monetary" class="oe_total_footer"/>
+                                <field name="beginning_cash" widget="monetary"/>
+                                <field name="ending_cash" widget="monetary" class="oe_total_footer"/>
+                            </group>
+                            <separator string="Free Cash Flow"/>
+                            <group>
+                                <field name="free_cash_flow" widget="monetary"/>
+                                <field name="fcf_conversion_rate" widget="percentage"/>
+                            </group>
+                        </page>
+                        <page string="Waterfall Chart">
+                            <field name="cash_waterfall" widget="graph" options="{'graph_type': 'waterfall'}" nolabel="1"/>
+                        </page>
+                    </notebook>
+                    <footer>
+                        <button name="export_pdf" string="Export PDF" type="object" class="btn-primary"/>
+                        <button name="export_excel" string="Export Excel" type="object"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Changes in Equity View -->
+    <record id="view_changes_equity_form" model="ir.ui.view">
+        <field name="name">changes.equity.form</field>
+        <field name="model">account.changes.equity</field>
+        <field name="arch" type="xml">
+            <form string="Statement of Changes in Equity" create="false" edit="false">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>Statement of Changes in Equity</h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <field name="equity_movements">
+                        <tree>
+                            <field name="component"/>
+                            <field name="opening_balance" widget="monetary"/>
+                            <field name="net_income" widget="monetary"/>
+                            <field name="other_comprehensive_income" widget="monetary"/>
+                            <field name="dividends" widget="monetary"/>
+                            <field name="share_issuance" widget="monetary"/>
+                            <field name="share_buyback" widget="monetary"/>
+                            <field name="other_changes" widget="monetary"/>
+                            <field name="closing_balance" widget="monetary"/>
+                        </tree>
+                    </field>
+                    <group>
+                        <field name="total_equity_opening" widget="monetary"/>
+                        <field name="total_comprehensive_income" widget="monetary"/>
+                        <field name="total_transactions_with_owners" widget="monetary"/>
+                        <field name="total_equity_closing" widget="monetary" class="oe_total_footer"/>
+                    </group>
+                    <footer>
+                        <button name="export_pdf" string="Export PDF" type="object" class="btn-primary"/>
+                        <button name="export_excel" string="Export Excel" type="object"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Executive Summary View -->
+    <record id="view_executive_summary_form" model="ir.ui.view">
+        <field name="name">executive.summary.form</field>
+        <field name="model">account.executive.summary</field>
+        <field name="arch" type="xml">
+            <form string="Executive Summary" create="false" edit="false">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>Executive Summary Report</h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="period"/>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                        </group>
+                        <group>
+                            <field name="company_ids" widget="many2many_tags" groups="base.group_multi_company"/>
+                            <field name="include_forecast"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Key Highlights">
+                            <field name="key_highlights" widget="html"/>
+                        </page>
+                        <page string="Financial Performance">
+                            <group col="4">
+                                <field name="revenue_ytd" widget="monetary"/>
+                                <field name="revenue_growth" widget="percentage"/>
+                                <field name="profit_ytd" widget="monetary"/>
+                                <field name="profit_margin" widget="percentage"/>
+                                <field name="ebitda_ytd" widget="monetary"/>
+                                <field name="ebitda_margin" widget="percentage"/>
+                                <field name="cash_position" widget="monetary"/>
+                                <field name="debt_position" widget="monetary"/>
+                            </group>
+                        </page>
+                        <page string="Business Metrics">
+                            <field name="business_metrics">
+                                <tree>
+                                    <field name="metric_name"/>
+                                    <field name="current_value"/>
+                                    <field name="previous_value"/>
+                                    <field name="change" widget="percentage"/>
+                                    <field name="target"/>
+                                    <field name="achievement" widget="percentage"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Risk Assessment">
+                            <field name="risk_assessment" widget="html"/>
+                        </page>
+                        <page string="Recommendations">
+                            <field name="recommendations" widget="html"/>
+                        </page>
+                    </notebook>
+                    <footer>
+                        <button name="generate_presentation" string="Generate Presentation" type="object" class="btn-primary"/>
+                        <button name="export_pdf" string="Export PDF" type="object"/>
+                        <button name="email_executives" string="Email to Executives" type="object"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Segment Reporting View -->
+    <record id="view_segment_reporting_form" model="ir.ui.view">
+        <field name="name">segment.reporting.form</field>
+        <field name="model">account.segment.reporting</field>
+        <field name="arch" type="xml">
+            <form string="Segment Reporting" create="false" edit="false">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>Segment Reporting</h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="segment_type"/>
+                        </group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="include_intersegment"/>
+                        </group>
+                    </group>
+                    <field name="segment_data">
+                        <tree>
+                            <field name="segment_id"/>
+                            <field name="revenue_external" widget="monetary"/>
+                            <field name="revenue_intersegment" widget="monetary"/>
+                            <field name="total_revenue" widget="monetary"/>
+                            <field name="operating_expenses" widget="monetary"/>
+                            <field name="operating_profit" widget="monetary"/>
+                            <field name="profit_margin" widget="percentage"/>
+                            <field name="assets" widget="monetary"/>
+                            <field name="liabilities" widget="monetary"/>
+                            <field name="capex" widget="monetary"/>
+                            <field name="roa" widget="percentage"/>
+                        </tree>
+                    </field>
+                    <group string="Consolidated">
+                        <field name="total_revenue_consolidated" widget="monetary"/>
+                        <field name="total_profit_consolidated" widget="monetary"/>
+                        <field name="elimination_amount" widget="monetary"/>
+                    </group>
+                    <footer>
+                        <button name="export_pdf" string="Export PDF" type="object" class="btn-primary"/>
+                        <button name="export_excel" string="Export Excel" type="object"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Custom Report Builder -->
+    <record id="view_report_builder_form" model="ir.ui.view">
+        <field name="name">report.builder.form</field>
+        <field name="model">account.report.builder</field>
+        <field name="arch" type="xml">
+            <form string="Report Builder">
+                <header>
+                    <button name="generate_report" string="Generate Report" type="object" class="btn-primary"/>
+                    <button name="save_template" string="Save as Template" type="object"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" placeholder="Custom Report Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Report Configuration">
+                            <field name="report_type"/>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="company_ids" widget="many2many_tags" groups="base.group_multi_company"/>
+                        </group>
+                        <group string="Options">
+                            <field name="include_draft"/>
+                            <field name="include_comparison"/>
+                            <field name="comparison_periods" invisible="include_comparison == False"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Columns">
+                            <field name="column_ids">
+                                <tree editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="field_type"/>
+                                    <field name="account_ids" widget="many2many_tags"/>
+                                    <field name="formula"/>
+                                    <field name="format_type"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Rows">
+                            <field name="row_ids">
+                                <tree editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="row_type"/>
+                                    <field name="account_ids" widget="many2many_tags"/>
+                                    <field name="domain"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Filters">
+                            <group>
+                                <field name="analytic_account_ids" widget="many2many_tags"/>
+                                <field name="partner_ids" widget="many2many_tags"/>
+                                <field name="tag_ids" widget="many2many_tags"/>
+                                <field name="custom_domain"/>
+                            </group>
+                        </page>
+                        <page string="Grouping">
+                            <group>
+                                <field name="group_by"/>
+                                <field name="show_hierarchy"/>
+                                <field name="aggregate_function"/>
+                            </group>
+                        </page>
+                        <page string="Visualization">
+                            <group>
+                                <field name="chart_type"/>
+                                <field name="show_table"/>
+                                <field name="show_chart"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Saved Reports -->
+    <record id="view_saved_reports_tree" model="ir.ui.view">
+        <field name="name">saved.reports.tree</field>
+        <field name="model">account.saved.reports</field>
+        <field name="arch" type="xml">
+            <tree string="Saved Reports">
+                <field name="name"/>
+                <field name="report_type"/>
+                <field name="created_by"/>
+                <field name="create_date"/>
+                <field name="last_run_date"/>
+                <field name="schedule_enabled"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Actions -->
+    <record id="action_balance_sheet_advanced" model="ir.actions.act_window">
+        <field name="name">Balance Sheet</field>
+        <field name="res_model">account.balance.sheet.advanced</field>
+        <field name="view_mode">form</field>
+        <field name="target">main</field>
+    </record>
+
+    <record id="action_profit_loss_advanced" model="ir.actions.act_window">
+        <field name="name">Profit &amp; Loss</field>
+        <field name="res_model">account.profit.loss.advanced</field>
+        <field name="view_mode">form</field>
+        <field name="target">main</field>
+    </record>
+
+    <record id="action_cash_flow_statement" model="ir.actions.act_window">
+        <field name="name">Cash Flow Statement</field>
+        <field name="res_model">account.cash.flow.statement</field>
+        <field name="view_mode">form</field>
+        <field name="target">main</field>
+    </record>
+
+    <record id="action_changes_equity" model="ir.actions.act_window">
+        <field name="name">Changes in Equity</field>
+        <field name="res_model">account.changes.equity</field>
+        <field name="view_mode">form</field>
+        <field name="target">main</field>
+    </record>
+
+    <record id="action_executive_summary" model="ir.actions.act_window">
+        <field name="name">Executive Summary</field>
+        <field name="res_model">account.executive.summary</field>
+        <field name="view_mode">form</field>
+        <field name="target">main</field>
+    </record>
+
+    <record id="action_segment_reporting" model="ir.actions.act_window">
+        <field name="name">Segment Reporting</field>
+        <field name="res_model">account.segment.reporting</field>
+        <field name="view_mode">form</field>
+        <field name="target">main</field>
+    </record>
+
+    <record id="action_report_builder" model="ir.actions.act_window">
+        <field name="name">Report Builder</field>
+        <field name="res_model">account.report.builder</field>
+        <field name="view_mode">form</field>
+    </record>
+
+    <record id="action_saved_reports" model="ir.actions.act_window">
+        <field name="name">Saved Reports</field>
+        <field name="res_model">account.saved.reports</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

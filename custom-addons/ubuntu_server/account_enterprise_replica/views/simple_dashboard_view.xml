@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_enterprise_dashboard_tree" model="ir.ui.view">
+        <field name="name">account.enterprise.dashboard.tree</field>
+        <field name="model">account.enterprise.dashboard</field>
+        <field name="arch" type="xml">
+            <tree string="Dashboards">
+                <field name="name"/>
+                <field name="dashboard_type"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="last_refresh"/>
+            </tree>
+        </field>
+    </record>
+    
+    <record id="view_account_enterprise_dashboard_form" model="ir.ui.view">
+        <field name="name">account.enterprise.dashboard.form</field>
+        <field name="model">account.enterprise.dashboard</field>
+        <field name="arch" type="xml">
+            <form string="Accounting Dashboard">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="company_id"/>
+                            <field name="dashboard_type"/>
+                            <field name="period_type"/>
+                        </group>
+                        <group>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="currency_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="KPI Overview">
+                            <group>
+                                <group string="Revenue">
+                                    <field name="kpi_total_revenue"/>
+                                    <field name="kpi_revenue_growth"/>
+                                </group>
+                                <group string="Profitability">
+                                    <field name="kpi_net_profit"/>
+                                    <field name="kpi_net_margin"/>
+                                    <field name="kpi_gross_margin"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Cash Flow">
+                                    <field name="kpi_cash_position"/>
+                                    <field name="kpi_operating_cash_flow"/>
+                                </group>
+                                <group string="Working Capital">
+                                    <field name="kpi_accounts_receivable"/>
+                                    <field name="kpi_accounts_payable"/>
+                                    <field name="kpi_dso"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Settings">
+                            <group>
+                                <group>
+                                    <field name="auto_refresh"/>
+                                    <field name="refresh_interval" invisible="not auto_refresh"/>
+                                    <field name="cache_duration"/>
+                                </group>
+                                <group>
+                                    <field name="last_refresh" readonly="1"/>
+                                    <field name="performance_load_time" readonly="1"/>
+                                    <field name="performance_total_loads" readonly="1"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <record id="action_account_enterprise_dashboard" model="ir.actions.act_window">
+        <field name="name">Accounting Dashboard</field>
+        <field name="res_model">account.enterprise.dashboard</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'default_dashboard_type': 'executive'}</field>
+    </record>
+    
+    <menuitem id="menu_account_enterprise_dashboard"
+              name="Enterprise Dashboard"
+              parent="account.menu_finance"
+              action="action_account_enterprise_dashboard"
+              sequence="1"/>
+</odoo>
