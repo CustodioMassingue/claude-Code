@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    
+    <t t-name="account_invoicing_ext_mz.ProfitLossReport">
+        <div class="o_profit_loss_report">
+            <!-- Header with controls -->
+            <div class="o_control_panel">
+                <div class="o_control_panel_main">
+                    <div class="o_control_panel_breadcrumbs">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">Accounting</li>
+                            <li class="breadcrumb-item active">Profit and Loss</li>
+                        </ol>
+                    </div>
+                    
+                    <div class="o_control_panel_actions">
+                        <!-- Export Buttons -->
+                        <button class="btn btn-primary" t-on-click="() => this.exportPDF()">
+                            <i class="fa fa-file-pdf-o"/> PDF
+                        </button>
+                        <button class="btn btn-primary ms-2" t-on-click="() => this.exportExcel()">
+                            <i class="fa fa-file-excel-o"/> XLSX
+                        </button>
+                        
+                        <span class="ms-3 text-muted">Profit and Loss</span>
+                        
+                        <!-- Date Range Button -->
+                        <button class="btn btn-outline-secondary ms-3" t-on-click="() => this.onDateRangeClick()">
+                            <i class="fa fa-calendar"/> <t t-esc="this.getDateRangeLabel()"/>
+                        </button>
+                        
+                        <!-- Comparison Dropdown -->
+                        <div class="btn-group ms-2">
+                            <button class="btn btn-outline-secondary dropdown-toggle"
+                                    t-attf-class="{{state.comparison ? 'active' : ''}}"
+                                    data-bs-toggle="dropdown">
+                                <i class="fa fa-balance-scale"/> Comparison
+                            </button>
+                            <div class="dropdown-menu p-3" style="min-width: 250px;">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="comparison" id="comp_none"
+                                           t-att-checked="!state.comparison"
+                                           t-on-change="() => this.setComparisonMode('none')"/>
+                                    <label class="form-check-label" for="comp_none">
+                                        <i class="fa fa-check text-success"/> No Comparison
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="comparison" id="comp_previous"
+                                           t-att-checked="state.comparisonMode === 'previous'"
+                                           t-on-change="() => this.setComparisonMode('previous')"/>
+                                    <label class="form-check-label" for="comp_previous">
+                                        Previous Period
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="comparison" id="comp_year"
+                                           t-att-checked="state.comparisonMode === 'year'"
+                                           t-on-change="() => this.setComparisonMode('year')"/>
+                                    <label class="form-check-label" for="comp_year">
+                                        Same Period Last Year
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="comparison" id="comp_specific"
+                                           t-att-checked="state.comparisonMode === 'specific'"
+                                           t-on-change="() => this.setComparisonMode('specific')"/>
+                                    <label class="form-check-label" for="comp_specific">
+                                        Specific Period
+                                    </label>
+                                </div>
+                                <t t-if="state.comparisonMode === 'specific'">
+                                    <label class="mt-2">From:</label>
+                                    <input type="date" class="form-control" 
+                                           t-att-value="state.comparisonDateFrom"
+                                           t-on-change="(ev) => this.onComparisonDateChange('comparisonDateFrom', ev)"/>
+                                    <label class="mt-2">To:</label>
+                                    <input type="date" class="form-control" 
+                                           t-att-value="state.comparisonDateTo"
+                                           t-on-change="(ev) => this.onComparisonDateChange('comparisonDateTo', ev)"/>
+                                </t>
+                                <hr class="dropdown-divider"/>
+                                <label class="mb-2">Period order</label>
+                                <select class="form-select form-select-sm"
+                                        t-att-value="state.periodOrder"
+                                        t-on-change="(ev) => this.onPeriodOrderChange(ev)">
+                                    <option value="descending">Descending</option>
+                                    <option value="ascending">Ascending</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- All Journals Dropdown -->
+                        <div class="btn-group ms-2">
+                            <button class="btn btn-outline-secondary dropdown-toggle" 
+                                    data-bs-toggle="dropdown">
+                                <i class="fa fa-book"/> 
+                                <t t-if="state.allJournals">All Journals</t>
+                                <t t-else="">
+                                    <t t-esc="state.selectedJournalsCount"/> Journal<t t-if="state.selectedJournalsCount > 1">s</t>
+                                </t>
+                            </button>
+                            <div class="dropdown-menu p-3" style="min-width: 300px; max-height: 500px; overflow-y: auto;">
+                                <!-- Quick Filters Section -->
+                                <div class="quick-filters-section">
+                                    <button class="dropdown-item px-2" t-on-click="() => this.selectJournalsByType('bank')">
+                                        Bank
+                                    </button>
+                                    <button class="dropdown-item px-2" t-on-click="() => this.selectJournalsByType('cash')">
+                                        Cash
+                                    </button>
+                                    <button class="dropdown-item px-2" t-on-click="() => this.selectJournalsByType('sale')">
+                                        Customer Invoices
+                                    </button>
+                                    <button class="dropdown-item px-2" t-on-click="() => this.selectJournalsByType('purchase')">
+                                        Vendor Bills
+                                    </button>
+                                    <button class="dropdown-item px-2" t-on-click="() => this.selectJournalsByType('general')">
+                                        Miscellaneous Operations
+                                    </button>
+                                </div>
+                                
+                                <hr class="dropdown-divider"/>
+                                
+                                <!-- All Journals Checkbox -->
+                                <h6 class="dropdown-header">Select Journals</h6>
+                                <div class="form-check px-3">
+                                    <input class="form-check-input" type="checkbox" 
+                                           id="journal_all"
+                                           t-att-checked="state.allJournals"
+                                           t-on-change="() => this.toggleAllJournals()"/>
+                                    <label class="form-check-label" for="journal_all">
+                                        <strong>All Journals</strong>
+                                    </label>
+                                </div>
+                                
+                                <hr class="dropdown-divider"/>
+                                
+                                <!-- Individual Journals List -->
+                                <div class="journals-list px-3">
+                                    <t t-foreach="state.journals" t-as="journal" t-key="journal.id">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox"
+                                                   t-att-id="'journal_' + journal.id"
+                                                   t-att-checked="state.filters.journals.includes(journal.id)"
+                                                   t-att-disabled="state.allJournals"
+                                                   t-on-change="(ev) => this.onJournalToggle(journal.id, ev)"/>
+                                            <label class="form-check-label" 
+                                                   t-att-for="'journal_' + journal.id">
+                                                <t t-esc="journal.code"/> - <t t-esc="journal.name"/>
+                                            </label>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Analytic Dropdown -->
+                        <div class="btn-group ms-2">
+                            <button class="btn btn-outline-secondary dropdown-toggle"
+                                    t-attf-class="{{state.showAnalytic ? 'active' : ''}}"
+                                    data-bs-toggle="dropdown">
+                                <i class="fa fa-bar-chart"/> Analytic
+                            </button>
+                            <div class="dropdown-menu p-3" style="min-width: 200px;">
+                                <button class="dropdown-item px-2" t-on-click="() => this.openAnalyticAccounts()">
+                                    Accounts
+                                </button>
+                                <button class="dropdown-item px-2" t-on-click="() => this.openAnalyticPlans()">
+                                    Plans
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Partners Button -->
+                        <button class="btn btn-outline-secondary ms-2"
+                                t-attf-class="{{state.showPartners ? 'active' : ''}}"
+                                t-on-click="() => this.openPartnerSelection()">
+                            <i class="fa fa-users"/> Partners
+                        </button>
+                        
+                        <!-- Posted Entries Dropdown -->
+                        <div class="btn-group ms-2">
+                            <button class="btn btn-outline-secondary dropdown-toggle"
+                                    t-attf-class="{{state.onlyPosted ? 'active' : ''}}"
+                                    data-bs-toggle="dropdown">
+                                <i class="fa fa-check-square"/> Posted Entries
+                            </button>
+                            <div class="dropdown-menu p-3" style="min-width: 200px;">
+                                <button class="dropdown-item px-2" t-on-click="() => this.toggleDraftEntries()">
+                                    <t t-if="state.includeDraft">
+                                        <i class="fa fa-check-square-o me-2"/>
+                                    </t>
+                                    <t t-else="">
+                                        <i class="fa fa-square-o me-2"/>
+                                    </t>
+                                    Draft Entries
+                                </button>
+                                <button class="dropdown-item px-2" t-on-click="() => this.toggleAnalyticSimulations()">
+                                    <t t-if="state.includeSimulations">
+                                        <i class="fa fa-check-square-o me-2"/>
+                                    </t>
+                                    <t t-else="">
+                                        <i class="fa fa-square-o me-2"/>
+                                    </t>
+                                    Analytic Simulations
+                                </button>
+                                <hr class="dropdown-divider"/>
+                                <button class="dropdown-item px-2" t-on-click="() => this.unfoldAll()">
+                                    Unfold All
+                                </button>
+                                <button class="dropdown-item px-2" t-on-click="() => this.toggleHideZero()">
+                                    <t t-if="state.hideZeroBalances">
+                                        <i class="fa fa-check-square-o me-2"/>
+                                    </t>
+                                    <t t-else="">
+                                        <i class="fa fa-square-o me-2"/>
+                                    </t>
+                                    Hide lines at 0
+                                </button>
+                                <button class="dropdown-item px-2" t-on-click="() => this.toggleSplitView()">
+                                    <t t-if="state.splitHorizontally">
+                                        <i class="fa fa-check-square-o me-2"/>
+                                    </t>
+                                    <t t-else="">
+                                        <i class="fa fa-square-o me-2"/>
+                                    </t>
+                                    Split Horizontally
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Report Dropdown -->
+                        <div class="btn-group ms-2">
+                            <button class="btn btn-outline-secondary dropdown-toggle" 
+                                    data-bs-toggle="dropdown">
+                                <i class="fa fa-file-text"/> Report: Profit and Loss (IN)
+                            </button>
+                            <div class="dropdown-menu p-3" style="min-width: 200px;">
+                                <button class="dropdown-item px-2">
+                                    Profit and Loss (IN)
+                                </button>
+                                <button class="dropdown-item px-2">
+                                    Profit and Loss (US)
+                                </button>
+                                <button class="dropdown-item px-2">
+                                    Profit and Loss (EU)
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Budget Button -->
+                        <button class="btn btn-outline-secondary ms-2"
+                                t-attf-class="{{state.showBudget ? 'active' : ''}}"
+                                t-on-click="() => this.openBudgetOptions()">
+                            <i class="fa fa-bar-chart-o"/> Budget
+                        </button>
+                        
+                        <!-- In Filter Dropdown -->
+                        <div class="btn-group ms-2">
+                            <button class="btn btn-outline-secondary dropdown-toggle" 
+                                    data-bs-toggle="dropdown">
+                                In <i class="fa fa-filter"/>
+                            </button>
+                            <div class="dropdown-menu p-3" style="min-width: 200px;">
+                                <h6 class="dropdown-header">Filter Options</h6>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" 
+                                           id="filter_all"
+                                           checked="checked"/>
+                                    <label class="form-check-label" for="filter_all">
+                                        All Items
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" 
+                                           id="filter_zero"/>
+                                    <label class="form-check-label" for="filter_zero">
+                                        Hide Zero Balances
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Content Area -->
+            <div class="o_content">
+                <!-- Unposted entries warning -->
+                <t t-if="state.hasUnposted">
+                    <div class="alert alert-info d-flex align-items-center">
+                        <span>There are <strong>unposted Journal Entries</strong> prior or included in this period.</span>
+                    </div>
+                </t>
+                
+                <!-- Loading State -->
+                <t t-if="state.loading">
+                    <div class="text-center p-5">
+                        <i class="fa fa-spinner fa-spin fa-3x text-primary"/>
+                        <p class="mt-3">Loading profit and loss...</p>
+                    </div>
+                </t>
+                
+                <!-- Error State -->
+                <t t-elif="state.error">
+                    <div class="alert alert-danger">
+                        <i class="fa fa-exclamation-triangle"/> <t t-esc="state.error"/>
+                    </div>
+                </t>
+                
+                <!-- Profit and Loss Table -->
+                <t t-elif="state.data">
+                    <div class="o_profit_loss_table">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th width="60%"></th>
+                                    <th class="text-end" width="20%">
+                                        <t t-esc="state.data.date_range"/>
+                                    </th>
+                                    <t t-if="state.comparison and state.data.comparison">
+                                        <th class="text-end" width="20%">
+                                            <t t-esc="state.data.comparison.date_range"/>
+                                        </th>
+                                    </t>
+                                    <th width="5%">
+                                        <button class="btn btn-sm btn-link p-0" title="Settings">
+                                            <i class="fa fa-cog"/>
+                                        </button>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <th class="text-end">Balance</th>
+                                    <t t-if="state.comparison">
+                                        <th class="text-end">Balance</th>
+                                    </t>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="this.getVisibleLines()" t-as="line" t-key="line.id">
+                                    <tr t-att-class="this.getLineClass(line)" 
+                                        t-att-data-line-id="line.id"
+                                        t-att-style="line.style || ''">
+                                        <td>
+                                            <!-- Indentation based on level -->
+                                            <span t-attf-style="padding-left: {{line.level * 30}}px;">
+                                                <!-- Expand/Collapse Button -->
+                                                <t t-if="line.unfoldable">
+                                                    <button class="btn btn-sm btn-link p-0 me-1"
+                                                            t-on-click.stop="() => this.toggleLine(line.id)">
+                                                        <i t-attf-class="fa fa-{{this.isExpanded(line.id) ? 'caret-down' : 'caret-right'}}"/>
+                                                    </button>
+                                                </t>
+                                                <t t-else="">
+                                                    <t t-if="line.level > 2">
+                                                        <span class="ms-3"></span>
+                                                    </t>
+                                                </t>
+                                                
+                                                <!-- Line Name with proper styling -->
+                                                <span t-attf-class="line-name {{line.is_total ? 'fw-bold' : ''}} {{line.level == 3 ? 'text-muted' : ''}}">
+                                                    <t t-esc="line.name"/>
+                                                </span>
+                                            </span>
+                                        </td>
+                                        
+                                        <!-- Current Balance -->
+                                        <td class="text-end">
+                                            <span t-attf-class="{{line.is_total ? 'fw-bold' : ''}} {{line.balance &lt; 0 ? 'text-danger' : ''}}">
+                                                <t t-esc="this.formatCurrency(line.balance)"/>
+                                            </span>
+                                        </td>
+                                        
+                                        <!-- Comparison Balance -->
+                                        <t t-if="state.comparison">
+                                            <td class="text-end">
+                                                <span t-attf-class="{{line.is_total ? 'fw-bold' : ''}}">
+                                                    <t t-if="state.data.comparison and state.data.comparison.lines">
+                                                        <t t-esc="this.formatCurrency(line.comparison_balance)"/>
+                                                    </t>
+                                                </span>
+                                            </td>
+                                        </t>
+                                        
+                                        <!-- Info/Action Column -->
+                                        <td class="text-center">
+                                            <t t-if="line.has_details or line.level == 3">
+                                                <button class="btn btn-sm btn-link p-0" 
+                                                        title="View details">
+                                                    <i class="fa fa-info-circle text-muted"/>
+                                                </button>
+                                            </t>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </div>
+        </div>
+    </t>
+    
+</templates>

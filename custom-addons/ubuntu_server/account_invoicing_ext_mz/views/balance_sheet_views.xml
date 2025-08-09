@@ -12,13 +12,6 @@
         }</field>
     </record>
     
-    <!-- Updated menu to use the new client action -->
-    <menuitem id="menu_mz_balance_sheet" 
-              name="Balance Sheet"
-              parent="menu_mz_reporting_statement" 
-              action="action_account_balance_sheet_report"
-              groups="account.group_account_user" 
-              sequence="111"/>
     
     <!-- PDF Report Template -->
     <report id="action_report_balance_sheet"
