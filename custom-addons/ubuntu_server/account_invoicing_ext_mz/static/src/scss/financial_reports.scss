@@ -22,7 +22,8 @@
 .o_trial_balance_report,
 .o_journal_audit_report,
 .o_partner_ledger_report,
-.o_aged_receivable_report {
+.o_aged_receivable_report,
+.o_aged_payable_report {
     position: relative !important;
     height: 100% !important;
     width: 100% !important;
@@ -188,7 +189,8 @@
         .o_journal_audit_table,
         .o_tax_summary_table,
         .o_partner_ledger_table,
-        .o_aged_receivable_table {
+        .o_aged_receivable_table,
+        .o_aged_payable_table {
             background: white;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
@@ -522,7 +524,8 @@
     .o_trial_balance_report,
     .o_journal_audit_report,
     .o_partner_ledger_report,
-    .o_aged_receivable_report {
+    .o_aged_receivable_report,
+    .o_aged_payable_report {
         .o_control_panel {
             padding: 8px 16px;
             
@@ -548,7 +551,8 @@
             .o_journal_audit_table,
             .o_tax_summary_table,
             .o_partner_ledger_table,
-            .o_aged_receivable_table {
+            .o_aged_receivable_table,
+            .o_aged_payable_table {
                 border-radius: 4px;
             }
         }
@@ -565,7 +569,8 @@
     .o_trial_balance_report,
     .o_journal_audit_report,
     .o_partner_ledger_report,
-    .o_aged_receivable_report {
+    .o_aged_receivable_report,
+    .o_aged_payable_report {
         .o_control_panel {
             .o_control_panel_main {
                 flex-direction: column;
@@ -601,7 +606,8 @@
             .o_journal_audit_table,
             .o_tax_summary_table,
             .o_partner_ledger_table,
-            .o_aged_receivable_table {
+            .o_aged_receivable_table,
+            .o_aged_payable_table {
                 table {
                     font-size: 11px;
                     
@@ -634,7 +640,8 @@
     .o_trial_balance_report,
     .o_journal_audit_report,
     .o_partner_ledger_report,
-    .o_aged_receivable_report {
+    .o_aged_receivable_report,
+    .o_aged_payable_report {
         .o_control_panel {
             display: none !important;
         }
@@ -657,7 +664,8 @@
             .o_journal_audit_table,
             .o_tax_summary_table,
             .o_partner_ledger_table,
-            .o_aged_receivable_table {
+            .o_aged_receivable_table,
+            .o_aged_payable_table {
                 box-shadow: none;
                 max-width: 100%;
                 
