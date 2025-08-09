@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:www.odoo.com)",
+      "Bash(mkdir:*)",
+      "Bash(rm:*)",
+      "Bash(docker exec:*)",
+      "Bash(docker ps:*)",
+      "Bash(python:*)"
+    ],
+    "deny": []
+  }
+}

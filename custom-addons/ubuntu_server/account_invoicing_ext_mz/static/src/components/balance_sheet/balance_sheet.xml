@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    
+    <t t-name="account_invoicing_ext_mz.BalanceSheetReport">
+        <div class="o_balance_sheet_report">
+            <!-- Header with controls -->
+            <div class="o_control_panel">
+                <div class="o_control_panel_main">
+                    <div class="o_control_panel_breadcrumbs">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">Accounting</li>
+                            <li class="breadcrumb-item active">Balance Sheet</li>
+                        </ol>
+                    </div>
+                    
+                    <div class="o_control_panel_actions">
+                        <!-- Export Buttons -->
+                        <button class="btn btn-primary" t-on-click="exportPDF">
+                            <i class="fa fa-file-pdf-o"/> PDF
+                        </button>
+                        <button class="btn btn-primary ms-2" t-on-click="exportExcel">
+                            <i class="fa fa-file-excel-o"/> XLSX
+                        </button>
+                        
+                        <!-- Date Filter -->
+                        <div class="btn-group ms-3">
+                            <button class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                                <i class="fa fa-calendar"/> As of <t t-esc="state.date_to"/>
+                            </button>
+                            <div class="dropdown-menu">
+                                <div class="p-3">
+                                    <label>Date:</label>
+                                    <input type="date" class="form-control" 
+                                           t-att-value="state.date_to"
+                                           t-on-change="(ev) => onDateChange('date_to', ev.target.value)"/>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Comparison Toggle -->
+                        <button class="btn btn-secondary ms-2" 
+                                t-attf-class="{{state.comparison ? 'active' : ''}}"
+                                t-on-click="onComparisonToggle">
+                            <i class="fa fa-balance-scale"/> Comparison
+                        </button>
+                        
+                        <!-- Journal Filter -->
+                        <div class="btn-group ms-2">
+                            <button class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                                <i class="fa fa-book"/> 
+                                <t t-if="state.allJournals">All Journals</t>
+                                <t t-else="">Selected Journals</t>
+                            </button>
+                            <div class="dropdown-menu p-3" style="min-width: 200px;">
+                                <t t-foreach="state.journals" t-as="journal" t-key="journal.id">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input"
+                                               t-att-id="'journal_' + journal.id"
+                                               t-att-checked="state.filters.journals.includes(journal.id)"/>
+                                        <label class="form-check-label" t-att-for="'journal_' + journal.id">
+                                            <t t-esc="journal.name"/>
+                                        </label>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                        
+                        <!-- Analytic Toggle -->
+                        <button class="btn btn-secondary ms-2"
+                                t-attf-class="{{state.showAnalytic ? 'active' : ''}}"
+                                t-on-click="onAnalyticToggle">
+                            <i class="fa fa-bar-chart"/> Analytic
+                        </button>
+                        
+                        <!-- Posted Entries Filter -->
+                        <button class="btn btn-secondary ms-2"
+                                t-attf-class="{{state.onlyPosted ? 'active' : ''}}"
+                                t-on-click="onPostedEntriesToggle">
+                            <i class="fa fa-check-square"/> Posted Entries
+                        </button>
+                        
+                        <!-- Filters Dropdown -->
+                        <div class="btn-group ms-2">
+                            <button class="btn btn-secondary" data-bs-toggle="dropdown">
+                                <i class="fa fa-filter"/> In
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Content Area -->
+            <div class="o_content">
+                <!-- Unposted entries warning -->
+                <t t-if="state.hasUnposted">
+                    <div class="alert alert-info d-flex align-items-center">
+                        <i class="fa fa-info-circle me-2"/>
+                        <span>There are unposted Journal Entries prior or included in this period.</span>
+                    </div>
+                </t>
+                
+                <!-- Loading State -->
+                <t t-if="state.loading">
+                    <div class="text-center p-5">
+                        <i class="fa fa-spinner fa-spin fa-3x text-primary"/>
+                        <p class="mt-3">Loading balance sheet...</p>
+                    </div>
+                </t>
+                
+                <!-- Error State -->
+                <t t-elif="state.error">
+                    <div class="alert alert-danger">
+                        <i class="fa fa-exclamation-triangle"/> <t t-esc="state.error"/>
+                    </div>
+                </t>
+                
+                <!-- Balance Sheet Table -->
+                <t t-elif="state.data">
+                    <div class="o_balance_sheet_table">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th width="60%"></th>
+                                    <th class="text-end" width="20%">
+                                        As of <t t-esc="state.data.date"/>
+                                    </th>
+                                    <t t-if="state.comparison and state.data.comparison">
+                                        <th class="text-end" width="20%">
+                                            As of <t t-esc="state.data.comparison.date"/>
+                                        </th>
+                                    </t>
+                                    <th width="5%"></th>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <th class="text-end">Balance</th>
+                                    <t t-if="state.comparison">
+                                        <th class="text-end">Balance</th>
+                                    </t>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="getVisibleLines()" t-as="line" t-key="line.id">
+                                    <tr t-att-class="getLineClass(line)" 
+                                        t-att-data-line-id="line.id">
+                                        <td>
+                                            <!-- Indentation based on level -->
+                                            <span t-attf-style="padding-left: {{line.level * 20}}px;">
+                                                <!-- Expand/Collapse Button -->
+                                                <t t-if="line.unfoldable">
+                                                    <button class="btn btn-sm btn-link p-0 me-1"
+                                                            t-on-click="() => toggleLine(line.id)">
+                                                        <i t-attf-class="fa fa-{{isExpanded(line.id) ? 'caret-down' : 'caret-right'}}"/>
+                                                    </button>
+                                                </t>
+                                                <t t-else="">
+                                                    <span class="me-3"></span>
+                                                </t>
+                                                
+                                                <!-- Line Name -->
+                                                <span t-attf-class="line-name {{line.is_total ? 'fw-bold' : ''}}">
+                                                    <t t-esc="line.name"/>
+                                                </span>
+                                            </span>
+                                        </td>
+                                        
+                                        <!-- Current Balance -->
+                                        <td class="text-end">
+                                            <span t-attf-class="{{line.is_total ? 'fw-bold' : ''}}">
+                                                <t t-esc="formatCurrency(line.balance)"/>
+                                            </span>
+                                        </td>
+                                        
+                                        <!-- Comparison Balance -->
+                                        <t t-if="state.comparison">
+                                            <td class="text-end">
+                                                <span t-attf-class="{{line.is_total ? 'fw-bold' : ''}}">
+                                                    <t t-if="state.data.comparison and state.data.comparison.lines">
+                                                        <t t-esc="formatCurrency(line.comparison_balance)"/>
+                                                    </t>
+                                                </span>
+                                            </td>
+                                        </t>
+                                        
+                                        <!-- Info/Action Column -->
+                                        <td class="text-center">
+                                            <t t-if="line.has_details">
+                                                <button class="btn btn-sm btn-link" 
+                                                        title="View details">
+                                                    <i class="fa fa-info-circle"/>
+                                                </button>
+                                            </t>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </div>
+        </div>
+    </t>
+    
+</templates>

@@ -1,0 +1,240 @@
+.o_balance_sheet_report {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    
+    .o_control_panel {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+        padding: 1rem;
+        flex-shrink: 0;
+        
+        .o_control_panel_main {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            
+            .o_control_panel_breadcrumbs {
+                .breadcrumb {
+                    margin-bottom: 0;
+                    background-color: transparent;
+                    padding: 0;
+                }
+            }
+            
+            .o_control_panel_actions {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                flex-wrap: wrap;
+                
+                .btn {
+                    white-space: nowrap;
+                    
+                    &.active {
+                        background-color: #0066cc;
+                        color: white;
+                        border-color: #0066cc;
+                    }
+                    
+                    i {
+                        margin-right: 0.25rem;
+                    }
+                }
+                
+                .dropdown-menu {
+                    min-width: 250px;
+                }
+            }
+        }
+    }
+    
+    .o_content {
+        flex: 1;
+        overflow: auto;
+        padding: 1rem;
+        
+        .alert {
+            margin-bottom: 1rem;
+            
+            &.alert-info {
+                background-color: #d1ecf1;
+                border-color: #bee5eb;
+                color: #0c5460;
+            }
+        }
+        
+        .o_balance_sheet_table {
+            background: white;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+            
+            table {
+                margin-bottom: 0;
+                
+                thead {
+                    background-color: #f8f9fa;
+                    position: sticky;
+                    top: 0;
+                    z-index: 10;
+                    
+                    tr {
+                        th {
+                            border-bottom: 2px solid #dee2e6;
+                            font-weight: 600;
+                            padding: 0.75rem;
+                            color: #495057;
+                            
+                            &:first-child {
+                                padding-left: 1rem;
+                            }
+                        }
+                    }
+                }
+                
+                tbody {
+                    tr {
+                        transition: background-color 0.15s ease;
+                        
+                        &:hover {
+                            background-color: #f8f9fa;
+                        }
+                        
+                        &.level-0 {
+                            background-color: #e7f3ff;
+                            
+                            td {
+                                font-weight: 600;
+                                font-size: 1.1rem;
+                                padding: 0.75rem;
+                                color: #004085;
+                            }
+                        }
+                        
+                        &.level-1 {
+                            td {
+                                padding: 0.625rem 0.75rem;
+                                font-weight: 500;
+                            }
+                        }
+                        
+                        &.level-2 {
+                            td {
+                                padding: 0.5rem 0.75rem;
+                                color: #6c757d;
+                            }
+                        }
+                        
+                        &.level-3 {
+                            td {
+                                padding: 0.375rem 0.75rem;
+                                font-size: 0.9rem;
+                                color: #6c757d;
+                            }
+                        }
+                        
+                        &.total-line {
+                            border-top: 2px solid #dee2e6;
+                            border-bottom: 3px double #dee2e6;
+                            background-color: #f0f8ff;
+                            
+                            td {
+                                font-weight: 700;
+                                color: #004085;
+                            }
+                        }
+                        
+                        td {
+                            padding: 0.5rem 0.75rem;
+                            vertical-align: middle;
+                            
+                            &:first-child {
+                                padding-left: 1rem;
+                            }
+                            
+                            .line-name {
+                                &.fw-bold {
+                                    font-weight: 600;
+                                }
+                            }
+                            
+                            button.btn-link {
+                                padding: 0;
+                                border: none;
+                                background: none;
+                                color: #0066cc;
+                                cursor: pointer;
+                                
+                                &:hover {
+                                    color: #0052a3;
+                                }
+                                
+                                i {
+                                    font-size: 0.875rem;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    // Responsive adjustments
+    @media (max-width: 991px) {
+        .o_control_panel {
+            .o_control_panel_main {
+                .o_control_panel_actions {
+                    margin-top: 1rem;
+                    width: 100%;
+                    
+                    .btn-group {
+                        margin-bottom: 0.5rem;
+                    }
+                }
+            }
+        }
+    }
+    
+    // Print styles
+    @media print {
+        .o_control_panel {
+            display: none;
+        }
+        
+        .o_content {
+            padding: 0;
+            
+            .alert {
+                display: none;
+            }
+            
+            .o_balance_sheet_table {
+                box-shadow: none;
+                
+                table {
+                    font-size: 10pt;
+                    
+                    button {
+                        display: none;
+                    }
+                }
+            }
+        }
+    }
+    
+    // Loading animation
+    .fa-spinner {
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(360deg);
+        }
+    }
+}

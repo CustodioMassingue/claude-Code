@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Client Action for Balance Sheet Report -->
+    <record id="action_account_balance_sheet_report" model="ir.actions.client">
+        <field name="name">Balance Sheet</field>
+        <field name="tag">account_balance_sheet_report</field>
+        <field name="target">main</field>
+        <field name="context">{
+            'default_date_to': context_today().strftime('%Y-%m-%d'),
+            'show_analytic': False,
+            'only_posted': True
+        }</field>
+    </record>
+    
+    <!-- Updated menu to use the new client action -->
+    <menuitem id="menu_mz_balance_sheet" 
+              name="Balance Sheet"
+              parent="menu_mz_reporting_statement" 
+              action="action_account_balance_sheet_report"
+              groups="account.group_account_user" 
+              sequence="111"/>
+    
+    <!-- PDF Report Template -->
+    <report id="action_report_balance_sheet"
+            string="Balance Sheet"
+            model="account.balance.sheet.report"
+            report_type="qweb-pdf"
+            file="account_invoicing_ext_mz.report_balance_sheet"
+            name="account_invoicing_ext_mz.report_balance_sheet"
+            menu="False"/>
+    
+    <!-- Report PDF Template -->
+    <template id="report_balance_sheet">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2 class="text-center">Balance Sheet</h2>
+                        <p class="text-center">
+                            <t t-esc="o.get('company', '')"/> - As of <t t-esc="o.get('date', '')"/>
+                        </p>
+                        
+                        <t t-if="o.get('has_unposted')">
+                            <div class="alert alert-warning">
+                                There are unposted Journal Entries in this period.
+                            </div>
+                        </t>
+                        
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Account</th>
+                                    <th class="text-right">Balance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="o.get('lines', [])" t-as="line">
+                                    <tr t-attf-class="#{line.get('is_total') and 'font-weight-bold border-top' or ''}">
+                                        <td>
+                                            <span t-attf-style="padding-left: #{line.get('level', 0) * 20}px;">
+                                                <t t-esc="line.get('name', '')"/>
+                                            </span>
+                                        </td>
+                                        <td class="text-right">
+                                            <t t-esc="'{:,.2f}'.format(line.get('balance', 0))"/>
+                                        </td>
+                                    </tr>
+                                    
+                                    <!-- Render children if expanded in PDF -->
+                                    <t t-if="line.get('children')">
+                                        <t t-foreach="line.get('children', [])" t-as="child">
+                                            <tr>
+                                                <td>
+                                                    <span t-attf-style="padding-left: #{child.get('level', 0) * 20}px;">
+                                                        <t t-esc="child.get('name', '')"/>
+                                                    </span>
+                                                </td>
+                                                <td class="text-right">
+                                                    <t t-esc="'{:,.2f}'.format(child.get('balance', 0))"/>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </t>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
