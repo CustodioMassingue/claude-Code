@@ -1,0 +1,562 @@
+// Financial Reports - Full Width Layout
+// Balance Sheet & Profit and Loss Reports
+
+// Force full-width layout by overriding Odoo's default container styles
+.o_action_manager {
+    &.o_xxl_form_view {
+        max-width: 100% !important;
+    }
+    
+    .o_content {
+        max-width: 100% !important;
+    }
+}
+
+// Common styles for both reports
+.o_balance_sheet_report,
+.o_profit_loss_report {
+    position: relative !important;
+    height: 100% !important;
+    width: 100% !important;
+    display: flex;
+    flex-direction: column;
+    background-color: #f5f5f5;
+    margin: 0 !important;
+    padding: 0 !important;
+    
+    // Control Panel - Full width header
+    .o_control_panel {
+        background-color: white;
+        border-bottom: 1px solid #dee2e6;
+        padding: 12px 24px;
+        flex-shrink: 0;
+        width: 100%;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        
+        .o_control_panel_main {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            
+            .o_control_panel_breadcrumbs {
+                display: none; // Hide breadcrumbs as they're redundant
+            }
+            
+            .o_control_panel_actions {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                flex-wrap: wrap;
+                flex: 1;
+                
+                // First button group (PDF/XLSX)
+                .btn-primary {
+                    background-color: #714B67;
+                    border-color: #714B67;
+                    font-size: 13px;
+                    padding: 5px 12px;
+                    
+                    &:hover {
+                        background-color: #5a3c52;
+                        border-color: #5a3c52;
+                    }
+                    
+                    i {
+                        margin-right: 4px;
+                    }
+                }
+                
+                // Title label
+                .text-muted {
+                    color: #6c757d !important;
+                    font-size: 14px;
+                    font-weight: 500;
+                    margin: 0 12px;
+                }
+                
+                // All filter buttons
+                .btn-outline-secondary {
+                    background-color: white;
+                    border-color: #dee2e6;
+                    color: #495057;
+                    font-size: 13px;
+                    padding: 5px 12px;
+                    
+                    &:hover {
+                        background-color: #f8f9fa;
+                        border-color: #adb5bd;
+                    }
+                    
+                    &.active {
+                        background-color: #e3f2fd;
+                        border-color: #0066cc;
+                        color: #0066cc;
+                    }
+                    
+                    i {
+                        margin-right: 4px;
+                        font-size: 12px;
+                    }
+                }
+                
+                // Dropdown menus
+                .dropdown-menu {
+                    border: 1px solid #dee2e6;
+                    box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+                    
+                    .dropdown-item {
+                        font-size: 13px;
+                        padding: 6px 16px;
+                        
+                        &:hover {
+                            background-color: #f8f9fa;
+                        }
+                        
+                        &:active {
+                            background-color: #e3f2fd;
+                        }
+                    }
+                    
+                    .form-check {
+                        padding: 6px 16px;
+                        
+                        .form-check-label {
+                            font-size: 13px;
+                            cursor: pointer;
+                        }
+                    }
+                    
+                    .dropdown-divider {
+                        margin: 4px 0;
+                    }
+                    
+                    .dropdown-header {
+                        font-size: 12px;
+                        text-transform: uppercase;
+                        color: #6c757d;
+                        padding: 8px 16px 4px;
+                    }
+                }
+            }
+        }
+    }
+    
+    // Main content area - Full width
+    .o_content {
+        flex: 1;
+        overflow: auto;
+        padding: 24px;
+        background-color: #f5f5f5;
+        
+        // Unposted warning
+        .alert {
+            margin: 0 auto 20px;
+            max-width: 1400px;
+            
+            &.alert-info {
+                background-color: #cff4fc;
+                border: 1px solid #9eeaf9;
+                color: #055160;
+                padding: 12px 20px;
+                border-radius: 4px;
+                font-size: 14px;
+                
+                strong {
+                    font-weight: 600;
+                }
+            }
+        }
+        
+        // Main table container
+        .o_balance_sheet_table,
+        .o_profit_loss_table {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            max-width: 1400px;
+            margin: 0 auto;
+            overflow: hidden;
+            
+            table {
+                width: 100%;
+                margin-bottom: 0;
+                border-collapse: collapse;
+                
+                thead {
+                    background-color: #fafbfc;
+                    position: sticky;
+                    top: 0;
+                    z-index: 10;
+                    
+                    tr {
+                        th {
+                            border-bottom: 2px solid #e1e4e8;
+                            font-weight: 600;
+                            padding: 12px 16px;
+                            color: #24292e;
+                            font-size: 13px;
+                            text-align: left;
+                            
+                            &:first-child {
+                                padding-left: 24px;
+                                width: 60%;
+                            }
+                            
+                            &.text-end {
+                                text-align: right !important;
+                                padding-right: 24px;
+                            }
+                            
+                            &:last-child {
+                                width: 60px;
+                                text-align: center;
+                            }
+                        }
+                    }
+                }
+                
+                tbody {
+                    tr {
+                        border-bottom: 1px solid #f0f0f0;
+                        transition: background-color 0.15s ease;
+                        
+                        &:hover {
+                            background-color: #fafbfc;
+                        }
+                        
+                        // Level 0 - Main sections (ASSETS, LIABILITIES, EQUITY)
+                        &.level-0 {
+                            background-color: #f6f8fa;
+                            
+                            td {
+                                font-weight: 700;
+                                font-size: 14px;
+                                padding: 14px 16px;
+                                color: #24292e;
+                                
+                                &:first-child {
+                                    padding-left: 24px;
+                                }
+                            }
+                        }
+                        
+                        // Main sections for Profit & Loss (Net Profit, Income, etc.)
+                        &[style*="background-color"] {
+                            td {
+                                font-weight: 600;
+                                padding: 12px 16px;
+                            }
+                        }
+                        
+                        // Level 1 - Sub-categories
+                        &.level-1 {
+                            td {
+                                padding: 10px 16px;
+                                font-weight: 500;
+                                font-size: 13px;
+                            }
+                        }
+                        
+                        // Level 2 - Detail categories
+                        &.level-2 {
+                            td {
+                                padding: 8px 16px;
+                                font-size: 13px;
+                                color: #586069;
+                            }
+                        }
+                        
+                        // Level 3 - Account details
+                        &.level-3 {
+                            td {
+                                padding: 6px 16px;
+                                font-size: 12px;
+                                color: #6a737d;
+                                
+                                .line-name {
+                                    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+                                }
+                            }
+                        }
+                        
+                        // Total line
+                        &.total-line {
+                            border-top: 2px solid #e1e4e8;
+                            border-bottom: 3px double #e1e4e8;
+                            background-color: #f0f8ff;
+                            
+                            td {
+                                font-weight: 700;
+                                color: #0366d6;
+                                padding: 12px 16px;
+                            }
+                        }
+                        
+                        td {
+                            padding: 8px 16px;
+                            vertical-align: middle;
+                            font-size: 13px;
+                            
+                            &:first-child {
+                                padding-left: 24px;
+                            }
+                            
+                            &.text-end {
+                                text-align: right !important;
+                                padding-right: 24px;
+                                font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+                                font-size: 12px;
+                            }
+                            
+                            &:last-child {
+                                text-align: center;
+                                width: 60px;
+                            }
+                            
+                            // Expand/collapse button
+                            button.btn-link {
+                                padding: 0;
+                                border: none;
+                                background: none;
+                                color: #0366d6;
+                                cursor: pointer;
+                                margin-right: 8px;
+                                
+                                &:hover {
+                                    color: #0052a3;
+                                }
+                                
+                                i {
+                                    font-size: 11px;
+                                }
+                            }
+                            
+                            // Info button
+                            .fa-info-circle {
+                                color: #6a737d;
+                                font-size: 14px;
+                                cursor: pointer;
+                                
+                                &:hover {
+                                    color: #0366d6;
+                                }
+                            }
+                            
+                            // Settings button
+                            .fa-cog {
+                                color: #6a737d;
+                                font-size: 14px;
+                                cursor: pointer;
+                                
+                                &:hover {
+                                    color: #0366d6;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    // Loading state
+    .text-center {
+        padding: 60px 20px;
+        
+        .fa-spinner {
+            color: #0366d6;
+            margin-bottom: 16px;
+        }
+        
+        p {
+            color: #586069;
+            font-size: 14px;
+        }
+    }
+    
+    // Error state
+    .alert-danger {
+        max-width: 600px;
+        margin: 40px auto;
+        padding: 16px 20px;
+        border-radius: 6px;
+        background-color: #ffeef0;
+        border: 1px solid #ffc9c9;
+        color: #9d0006;
+        font-size: 14px;
+        
+        .fa-exclamation-triangle {
+            margin-right: 8px;
+        }
+    }
+}
+
+// Loading animation
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.fa-spinner {
+    animation: spin 1s linear infinite;
+}
+
+// Responsive adjustments
+@media (max-width: 1200px) {
+    .o_balance_sheet_report,
+    .o_profit_loss_report {
+        .o_control_panel {
+            padding: 8px 16px;
+            
+            .o_control_panel_main {
+                .o_control_panel_actions {
+                    .btn, .btn-group {
+                        margin-bottom: 4px;
+                    }
+                }
+            }
+        }
+        
+        .o_content {
+            padding: 16px;
+            
+            .o_balance_sheet_table,
+            .o_profit_loss_table {
+                border-radius: 4px;
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .o_balance_sheet_report,
+    .o_profit_loss_report {
+        .o_control_panel {
+            .o_control_panel_main {
+                flex-direction: column;
+                align-items: flex-start;
+                
+                .o_control_panel_actions {
+                    width: 100%;
+                    margin-top: 8px;
+                    
+                    .btn-group {
+                        width: 100%;
+                        margin-bottom: 4px;
+                        
+                        .btn {
+                            width: 100%;
+                            text-align: left;
+                        }
+                    }
+                }
+            }
+        }
+        
+        .o_content {
+            padding: 8px;
+            
+            .o_balance_sheet_table,
+            .o_profit_loss_table {
+                table {
+                    font-size: 11px;
+                    
+                    thead th,
+                    tbody td {
+                        padding: 6px 8px;
+                        
+                        &:first-child {
+                            padding-left: 12px;
+                        }
+                        
+                        &.text-end {
+                            padding-right: 12px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Print styles
+@media print {
+    .o_balance_sheet_report,
+    .o_profit_loss_report {
+        .o_control_panel {
+            display: none !important;
+        }
+        
+        .o_content {
+            padding: 0;
+            background: white;
+            
+            .alert {
+                display: none;
+            }
+            
+            .o_balance_sheet_table,
+            .o_profit_loss_table {
+                box-shadow: none;
+                max-width: 100%;
+                
+                table {
+                    font-size: 10pt;
+                    
+                    button,
+                    .fa-info-circle,
+                    .fa-cog {
+                        display: none !important;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Override Odoo's default form view container
+.o_form_view {
+    .o_form_sheet_bg {
+        padding: 0 !important;
+        background: transparent !important;
+        
+        .o_form_sheet {
+            margin: 0 !important;
+            padding: 0 !important;
+            max-width: 100% !important;
+            width: 100% !important;
+            box-shadow: none !important;
+            border: none !important;
+            background: transparent !important;
+        }
+    }
+}
+
+// Ensure full height but respecting header
+.o_main_content {
+    > .o_action_manager {
+        > .o_action {
+            height: calc(100vh - 46px); // Account for Odoo navbar height
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+    }
+}
+
+// Make the action container use full width
+.o_action {
+    .o_view_controller {
+        max-width: 100% !important;
+        
+        .o_action_manager {
+            max-width: 100% !important;
+        }
+    }
+}
