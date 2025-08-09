@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="account_invoicing_ext_mz.PartnerLedgerReport" owl="1">
+        <div class="o_partner_ledger_report">
+            <div class="o_control_panel">
+                <div class="o_control_panel_main">
+                    <div class="o_control_panel_actions">
+                        <!-- Export buttons -->
+                        <button class="btn btn-primary" t-on-click="() => this.exportToPDF()">
+                            <i class="fa fa-file-pdf-o"/> PDF
+                        </button>
+                        <button class="btn btn-primary ms-1" t-on-click="() => this.exportToXLSX()">
+                            <i class="fa fa-file-excel-o"/> XLSX
+                        </button>
+                        
+                        <span class="text-muted mx-3">Partner Ledger</span>
+                        
+                        <!-- Date filters -->
+                        <div class="btn-group">
+                            <input type="date" 
+                                   class="form-control form-control-sm"
+                                   t-att-value="state.filters.date_from"
+                                   t-on-change="(ev) => this.onDateFromChange(ev)"/>
+                            <span class="mx-2">to</span>
+                            <input type="date" 
+                                   class="form-control form-control-sm"
+                                   t-att-value="state.filters.date_to"
+                                   t-on-change="(ev) => this.onDateToChange(ev)"/>
+                        </div>
+                        
+                        <!-- Account Type dropdown -->
+                        <div class="btn-group ms-2">
+                            <button class="btn btn-outline-secondary dropdown-toggle" 
+                                    data-bs-toggle="dropdown">
+                                <i class="fa fa-users"/>
+                                <t t-if="state.filters.account_type === 'all'">All Partners</t>
+                                <t t-elif="state.filters.account_type === 'receivable'">Customers</t>
+                                <t t-elif="state.filters.account_type === 'payable'">Vendors</t>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" 
+                                       t-on-click.prevent="() => this.onAccountTypeChange('all')">
+                                    All Partners
+                                </a></li>
+                                <li><a class="dropdown-item" href="#" 
+                                       t-on-click.prevent="() => this.onAccountTypeChange('receivable')">
+                                    Customers
+                                </a></li>
+                                <li><a class="dropdown-item" href="#" 
+                                       t-on-click.prevent="() => this.onAccountTypeChange('payable')">
+                                    Vendors
+                                </a></li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Partner filter -->
+                        <button class="btn btn-outline-secondary ms-1"
+                                t-on-click="() => this.onPartnerFilterClick()">
+                            <i class="fa fa-filter"/>
+                            <t t-if="state.filters.partner_ids.length > 0">
+                                <t t-esc="state.filters.partner_ids.length"/> Partners
+                            </t>
+                            <t t-else="">All Partners</t>
+                        </button>
+                        
+                        <!-- Posted Entries -->
+                        <button class="btn btn-outline-secondary ms-1"
+                                t-att-class="{ 'active': state.filters.posted_entries }"
+                                t-on-click="() => this.onPostedEntriesToggle()">
+                            <i class="fa fa-check-square" t-if="state.filters.posted_entries"/>
+                            <i class="fa fa-square-o" t-else=""/>
+                            Posted Entries
+                        </button>
+                        
+                        <!-- Options dropdown -->
+                        <div class="btn-group ms-1">
+                            <button class="btn btn-outline-secondary" t-on-click="() => this.showSettings()">
+                                <i class="fa fa-cog"/>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="o_content">
+                <!-- Unposted warning -->
+                <div t-if="state.unpostedWarning" class="alert alert-info mb-3">
+                    <strong>There are unposted Journal Entries</strong> prior or included in this period.
+                </div>
+                
+                <!-- Loading state -->
+                <div t-if="state.isLoading" class="text-center py-5">
+                    <i class="fa fa-spinner fa-spin fa-3x mb-3"/>
+                    <p>Loading Partner Ledger...</p>
+                </div>
+                
+                <!-- Error state -->
+                <div t-elif="state.error" class="alert alert-danger">
+                    <i class="fa fa-exclamation-triangle"/> <t t-esc="state.error"/>
+                </div>
+                
+                <!-- Partner Ledger table -->
+                <div t-else="">
+                    <div class="o_partner_ledger_table">
+                        <table class="table">
+                            <thead>
+                                <tr style="background-color: #c9cccf;">
+                                    <th style="width: 30%;">Partner</th>
+                                    <th style="width: 10%;">Date</th>
+                                    <th style="width: 15%;">Reference</th>
+                                    <th style="width: 20%;">Account</th>
+                                    <th class="text-end">Debit</th>
+                                    <th class="text-end">Credit</th>
+                                    <th class="text-end">Balance</th>
+                                    <th style="width: 40px; text-align: center;">
+                                        <i class="fa fa-cog" style="color: #6a737d; cursor: pointer;" t-on-click="() => this.showSettings()"/>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="state.partners" t-as="partner" t-key="partner.id">
+                                    <!-- Partner header row -->
+                                    <tr class="partner-header">
+                                        <td colspan="4">
+                                            <button class="btn btn-link p-0 me-2" 
+                                                    t-on-click="() => this.togglePartner(partner.id)">
+                                                <i t-att-class="this.isExpanded(partner.id) ? 'fa fa-caret-down' : 'fa fa-caret-right'"/>
+                                            </button>
+                                            <strong><t t-esc="partner.name"/></strong>
+                                            <t t-if="partner.ref">
+                                                (<t t-esc="partner.ref"/>)
+                                            </t>
+                                        </td>
+                                        <td class="text-end">
+                                            <strong><t t-esc="state.currencySymbol"/> <t t-esc="this.formatCurrency(partner.debit)"/></strong>
+                                        </td>
+                                        <td class="text-end">
+                                            <strong><t t-esc="state.currencySymbol"/> <t t-esc="this.formatCurrency(partner.credit)"/></strong>
+                                        </td>
+                                        <td class="text-end">
+                                            <strong>
+                                                <t t-esc="state.currencySymbol"/> 
+                                                <t t-if="partner.balance >= 0">
+                                                    <t t-esc="this.formatCurrency(partner.balance)"/>
+                                                </t>
+                                                <t t-else="">
+                                                    (<t t-esc="this.formatCurrency(Math.abs(partner.balance))"/>)
+                                                </t>
+                                            </strong>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    
+                                    <!-- Partner detail rows (expandable) -->
+                                    <t t-if="this.isExpanded(partner.id)">
+                                        <t t-if="partner.initial_balance !== 0">
+                                            <tr class="partner-detail">
+                                                <td class="ps-5 text-muted">Initial Balance</td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td class="text-end text-muted">
+                                                    <t t-esc="state.currencySymbol"/> <t t-esc="this.formatCurrency(partner.initial_balance)"/>
+                                                </td>
+                                                <td></td>
+                                            </tr>
+                                        </t>
+                                        <t t-foreach="partner.lines" t-as="line" t-key="line.id">
+                                            <tr class="partner-detail">
+                                                <td class="ps-5">
+                                                    <span class="text-muted">
+                                                        <t t-esc="line.move_name"/>
+                                                    </span>
+                                                </td>
+                                                <td class="text-muted">
+                                                    <t t-esc="line.date"/>
+                                                </td>
+                                                <td class="text-muted">
+                                                    <t t-esc="line.ref"/>
+                                                </td>
+                                                <td class="text-muted">
+                                                    <small>
+                                                        <t t-esc="line.account_code"/> - <t t-esc="line.account_name"/>
+                                                    </small>
+                                                </td>
+                                                <td class="text-end">
+                                                    <t t-if="line.debit > 0">
+                                                        <t t-esc="this.formatCurrency(line.debit)"/>
+                                                    </t>
+                                                </td>
+                                                <td class="text-end">
+                                                    <t t-if="line.credit > 0">
+                                                        <t t-esc="this.formatCurrency(line.credit)"/>
+                                                    </t>
+                                                </td>
+                                                <td class="text-end">
+                                                    <t t-if="line.cumulative_balance >= 0">
+                                                        <t t-esc="this.formatCurrency(line.cumulative_balance)"/>
+                                                    </t>
+                                                    <t t-else="">
+                                                        (<t t-esc="this.formatCurrency(Math.abs(line.cumulative_balance))"/>)
+                                                    </t>
+                                                </td>
+                                                <td></td>
+                                            </tr>
+                                        </t>
+                                    </t>
+                                </t>
+                                
+                                <!-- Total row -->
+                                <tr class="total-line">
+                                    <td colspan="4"><strong>Total</strong></td>
+                                    <td class="text-end">
+                                        <strong><t t-esc="state.currencySymbol"/> <t t-esc="this.formatCurrency(state.totals.debit)"/></strong>
+                                    </td>
+                                    <td class="text-end">
+                                        <strong><t t-esc="state.currencySymbol"/> <t t-esc="this.formatCurrency(state.totals.credit)"/></strong>
+                                    </td>
+                                    <td class="text-end">
+                                        <strong>
+                                            <t t-esc="state.currencySymbol"/> 
+                                            <t t-if="state.totals.balance >= 0">
+                                                <t t-esc="this.formatCurrency(state.totals.balance)"/>
+                                            </t>
+                                            <t t-else="">
+                                                (<t t-esc="this.formatCurrency(Math.abs(state.totals.balance))"/>)
+                                            </t>
+                                        </strong>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

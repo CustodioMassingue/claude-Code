@@ -7,3 +7,4 @@ from . import account_tax_return
 from . import account_general_ledger
 from . import account_trial_balance
 from . import account_journal_audit
+from . import account_partner_ledger

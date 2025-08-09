@@ -176,15 +176,14 @@
             groups="account.group_account_user" sequence="123"/>
 
   <!-- Partner Reports -->
-  <record id="act_mz_partner_ledger" model="ir.actions.act_window">
+  <!-- Partner Ledger Client Action -->
+  <record id="action_client_partner_ledger_report_mz" model="ir.actions.client">
     <field name="name">Partner Ledger</field>
-    <field name="res_model">account.move.line</field>
-    <field name="view_mode">tree,form</field>
-    <field name="domain">[('account_id.account_type','in',('asset_receivable','liability_payable'))]</field>
-    <field name="context">{'search_default_group_by_partner':1,'search_default_posted':1}</field>
+    <field name="tag">account_partner_ledger_report</field>
+    <field name="target">main</field>
   </record>
-  <menuitem id="menu_mz_partner_ledger" name="Partner Ledger"
-            parent="menu_mz_reporting_partner" action="act_mz_partner_ledger"
+  <menuitem id="menu_partner_ledger_new" name="Partner Ledger"
+            parent="menu_mz_reporting_partner" action="action_client_partner_ledger_report_mz"
             groups="account.group_account_user" sequence="131"/>
 
   <record id="act_mz_aged_receivable" model="ir.actions.act_window">
