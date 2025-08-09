@@ -9,12 +9,17 @@ class AccountBalanceSheet(models.TransientModel):
     _description = 'Balance Sheet Report'
     
     @api.model
-    def get_balance_sheet_data(self, date_from=None, date_to=None, journals=None, company_id=None):
+    def get_balance_sheet_data(self, date_from=None, date_to=None, journals=None, company_id=None, 
+                              only_posted=True, include_draft=False, hide_zero=False,
+                              comparison=False, comparison_date=None, comparison_mode='none',
+                              analytic_accounts=None, analytic_plans=None, **kwargs):
         """
         Generate Balance Sheet data with hierarchical structure
         """
         if not date_to:
             date_to = fields.Date.today()
+        if isinstance(date_to, str):
+            date_to = fields.Date.from_string(date_to)
         if not date_from:
             date_from = date(date_to.year, 1, 1)
         if not company_id:
@@ -23,11 +28,20 @@ class AccountBalanceSheet(models.TransientModel):
         domain = [
             ('date', '<=', date_to),
             ('company_id', '=', company_id),
-            ('parent_state', '=', 'posted')
         ]
+        
+        # Filter by posted state
+        if only_posted and not include_draft:
+            domain.append(('parent_state', '=', 'posted'))
+        elif not only_posted or include_draft:
+            domain.append(('parent_state', 'in', ['posted', 'draft']))
         
         if journals:
             domain.append(('journal_id', 'in', journals))
+        
+        # Apply analytic filtering if provided
+        if analytic_accounts:
+            domain.append(('analytic_account_id', 'in', analytic_accounts))
             
         move_lines = self.env['account.move.line'].search(domain)
         
@@ -356,6 +370,37 @@ class AccountBalanceSheet(models.TransientModel):
         
         balance_sheet['has_unposted'] = unposted_moves > 0
         balance_sheet['total_balance'] = assets_total == (liabilities_total + equity_total)
+        
+        # Add comparison data if requested
+        if comparison and comparison_date:
+            comparison_date_obj = fields.Date.from_string(comparison_date) if isinstance(comparison_date, str) else comparison_date
+            comparison_data = self.get_balance_sheet_data(
+                date_from=date_from,
+                date_to=comparison_date_obj,
+                journals=journals,
+                company_id=company_id,
+                only_posted=only_posted,
+                include_draft=include_draft,
+                hide_zero=hide_zero,
+                comparison=False  # Avoid recursive comparison
+            )
+            balance_sheet['comparison'] = {
+                'date': comparison_date_obj.strftime('%d/%m/%Y'),
+                'lines': comparison_data.get('lines', [])
+            }
+            
+            # Map comparison balances to main lines
+            def map_comparison_balances(main_lines, comp_lines):
+                comp_dict = {line['id']: line['balance'] for line in comp_lines}
+                for main_line in main_lines:
+                    main_line['comparison_balance'] = comp_dict.get(main_line['id'], 0.0)
+                    if main_line.get('children'):
+                        comp_children = next((cl['children'] for cl in comp_lines if cl['id'] == main_line['id']), [])
+                        if comp_children:
+                            map_comparison_balances(main_line['children'], comp_children)
+            
+            if balance_sheet.get('comparison'):
+                map_comparison_balances(lines, balance_sheet['comparison']['lines'])
         
         return balance_sheet
     

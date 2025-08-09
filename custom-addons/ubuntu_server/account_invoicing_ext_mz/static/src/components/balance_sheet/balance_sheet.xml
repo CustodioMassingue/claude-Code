@@ -26,27 +26,112 @@
                         
                         <!-- Date Filter -->
                         <div class="btn-group ms-3">
-                            <button class="btn btn-outline-secondary" disabled="">
+                            <button class="btn btn-outline-secondary">
                                 <i class="fa fa-calendar"/> As of <t t-esc="state.date_to"/>
                             </button>
                             <button class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" 
                                     data-bs-toggle="dropdown">
                                 <span class="visually-hidden">Toggle Dropdown</span>
                             </button>
-                            <div class="dropdown-menu p-3">
-                                <label>Select Date:</label>
+                            <div class="dropdown-menu p-3" style="min-width: 250px;">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="dateFilter" id="date_today"
+                                           t-att-checked="state.dateFilter === 'today'"
+                                           t-on-change="() => this.selectDateFilter('today')"/>
+                                    <label class="form-check-label" for="date_today">
+                                        <strong>Today</strong>
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="dateFilter" id="date_month"
+                                           t-att-checked="state.dateFilter === 'month'"
+                                           t-on-change="() => this.selectDateFilter('month')"/>
+                                    <label class="form-check-label" for="date_month">
+                                        End of Month
+                                        <span class="text-muted ms-2"><t t-esc="this.getMonthLabel()"/></span>
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="dateFilter" id="date_quarter"
+                                           t-att-checked="state.dateFilter === 'quarter'"
+                                           t-on-change="() => this.selectDateFilter('quarter')"/>
+                                    <label class="form-check-label" for="date_quarter">
+                                        End of Quarter
+                                        <span class="text-muted ms-2"><t t-esc="this.getQuarterLabel()"/></span>
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="dateFilter" id="date_year"
+                                           t-att-checked="state.dateFilter === 'year'"
+                                           t-on-change="() => this.selectDateFilter('year')"/>
+                                    <label class="form-check-label" for="date_year">
+                                        End of Year
+                                        <span class="text-muted ms-2"><t t-esc="this.getYearLabel()"/></span>
+                                    </label>
+                                </div>
+                                <hr class="dropdown-divider"/>
+                                <label>Specific Date:</label>
                                 <input type="date" class="form-control" 
                                        t-att-value="state.date_to"
                                        t-on-change="(ev) => this.onDateChange('date_to', ev)"/>
                             </div>
                         </div>
                         
-                        <!-- Comparison Toggle -->
-                        <button class="btn btn-outline-secondary ms-2" 
-                                t-attf-class="{{state.comparison ? 'active' : ''}}"
-                                t-on-click="() => this.onComparisonToggle()">
-                            <i class="fa fa-balance-scale"/> Comparison
-                        </button>
+                        <!-- Comparison Dropdown -->
+                        <div class="btn-group ms-2">
+                            <button class="btn btn-outline-secondary dropdown-toggle"
+                                    t-attf-class="{{state.comparison ? 'active' : ''}}"
+                                    data-bs-toggle="dropdown">
+                                <i class="fa fa-balance-scale"/> Comparison
+                            </button>
+                            <div class="dropdown-menu p-3" style="min-width: 250px;">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="comparison" id="comp_none"
+                                           t-att-checked="!state.comparison"
+                                           t-on-change="() => this.setComparisonMode('none')"/>
+                                    <label class="form-check-label" for="comp_none">
+                                        <i class="fa fa-check text-success"/> No Comparison
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="comparison" id="comp_previous"
+                                           t-att-checked="state.comparisonMode === 'previous'"
+                                           t-on-change="() => this.setComparisonMode('previous')"/>
+                                    <label class="form-check-label" for="comp_previous">
+                                        Previous Period
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="comparison" id="comp_year"
+                                           t-att-checked="state.comparisonMode === 'year'"
+                                           t-on-change="() => this.setComparisonMode('year')"/>
+                                    <label class="form-check-label" for="comp_year">
+                                        Same Period Last Year
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="comparison" id="comp_specific"
+                                           t-att-checked="state.comparisonMode === 'specific'"
+                                           t-on-change="() => this.setComparisonMode('specific')"/>
+                                    <label class="form-check-label" for="comp_specific">
+                                        Specific Date
+                                    </label>
+                                </div>
+                                <t t-if="state.comparisonMode === 'specific'">
+                                    <input type="date" class="form-control mt-2" 
+                                           t-att-value="state.comparisonDate"
+                                           t-on-change="(ev) => this.onComparisonDateChange(ev)"/>
+                                </t>
+                                <hr class="dropdown-divider"/>
+                                <label class="mb-2">Period order</label>
+                                <select class="form-select form-select-sm"
+                                        t-att-value="state.periodOrder"
+                                        t-on-change="(ev) => this.onPeriodOrderChange(ev)">
+                                    <option value="descending">Descending</option>
+                                    <option value="ascending">Ascending</option>
+                                </select>
+                            </div>
+                        </div>
                         
                         <!-- All Journals Dropdown -->
                         <div class="btn-group ms-2">
@@ -134,19 +219,73 @@
                             </div>
                         </div>
                         
-                        <!-- Analytic Toggle -->
-                        <button class="btn btn-outline-secondary ms-2"
-                                t-attf-class="{{state.showAnalytic ? 'active' : ''}}"
-                                t-on-click="() => this.onAnalyticToggle()">
-                            <i class="fa fa-bar-chart"/> Analytic
-                        </button>
+                        <!-- Analytic Dropdown -->
+                        <div class="btn-group ms-2">
+                            <button class="btn btn-outline-secondary dropdown-toggle"
+                                    t-attf-class="{{state.showAnalytic ? 'active' : ''}}"
+                                    data-bs-toggle="dropdown">
+                                <i class="fa fa-bar-chart"/> Analytic
+                            </button>
+                            <div class="dropdown-menu p-3" style="min-width: 200px;">
+                                <button class="dropdown-item px-2" t-on-click="() => this.openAnalyticAccounts()">
+                                    Accounts
+                                </button>
+                                <button class="dropdown-item px-2" t-on-click="() => this.openAnalyticPlans()">
+                                    Plans
+                                </button>
+                            </div>
+                        </div>
                         
-                        <!-- Posted Entries Filter -->
-                        <button class="btn btn-outline-secondary ms-2"
-                                t-attf-class="{{state.onlyPosted ? 'active' : ''}}"
-                                t-on-click="() => this.onPostedEntriesToggle()">
-                            <i class="fa fa-check-square"/> Posted Entries
-                        </button>
+                        <!-- Posted Entries Dropdown -->
+                        <div class="btn-group ms-2">
+                            <button class="btn btn-outline-secondary dropdown-toggle"
+                                    t-attf-class="{{state.onlyPosted ? 'active' : ''}}"
+                                    data-bs-toggle="dropdown">
+                                <i class="fa fa-check-square"/> Posted Entries
+                            </button>
+                            <div class="dropdown-menu p-3" style="min-width: 200px;">
+                                <button class="dropdown-item px-2" t-on-click="() => this.toggleDraftEntries()">
+                                    <t t-if="state.includeDraft">
+                                        <i class="fa fa-check-square-o me-2"/>
+                                    </t>
+                                    <t t-else="">
+                                        <i class="fa fa-square-o me-2"/>
+                                    </t>
+                                    Draft Entries
+                                </button>
+                                <button class="dropdown-item px-2" t-on-click="() => this.toggleAnalyticSimulations()">
+                                    <t t-if="state.includeSimulations">
+                                        <i class="fa fa-check-square-o me-2"/>
+                                    </t>
+                                    <t t-else="">
+                                        <i class="fa fa-square-o me-2"/>
+                                    </t>
+                                    Analytic Simulations
+                                </button>
+                                <hr class="dropdown-divider"/>
+                                <button class="dropdown-item px-2" t-on-click="() => this.unfoldAll()">
+                                    Unfold All
+                                </button>
+                                <button class="dropdown-item px-2" t-on-click="() => this.toggleHideZero()">
+                                    <t t-if="state.hideZeroBalances">
+                                        <i class="fa fa-check-square-o me-2"/>
+                                    </t>
+                                    <t t-else="">
+                                        <i class="fa fa-square-o me-2"/>
+                                    </t>
+                                    Hide lines at 0
+                                </button>
+                                <button class="dropdown-item px-2" t-on-click="() => this.toggleSplitView()">
+                                    <t t-if="state.splitHorizontally">
+                                        <i class="fa fa-check-square-o me-2"/>
+                                    </t>
+                                    <t t-else="">
+                                        <i class="fa fa-square-o me-2"/>
+                                    </t>
+                                    Split Horizontally
+                                </button>
+                            </div>
+                        </div>
                         
                         <!-- In Filter Dropdown -->
                         <div class="btn-group ms-2">

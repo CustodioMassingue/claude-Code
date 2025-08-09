@@ -6,7 +6,10 @@ from datetime import datetime, date
 class BalanceSheetController(http.Controller):
     
     @http.route('/account/balance_sheet/data', type='json', auth='user')
-    def get_balance_sheet_data(self, date_to=None, date_from=None, journals=None, company_id=None, comparison=False):
+    def get_balance_sheet_data(self, date_to=None, date_from=None, journals=None, company_id=None, 
+                              comparison=False, comparison_date=None, comparison_mode='none',
+                              only_posted=True, include_draft=False, include_simulations=False,
+                              hide_zero=False, analytic_accounts=None, analytic_plans=None, **kwargs):
         """
         Fetch balance sheet data via AJAX
         """
@@ -19,6 +22,8 @@ class BalanceSheetController(http.Controller):
                 date_to = datetime.strptime(date_to, '%Y-%m-%d').date()
             if date_from and isinstance(date_from, str):
                 date_from = datetime.strptime(date_from, '%Y-%m-%d').date()
+            if comparison_date and isinstance(comparison_date, str):
+                comparison_date = datetime.strptime(comparison_date, '%Y-%m-%d').date()
                 
             # Get balance sheet data
             balance_sheet_model = request.env['account.balance.sheet.report']
@@ -26,20 +31,17 @@ class BalanceSheetController(http.Controller):
                 date_from=date_from,
                 date_to=date_to,
                 journals=journals,
-                company_id=company_id
+                company_id=company_id,
+                only_posted=only_posted,
+                include_draft=include_draft,
+                hide_zero=hide_zero,
+                comparison=comparison,
+                comparison_date=comparison_date,
+                comparison_mode=comparison_mode,
+                analytic_accounts=analytic_accounts,
+                analytic_plans=analytic_plans,
+                include_simulations=include_simulations
             )
-            
-            # Add comparison data if requested
-            if comparison and date_to:
-                # Get comparison data (previous period)
-                from dateutil.relativedelta import relativedelta
-                comparison_date = date_to - relativedelta(years=1)
-                comparison_data = balance_sheet_model.get_balance_sheet_data(
-                    date_to=comparison_date,
-                    journals=journals,
-                    company_id=company_id
-                )
-                data['comparison'] = comparison_data
                 
             return {
                 'success': True,

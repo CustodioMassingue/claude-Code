@@ -1,4 +1,4 @@
-# 🎉 Balance Sheet - Release Notes v2.1
+# 🎉 Balance Sheet - Release Notes v3.0
 
 ## ✅ Novas Funcionalidades Implementadas
 
@@ -95,12 +95,34 @@ Todos os filtros da versão Enterprise foram implementados:
 - `static/src/components/balance_sheet/balance_sheet.js` - Novos métodos para filtros
 - `static/src/components/balance_sheet/balance_sheet.xml` - Interface completa com todos os controles
 
-### Novos Métodos JavaScript
-- `toggleAllJournals()` - Gerencia seleção de todos os diários
-- `onJournalToggle()` - Controla seleção individual de diários
-- `selectJournalsByType(journalType)` - ✨ NOVO! Seleciona diários por tipo (bank, cash, sale, purchase, general)
-- `selectJournalsByName(journalName)` - ✨ NOVO! Seleciona diários por nome (busca parcial case-insensitive)
-- Propriedade `selectedJournalsCount` - Contador de diários selecionados
+### Novos Métodos JavaScript (v3.0)
+- **Filtros de Diários:**
+  - `toggleAllJournals()` - Gerencia seleção de todos os diários
+  - `onJournalToggle()` - Controla seleção individual de diários
+  - `selectJournalsByType(journalType)` - Seleciona diários por tipo
+  - `selectJournalsByName(journalName)` - Seleciona diários por nome
+
+- **Filtros de Data:**
+  - `selectDateFilter(filterType)` - Seleciona tipo de período
+  - `getMonthLabel()` - Retorna label do mês atual
+  - `getQuarterLabel()` - Retorna label do trimestre
+  - `getYearLabel()` - Retorna label do ano
+
+- **Filtros de Comparação:**
+  - `setComparisonMode(mode)` - Define modo de comparação
+  - `onComparisonDateChange(event)` - Atualiza data de comparação
+  - `onPeriodOrderChange(event)` - Altera ordem do período
+
+- **Filtros Analíticos:**
+  - `openAnalyticAccounts()` - Abre seletor de contas analíticas
+  - `openAnalyticPlans()` - Abre seletor de planos analíticos
+
+- **Filtros de Entradas:**
+  - `toggleDraftEntries()` - Alterna inclusão de rascunhos
+  - `toggleAnalyticSimulations()` - Alterna simulações analíticas
+  - `unfoldAll()` - Expande todas as linhas
+  - `toggleHideZero()` - Alterna ocultação de saldos zero
+  - `toggleSplitView()` - Alterna visualização dividida
 
 ### Estrutura de Dados Expandida
 ```javascript
@@ -134,11 +156,38 @@ Todos os filtros da versão Enterprise foram implementados:
 - Interface idêntica à versão Enterprise
 - Sem quebrar funcionalidades existentes
 
+## 🆕 Novos Filtros Avançados (v3.0)
+
+### Filtro "As of" (Seletor de Data)
+- **Today** - Data atual
+- **End of Month** - Último dia do mês atual
+- **End of Quarter** - Último dia do trimestre atual  
+- **End of Year** - Último dia do ano
+- **Specific Date** - Seleção manual de data
+
+### Filtro "Comparison" (Comparação de Períodos)
+- **No Comparison** - Sem comparação (padrão)
+- **Previous Period** - Período anterior
+- **Same Period Last Year** - Mesmo período do ano anterior
+- **Specific Date** - Data específica para comparação
+- **Period Order** - Ordenação Descendente/Ascendente
+
+### Filtro "Analytic"
+- **Accounts** - Seleção de contas analíticas
+- **Plans** - Seleção de planos analíticos
+
+### Filtro "Posted Entries" (Entradas Postadas)
+- **Draft Entries** - Incluir/excluir lançamentos em rascunho
+- **Analytic Simulations** - Incluir simulações analíticas
+- **Unfold All** - Expandir todas as categorias
+- **Hide lines at 0** - Ocultar linhas com saldo zero ✅
+- **Split Horizontally** - Divisão horizontal da visualização
+
 ## 🚀 Próximos Passos (Opcional)
-- Implementar filtro "Hide Zero Balances" funcional
 - Adicionar gráficos visuais
 - Implementar drill-down para transações
-- Adicionar comparação customizada de períodos
+- Completar integração com contas analíticas
+- Adicionar mais opções de exportação
 
 ## 📝 Notas Importantes
 - **Limpe o cache do navegador** após a atualização
@@ -146,6 +195,16 @@ Todos os filtros da versão Enterprise foram implementados:
 - Contas com saldo zero podem não aparecer (configurável)
 
 ---
-**Versão:** 2.1.0  
+**Versão:** 3.0.0  
 **Data:** 09/08/2025  
 **Desenvolvido com qualidade profissional** 🏆
+
+## Resumo das Alterações v3.0
+- ✅ Implementado filtro "As of" com opções de período
+- ✅ Implementado filtro "Comparison" com múltiplos modos
+- ✅ Implementado filtro "Analytic" com Accounts e Plans
+- ✅ Expandido filtro "Posted Entries" com múltiplas opções
+- ✅ Adicionado suporte para ocultar linhas com saldo zero
+- ✅ Implementado "Unfold All" para expandir tudo
+- ✅ Backend atualizado para processar todos os novos filtros
+- ✅ 100% compatível com a versão Enterprise

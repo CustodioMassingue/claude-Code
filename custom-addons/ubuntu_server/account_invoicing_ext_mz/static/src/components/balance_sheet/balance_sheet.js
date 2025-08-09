@@ -25,13 +25,22 @@ export class BalanceSheetReport extends Component {
             date_to: this.getDefaultDate(),
             date_from: null,
             comparison: false,
+            comparisonMode: 'none', // none, previous, year, specific
+            comparisonDate: null,
+            periodOrder: 'descending',
+            dateFilter: 'today', // today, month, quarter, year, specific
             journals: [],
             allJournals: true,
             selectedJournalsCount: 0,
             showAnalytic: false,
+            analyticAccounts: [],
+            analyticPlans: [],
             onlyPosted: true,
             hasUnposted: false,
+            includeDraft: false,
+            includeSimulations: false,
             hideZeroBalances: false,
+            splitHorizontally: false,
             filters: {
                 date_to: this.getDefaultDate(),
                 date_from: null,
@@ -79,6 +88,14 @@ export class BalanceSheetReport extends Component {
                 journals: this.state.allJournals ? null : this.state.filters.journals,
                 company_id: this.user.context.company_id || false,
                 comparison: this.state.comparison,
+                comparison_date: this.state.comparisonDate,
+                comparison_mode: this.state.comparisonMode,
+                only_posted: this.state.onlyPosted,
+                include_draft: this.state.includeDraft,
+                include_simulations: this.state.includeSimulations,
+                hide_zero: this.state.hideZeroBalances,
+                analytic_accounts: this.state.analyticAccounts,
+                analytic_plans: this.state.analyticPlans,
             });
             
             if (result.success) {
@@ -282,6 +299,149 @@ export class BalanceSheetReport extends Component {
         await this.loadBalanceSheetData();
     }
     
+    // Date Filter Methods
+    async selectDateFilter(filterType) {
+        this.state.dateFilter = filterType;
+        const today = new Date();
+        let newDate;
+        
+        switch(filterType) {
+            case 'today':
+                newDate = today;
+                break;
+            case 'month':
+                newDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+                break;
+            case 'quarter':
+                const currentQuarter = Math.floor(today.getMonth() / 3);
+                newDate = new Date(today.getFullYear(), (currentQuarter + 1) * 3, 0);
+                break;
+            case 'year':
+                newDate = new Date(today.getFullYear(), 11, 31);
+                break;
+            default:
+                return;
+        }
+        
+        this.state.date_to = newDate.toISOString().split('T')[0];
+        this.state.filters.date_to = this.state.date_to;
+        await this.loadBalanceSheetData();
+    }
+    
+    getMonthLabel() {
+        const date = new Date(this.state.date_to);
+        return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    }
+    
+    getQuarterLabel() {
+        const date = new Date(this.state.date_to);
+        const quarter = Math.floor(date.getMonth() / 3) + 1;
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const startMonth = (quarter - 1) * 3;
+        const endMonth = startMonth + 2;
+        return `${monthNames[startMonth]} - ${monthNames[endMonth]} ${date.getFullYear()}`;
+    }
+    
+    getYearLabel() {
+        const date = new Date(this.state.date_to);
+        return date.getFullYear().toString();
+    }
+    
+    // Comparison Methods
+    async setComparisonMode(mode) {
+        this.state.comparisonMode = mode;
+        this.state.comparison = mode !== 'none';
+        
+        if (mode === 'previous') {
+            // Calculate previous period date
+            const currentDate = new Date(this.state.date_to);
+            const previousMonth = new Date(currentDate.setMonth(currentDate.getMonth() - 1));
+            this.state.comparisonDate = previousMonth.toISOString().split('T')[0];
+        } else if (mode === 'year') {
+            // Same period last year
+            const currentDate = new Date(this.state.date_to);
+            const lastYear = new Date(currentDate.setFullYear(currentDate.getFullYear() - 1));
+            this.state.comparisonDate = lastYear.toISOString().split('T')[0];
+        }
+        
+        await this.loadBalanceSheetData();
+    }
+    
+    async onComparisonDateChange(event) {
+        this.state.comparisonDate = event.target.value;
+        await this.loadBalanceSheetData();
+    }
+    
+    onPeriodOrderChange(event) {
+        this.state.periodOrder = event.target.value;
+        // Re-render the comparison columns if needed
+        this.state.data = { ...this.state.data };
+    }
+    
+    // Analytic Methods
+    async openAnalyticAccounts() {
+        // Open dialog to select analytic accounts
+        this.notification.add("Analytic Accounts selection coming soon", {
+            type: 'info',
+            title: 'Analytic Filter'
+        });
+        // TODO: Implement analytic account selection dialog
+    }
+    
+    async openAnalyticPlans() {
+        // Open dialog to select analytic plans
+        this.notification.add("Analytic Plans selection coming soon", {
+            type: 'info',
+            title: 'Analytic Filter'
+        });
+        // TODO: Implement analytic plans selection dialog
+    }
+    
+    // Posted Entries Methods
+    async toggleDraftEntries() {
+        this.state.includeDraft = !this.state.includeDraft;
+        this.state.onlyPosted = !this.state.includeDraft;
+        await this.loadBalanceSheetData();
+    }
+    
+    async toggleAnalyticSimulations() {
+        this.state.includeSimulations = !this.state.includeSimulations;
+        // TODO: Implement analytic simulations filtering
+        await this.loadBalanceSheetData();
+    }
+    
+    unfoldAll() {
+        // Expand all expandable lines
+        if (this.state.data && this.state.data.lines) {
+            const expandAllLines = (lines) => {
+                lines.forEach(line => {
+                    if (line.unfoldable) {
+                        this.state.expandedLines.add(line.id);
+                        if (line.children) {
+                            expandAllLines(line.children);
+                        }
+                    }
+                });
+            };
+            expandAllLines(this.state.data.lines);
+            this.state.expandedLines = new Set(this.state.expandedLines);
+        }
+    }
+    
+    async toggleHideZero() {
+        this.state.hideZeroBalances = !this.state.hideZeroBalances;
+        await this.loadBalanceSheetData();
+    }
+    
+    toggleSplitView() {
+        this.state.splitHorizontally = !this.state.splitHorizontally;
+        // TODO: Implement split view functionality
+        this.notification.add("Split view functionality coming soon", {
+            type: 'info',
+            title: 'View Options'
+        });
+    }
+    
     async onComparisonToggle() {
         this.state.comparison = !this.state.comparison;
         await this.loadBalanceSheetData();
@@ -323,6 +483,11 @@ export class BalanceSheetReport extends Component {
         
         for (const line of lines) {
             if (parentExpanded) {
+                // Apply hide zero balances filter
+                if (this.state.hideZeroBalances && line.balance === 0 && !line.is_total) {
+                    continue;
+                }
+                
                 visibleLines.push(line);
                 
                 if (line.children && this.isExpanded(line.id)) {

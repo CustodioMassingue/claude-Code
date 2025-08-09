@@ -8,7 +8,8 @@
       "Bash(docker ps:*)",
       "Bash(python:*)",
       "WebFetch(domain:github.com)",
-      "Bash(docker restart:*)"
+      "Bash(docker restart:*)",
+      "Bash(docker logs:*)"
     ],
     "deny": []
   }
