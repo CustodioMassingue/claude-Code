@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="account_invoicing_ext_mz.TrialBalanceReport" owl="1">
+        <div class="o_trial_balance_report">
+            <div class="o_control_panel">
+                <div class="o_control_panel_main">
+                    <div class="o_control_panel_actions">
+                        <!-- Export buttons -->
+                        <button class="btn btn-primary" t-on-click="() => this.exportToPDF()">
+                            <i class="fa fa-file-pdf-o"/> PDF
+                        </button>
+                        <button class="btn btn-primary ms-1" t-on-click="() => this.exportToXLSX()">
+                            <i class="fa fa-file-excel-o"/> XLSX
+                        </button>
+                        
+                        <span class="text-muted mx-3">Trial Balance</span>
+                        
+                        <!-- Search box -->
+                        <div class="input-group ms-2" style="width: 200px;">
+                            <span class="input-group-text">
+                                <i class="fa fa-search"/>
+                            </span>
+                            <input type="text" 
+                                   class="form-control" 
+                                   placeholder="Search..."
+                                   t-att-value="state.searchQuery"
+                                   t-on-input="(ev) => this.onSearchChange(ev)"/>
+                        </div>
+                        
+                        <!-- Date filter -->
+                        <div class="btn-group ms-2">
+                            <button class="btn btn-outline-secondary">
+                                <i class="fa fa-calendar"/>
+                                <t t-if="state.filters.date_to">
+                                    <t t-esc="formatDate(state.filters.date_to + '-01')"/>
+                                </t>
+                                <t t-else="">Aug 2025</t>
+                            </button>
+                            <input type="month" 
+                                   class="d-none" 
+                                   t-att-value="state.filters.date_to"
+                                   t-on-change="(ev) => this.onDateChange(ev)"/>
+                        </div>
+                        
+                        <!-- Comparison -->
+                        <button class="btn btn-outline-secondary ms-1"
+                                t-on-click="() => this.onComparisonClick()">
+                            <i class="fa fa-percent"/>
+                            Comparison
+                        </button>
+                        
+                        <!-- All Journals dropdown -->
+                        <div class="btn-group ms-1">
+                            <button class="btn btn-outline-secondary dropdown-toggle" 
+                                    data-bs-toggle="dropdown">
+                                <i class="fa fa-book"/>
+                                <t t-if="state.filters.journals === 'all'">All Journals</t>
+                                <t t-else="">Selected Journals</t>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" 
+                                       t-on-click.prevent="() => this.onJournalFilterClick('all')">
+                                    All Journals
+                                </a></li>
+                                <li><hr class="dropdown-divider"/></li>
+                                <li class="dropdown-header">By Type</li>
+                                <li><a class="dropdown-item" href="#" 
+                                       t-on-click.prevent="() => this.onJournalFilterClick('sale')">
+                                    <i class="fa fa-check-square-o me-2"/> Sales
+                                </a></li>
+                                <li><a class="dropdown-item" href="#" 
+                                       t-on-click.prevent="() => this.onJournalFilterClick('purchase')">
+                                    <i class="fa fa-square-o me-2"/> Purchases
+                                </a></li>
+                                <li><a class="dropdown-item" href="#" 
+                                       t-on-click.prevent="() => this.onJournalFilterClick('cash')">
+                                    <i class="fa fa-square-o me-2"/> Cash
+                                </a></li>
+                                <li><a class="dropdown-item" href="#" 
+                                       t-on-click.prevent="() => this.onJournalFilterClick('bank')">
+                                    <i class="fa fa-square-o me-2"/> Bank
+                                </a></li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Analytic -->
+                        <button class="btn btn-outline-secondary ms-1"
+                                t-on-click="() => this.onAnalyticClick()">
+                            <i class="fa fa-bar-chart"/>
+                            Analytic
+                        </button>
+                        
+                        <!-- Posted Entries -->
+                        <button class="btn btn-outline-secondary ms-1"
+                                t-att-class="{ 'active': state.filters.posted_entries }"
+                                t-on-click="() => this.onPostedEntriesToggle()">
+                            <i class="fa fa-check-square" t-if="state.filters.posted_entries"/>
+                            <i class="fa fa-square-o" t-else=""/>
+                            Posted Entries
+                        </button>
+                        
+                        <!-- Options dropdown -->
+                        <div class="btn-group ms-1">
+                            <button class="btn btn-outline-secondary" t-on-click="() => this.showSettings()">
+                                <i class="fa fa-cog"/>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="o_content">
+                <!-- Unposted warning -->
+                <div t-if="state.unpostedWarning" class="alert alert-info mb-3">
+                    <strong>There are unposted Journal Entries</strong> prior or included in this period.
+                </div>
+                
+                <!-- Loading state -->
+                <div t-if="state.isLoading" class="text-center py-5">
+                    <i class="fa fa-spinner fa-spin fa-3x mb-3"/>
+                    <p>Loading Trial Balance...</p>
+                </div>
+                
+                <!-- Error state -->
+                <div t-elif="state.error" class="alert alert-danger">
+                    <i class="fa fa-exclamation-triangle"/> <t t-esc="state.error"/>
+                </div>
+                
+                <!-- Trial Balance table -->
+                <div t-else="" class="o_trial_balance_table">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th rowspan="2" style="vertical-align: middle;"></th>
+                                <th colspan="2" class="text-center">Initial Balance</th>
+                                <th colspan="2" class="text-center">
+                                    <t t-if="state.filters.date_to">
+                                        <t t-esc="formatDate(state.filters.date_to + '-01')"/>
+                                    </t>
+                                    <t t-else="">Aug 2025</t>
+                                </th>
+                                <th colspan="2" class="text-center">End Balance</th>
+                            </tr>
+                            <tr>
+                                <th class="text-end">Debit</th>
+                                <th class="text-end">Credit</th>
+                                <th class="text-end">Debit</th>
+                                <th class="text-end">Credit</th>
+                                <th class="text-end">Debit</th>
+                                <th class="text-end">Credit</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="getFilteredAccounts()" t-as="account" t-key="account.id">
+                                <tr>
+                                    <td>
+                                        <span class="account-name">
+                                            <t t-esc="account.code"/> <t t-esc="account.name"/>
+                                        </span>
+                                    </td>
+                                    <!-- Initial Balance -->
+                                    <td class="text-end">
+                                        <t t-if="account.initial_debit > 0">
+                                            <t t-esc="formatCurrency(account.initial_debit)"/>
+                                        </t>
+                                    </td>
+                                    <td class="text-end">
+                                        <t t-if="account.initial_credit > 0">
+                                            <t t-esc="formatCurrency(account.initial_credit)"/>
+                                        </t>
+                                    </td>
+                                    <!-- Period Movement -->
+                                    <td class="text-end">
+                                        <t t-if="account.period_debit > 0">
+                                            <t t-esc="formatCurrency(account.period_debit)"/>
+                                        </t>
+                                    </td>
+                                    <td class="text-end">
+                                        <t t-if="account.period_credit > 0">
+                                            <t t-esc="formatCurrency(account.period_credit)"/>
+                                        </t>
+                                    </td>
+                                    <!-- End Balance -->
+                                    <td class="text-end">
+                                        <t t-if="account.end_debit > 0">
+                                            <t t-esc="formatCurrency(account.end_debit)"/>
+                                        </t>
+                                    </td>
+                                    <td class="text-end">
+                                        <t t-if="account.end_credit > 0">
+                                            <t t-esc="formatCurrency(account.end_credit)"/>
+                                        </t>
+                                    </td>
+                                </tr>
+                            </t>
+                            
+                            <!-- Total row -->
+                            <tr class="total-line">
+                                <td class="fw-bold">
+                                    Total
+                                </td>
+                                <td class="text-end fw-bold">
+                                    <t t-esc="formatCurrency(state.totals.initial_debit)"/>
+                                </td>
+                                <td class="text-end fw-bold">
+                                    <t t-esc="formatCurrency(state.totals.initial_credit)"/>
+                                </td>
+                                <td class="text-end fw-bold">
+                                    <t t-esc="formatCurrency(state.totals.period_debit)"/>
+                                </td>
+                                <td class="text-end fw-bold">
+                                    <t t-esc="formatCurrency(state.totals.period_credit)"/>
+                                </td>
+                                <td class="text-end fw-bold">
+                                    <t t-esc="formatCurrency(state.totals.end_debit)"/>
+                                </td>
+                                <td class="text-end fw-bold">
+                                    <t t-esc="formatCurrency(state.totals.end_credit)"/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

@@ -26,6 +26,10 @@
             "/account_invoicing_ext_mz/static/src/components/executive_summary/executive_summary.xml",
             "/account_invoicing_ext_mz/static/src/components/tax_return/tax_return.js",
             "/account_invoicing_ext_mz/static/src/components/tax_return/tax_return.xml",
+            "/account_invoicing_ext_mz/static/src/components/general_ledger/general_ledger.js",
+            "/account_invoicing_ext_mz/static/src/components/general_ledger/general_ledger.xml",
+            "/account_invoicing_ext_mz/static/src/components/trial_balance/trial_balance.js",
+            "/account_invoicing_ext_mz/static/src/components/trial_balance/trial_balance.xml",
             "/account_invoicing_ext_mz/static/src/scss/financial_reports.scss"
         ]
     },

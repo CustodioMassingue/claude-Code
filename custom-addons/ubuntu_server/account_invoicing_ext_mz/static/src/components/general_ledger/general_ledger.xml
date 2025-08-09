@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="account_invoicing_ext_mz.GeneralLedgerReport" owl="1">
+        <div class="o_general_ledger_report">
+            <div class="o_control_panel">
+                <div class="o_control_panel_main">
+                    <div class="o_control_panel_actions">
+                        <!-- Export buttons -->
+                        <button class="btn btn-primary" t-on-click="() => this.exportToPDF()">
+                            <i class="fa fa-file-pdf-o"/> PDF
+                        </button>
+                        <button class="btn btn-primary ms-1" t-on-click="() => this.exportToXLSX()">
+                            <i class="fa fa-file-excel-o"/> XLSX
+                        </button>
+                        
+                        <span class="text-muted mx-3">General Ledger</span>
+                        
+                        <!-- Search box -->
+                        <div class="input-group ms-2" style="width: 250px;">
+                            <span class="input-group-text">
+                                <i class="fa fa-search"/>
+                            </span>
+                            <input type="text" 
+                                   class="form-control" 
+                                   placeholder="Search..."
+                                   t-att-value="state.searchQuery"
+                                   t-on-input="(ev) => this.onSearchChange(ev)"/>
+                        </div>
+                        
+                        <!-- Date Range -->
+                        <div class="btn-group ms-2">
+                            <button class="btn btn-outline-secondary">
+                                <i class="fa fa-calendar"/>
+                                From <t t-esc="formatDate(state.filters.date_from)"/> to <t t-esc="formatDate(state.filters.date_to)"/>
+                            </button>
+                            <div class="d-none">
+                                <input type="date" 
+                                       t-att-value="state.filters.date_from"
+                                       t-on-change="(ev) => this.onDateFromChange(ev)"/>
+                                <input type="date" 
+                                       t-att-value="state.filters.date_to"
+                                       t-on-change="(ev) => this.onDateToChange(ev)"/>
+                            </div>
+                        </div>
+                        
+                        <!-- All Journals dropdown -->
+                        <div class="btn-group ms-1">
+                            <button class="btn btn-outline-secondary dropdown-toggle" 
+                                    data-bs-toggle="dropdown">
+                                <i class="fa fa-book"/>
+                                <t t-if="state.filters.journals === 'all'">All Journals</t>
+                                <t t-else="">Selected Journals</t>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" 
+                                       t-on-click.prevent="() => this.onJournalFilterClick('all')">
+                                    All Journals
+                                </a></li>
+                                <li><hr class="dropdown-divider"/></li>
+                                <li class="dropdown-header">By Type</li>
+                                <li><a class="dropdown-item" href="#" 
+                                       t-on-click.prevent="() => this.onJournalFilterClick('sale')">
+                                    <i class="fa fa-check-square-o me-2"/> Sales
+                                </a></li>
+                                <li><a class="dropdown-item" href="#" 
+                                       t-on-click.prevent="() => this.onJournalFilterClick('purchase')">
+                                    <i class="fa fa-square-o me-2"/> Purchases
+                                </a></li>
+                                <li><a class="dropdown-item" href="#" 
+                                       t-on-click.prevent="() => this.onJournalFilterClick('cash')">
+                                    <i class="fa fa-square-o me-2"/> Cash
+                                </a></li>
+                                <li><a class="dropdown-item" href="#" 
+                                       t-on-click.prevent="() => this.onJournalFilterClick('bank')">
+                                    <i class="fa fa-square-o me-2"/> Bank
+                                </a></li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Analytic -->
+                        <button class="btn btn-outline-secondary ms-1"
+                                t-on-click="() => this.onAnalyticClick()">
+                            <i class="fa fa-bar-chart"/>
+                            Analytic
+                        </button>
+                        
+                        <!-- Posted Entries -->
+                        <button class="btn btn-outline-secondary ms-1"
+                                t-att-class="{ 'active': state.filters.posted_entries }"
+                                t-on-click="() => this.onPostedEntriesToggle()">
+                            <i class="fa fa-check-square" t-if="state.filters.posted_entries"/>
+                            <i class="fa fa-square-o" t-else=""/>
+                            Posted Entries
+                        </button>
+                        
+                        <!-- Options dropdown -->
+                        <div class="btn-group ms-1">
+                            <button class="btn btn-outline-secondary" t-on-click="() => this.showSettings()">
+                                <i class="fa fa-cog"/>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="o_content">
+                <!-- Unposted warning -->
+                <div t-if="state.unpostedWarning" class="alert alert-info mb-3">
+                    <strong>There are unposted Journal Entries</strong> prior or included in this period.
+                </div>
+                
+                <!-- Loading state -->
+                <div t-if="state.isLoading" class="text-center py-5">
+                    <i class="fa fa-spinner fa-spin fa-3x mb-3"/>
+                    <p>Loading General Ledger...</p>
+                </div>
+                
+                <!-- Error state -->
+                <div t-elif="state.error" class="alert alert-danger">
+                    <i class="fa fa-exclamation-triangle"/> <t t-esc="state.error"/>
+                </div>
+                
+                <!-- General Ledger table -->
+                <div t-else="" class="o_general_ledger_table">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th colspan="5"></th>
+                                <th colspan="3" class="text-center">
+                                    From <t t-esc="formatDate(state.filters.date_from)"/> to <t t-esc="formatDate(state.filters.date_to)"/>
+                                </th>
+                            </tr>
+                            <tr>
+                                <th>Date</th>
+                                <th>Communication</th>
+                                <th>Partner</th>
+                                <th>Currency</th>
+                                <th class="text-end">Debit</th>
+                                <th class="text-end">Credit</th>
+                                <th class="text-end">Balance</th>
+                                <th style="width: 40px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="getFilteredAccounts()" t-as="account" t-key="account.id">
+                                <!-- Account header row -->
+                                <tr class="account-header">
+                                    <td colspan="4">
+                                        <button class="btn btn-link p-0 me-2" 
+                                                t-on-click="() => this.toggleAccount(account.id)">
+                                            <i t-att-class="isExpanded(account.id) ? 'fa fa-caret-down' : 'fa fa-caret-right'"/>
+                                        </button>
+                                        <strong>
+                                            <t t-esc="account.code"/> <t t-esc="account.name"/>
+                                        </strong>
+                                    </td>
+                                    <td class="text-end">
+                                        <t t-esc="state.currencySymbol"/> <t t-esc="formatCurrency(account.debit)"/>
+                                    </td>
+                                    <td class="text-end">
+                                        <t t-esc="state.currencySymbol"/> <t t-esc="formatCurrency(account.credit)"/>
+                                    </td>
+                                    <td class="text-end" t-att-class="getAmountClass(account.balance)">
+                                        <t t-esc="state.currencySymbol"/> <t t-esc="formatCurrency(account.balance)"/>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                
+                                <!-- Account detail rows (expandable) -->
+                                <t t-if="isExpanded(account.id)">
+                                    <t t-foreach="account.lines" t-as="line" t-key="line.id">
+                                        <tr class="account-detail">
+                                            <td class="ps-4">
+                                                <t t-esc="line.date"/>
+                                            </td>
+                                            <td>
+                                                <span class="text-muted">
+                                                    <t t-esc="line.move_name"/>
+                                                </span>
+                                                <t t-if="line.communication">
+                                                    - <t t-esc="line.communication"/>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-esc="line.partner"/>
+                                            </td>
+                                            <td>
+                                                <t t-esc="line.currency"/>
+                                            </td>
+                                            <td class="text-end">
+                                                <t t-if="line.debit > 0">
+                                                    <t t-esc="state.currencySymbol"/> <t t-esc="formatCurrency(line.debit)"/>
+                                                </t>
+                                            </td>
+                                            <td class="text-end">
+                                                <t t-if="line.credit > 0">
+                                                    <t t-esc="state.currencySymbol"/> <t t-esc="formatCurrency(line.credit)"/>
+                                                </t>
+                                            </td>
+                                            <td class="text-end" t-att-class="getAmountClass(line.balance)">
+                                                <t t-esc="state.currencySymbol"/> <t t-esc="formatCurrency(line.balance)"/>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                    </t>
+                                </t>
+                            </t>
+                            
+                            <!-- Total row -->
+                            <tr class="total-line">
+                                <td colspan="4" class="fw-bold">
+                                    Total
+                                </td>
+                                <td class="text-end fw-bold">
+                                    <t t-esc="state.currencySymbol"/> <t t-esc="formatCurrency(state.totalDebit)"/>
+                                </td>
+                                <td class="text-end fw-bold">
+                                    <t t-esc="state.currencySymbol"/> <t t-esc="formatCurrency(state.totalCredit)"/>
+                                </td>
+                                <td class="text-end fw-bold" t-att-class="getAmountClass(state.totalBalance)">
+                                    <t t-esc="state.currencySymbol"/> <t t-esc="formatCurrency(state.totalBalance)"/>
+                                </td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>
