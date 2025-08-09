@@ -186,15 +186,14 @@
             parent="menu_mz_reporting_partner" action="action_client_partner_ledger_report_mz"
             groups="account.group_account_user" sequence="131"/>
 
-  <record id="act_mz_aged_receivable" model="ir.actions.act_window">
+  <!-- Aged Receivable Client Action -->
+  <record id="action_client_aged_receivable_report_mz" model="ir.actions.client">
     <field name="name">Aged Receivable</field>
-    <field name="res_model">account.move.line</field>
-    <field name="view_mode">tree,form</field>
-    <field name="domain">[('account_id.account_type','=','asset_receivable'),('reconciled','=',False)]</field>
-    <field name="context">{'search_default_group_by_partner':1}</field>
+    <field name="tag">account_aged_receivable_report</field>
+    <field name="target">main</field>
   </record>
-  <menuitem id="menu_mz_aged_receivable" name="Aged Receivable"
-            parent="menu_mz_reporting_partner" action="act_mz_aged_receivable"
+  <menuitem id="menu_aged_receivable_new" name="Aged Receivable"
+            parent="menu_mz_reporting_partner" action="action_client_aged_receivable_report_mz"
             groups="account.group_account_user" sequence="132"/>
 
   <record id="act_mz_aged_payable" model="ir.actions.act_window">

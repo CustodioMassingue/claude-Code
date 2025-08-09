@@ -34,6 +34,8 @@
             "/account_invoicing_ext_mz/static/src/components/journal_audit/journal_audit.xml",
             "/account_invoicing_ext_mz/static/src/components/partner_ledger/partner_ledger.js",
             "/account_invoicing_ext_mz/static/src/components/partner_ledger/partner_ledger.xml",
+            "/account_invoicing_ext_mz/static/src/components/aged_receivable/aged_receivable.js",
+            "/account_invoicing_ext_mz/static/src/components/aged_receivable/aged_receivable.xml",
             "/account_invoicing_ext_mz/static/src/scss/financial_reports.scss"
         ]
     },

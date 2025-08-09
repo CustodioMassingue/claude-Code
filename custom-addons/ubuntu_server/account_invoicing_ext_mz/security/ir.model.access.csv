@@ -9,3 +9,4 @@ access_general_ledger_report,access.general.ledger.report,model_account_general_
 access_trial_balance_report,access.trial.balance.report,model_account_trial_balance_report,account.group_account_user,1,0,0,0
 access_journal_audit_report,access.journal.audit.report,model_account_journal_audit_report,account.group_account_user,1,0,0,0
 access_partner_ledger_report,access.partner.ledger.report,model_account_partner_ledger_report,account.group_account_user,1,0,0,0
+access_aged_receivable_report,access.aged.receivable.report,model_account_aged_receivable_report,account.group_account_user,1,0,0,0
