@@ -30,6 +30,8 @@
             "/account_invoicing_ext_mz/static/src/components/general_ledger/general_ledger.xml",
             "/account_invoicing_ext_mz/static/src/components/trial_balance/trial_balance.js",
             "/account_invoicing_ext_mz/static/src/components/trial_balance/trial_balance.xml",
+            "/account_invoicing_ext_mz/static/src/components/journal_audit/journal_audit.js",
+            "/account_invoicing_ext_mz/static/src/components/journal_audit/journal_audit.xml",
             "/account_invoicing_ext_mz/static/src/scss/financial_reports.scss"
         ]
     },

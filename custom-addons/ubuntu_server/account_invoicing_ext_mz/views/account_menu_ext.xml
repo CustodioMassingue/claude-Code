@@ -165,14 +165,14 @@
             parent="menu_mz_reporting_audit" action="action_client_trial_balance_report_mz"
             groups="account.group_account_user" sequence="122"/>
 
-  <record id="act_mz_journal_audit" model="ir.actions.act_window">
+  <!-- Journal Audit Client Action -->
+  <record id="action_client_journal_audit_report_mz" model="ir.actions.client">
     <field name="name">Journal Audit</field>
-    <field name="res_model">account.move</field>
-    <field name="view_mode">tree,form</field>
-    <field name="context">{'search_default_group_by_journal':1,'search_default_posted':1}</field>
+    <field name="tag">account_journal_audit_report</field>
+    <field name="target">main</field>
   </record>
-  <menuitem id="menu_mz_journal_audit" name="Journal Audit"
-            parent="menu_mz_reporting_audit" action="act_mz_journal_audit"
+  <menuitem id="menu_journal_audit_new" name="Journal Audit"
+            parent="menu_mz_reporting_audit" action="action_client_journal_audit_report_mz"
             groups="account.group_account_user" sequence="123"/>
 
   <!-- Partner Reports -->

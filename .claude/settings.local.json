@@ -10,7 +10,8 @@
       "WebFetch(domain:github.com)",
       "Bash(docker restart:*)",
       "Bash(docker logs:*)",
-      "Bash(docker-compose restart:*)"
+      "Bash(docker-compose restart:*)",
+      "Bash(docker-compose:*)"
     ],
     "deny": []
   }

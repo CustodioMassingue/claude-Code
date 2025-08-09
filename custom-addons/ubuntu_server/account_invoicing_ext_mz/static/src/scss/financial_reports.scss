@@ -19,7 +19,8 @@
 .o_executive_summary_report,
 .o_tax_return_report,
 .o_general_ledger_report,
-.o_trial_balance_report {
+.o_trial_balance_report,
+.o_journal_audit_report {
     position: relative !important;
     height: 100% !important;
     width: 100% !important;
@@ -181,7 +182,9 @@
         .o_executive_summary_table,
         .o_tax_return_table,
         .o_general_ledger_table,
-        .o_trial_balance_table {
+        .o_trial_balance_table,
+        .o_journal_audit_table,
+        .o_tax_summary_table {
             background: white;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
@@ -332,6 +335,29 @@
                             }
                         }
                         
+                        // Journal header rows for Journal Audit
+                        &.journal-header {
+                            background-color: #f8f9fa;
+                            
+                            td {
+                                font-weight: 500;
+                                padding: 10px 16px;
+                            }
+                        }
+                        
+                        // Journal detail rows for Journal Audit
+                        &.journal-detail {
+                            td {
+                                padding: 6px 16px;
+                                font-size: 12px;
+                                color: #6a737d;
+                                
+                                &.ps-5 {
+                                    padding-left: 40px !important;
+                                }
+                            }
+                        }
+                        
                         // Total line
                         &.total-line {
                             border-top: 2px solid #e1e4e8;
@@ -466,7 +492,8 @@
     .o_executive_summary_report,
     .o_tax_return_report,
     .o_general_ledger_report,
-    .o_trial_balance_report {
+    .o_trial_balance_report,
+    .o_journal_audit_report {
         .o_control_panel {
             padding: 8px 16px;
             
@@ -488,7 +515,9 @@
             .o_executive_summary_table,
             .o_tax_return_table,
             .o_general_ledger_table,
-            .o_trial_balance_table {
+            .o_trial_balance_table,
+            .o_journal_audit_table,
+            .o_tax_summary_table {
                 border-radius: 4px;
             }
         }
@@ -502,7 +531,8 @@
     .o_executive_summary_report,
     .o_tax_return_report,
     .o_general_ledger_report,
-    .o_trial_balance_report {
+    .o_trial_balance_report,
+    .o_journal_audit_report {
         .o_control_panel {
             .o_control_panel_main {
                 flex-direction: column;
@@ -534,7 +564,9 @@
             .o_executive_summary_table,
             .o_tax_return_table,
             .o_general_ledger_table,
-            .o_trial_balance_table {
+            .o_trial_balance_table,
+            .o_journal_audit_table,
+            .o_tax_summary_table {
                 table {
                     font-size: 11px;
                     
@@ -564,7 +596,8 @@
     .o_executive_summary_report,
     .o_tax_return_report,
     .o_general_ledger_report,
-    .o_trial_balance_report {
+    .o_trial_balance_report,
+    .o_journal_audit_report {
         .o_control_panel {
             display: none !important;
         }
@@ -583,7 +616,9 @@
             .o_executive_summary_table,
             .o_tax_return_table,
             .o_general_ledger_table,
-            .o_trial_balance_table {
+            .o_trial_balance_table,
+            .o_journal_audit_table,
+            .o_tax_summary_table {
                 box-shadow: none;
                 max-width: 100%;
                 

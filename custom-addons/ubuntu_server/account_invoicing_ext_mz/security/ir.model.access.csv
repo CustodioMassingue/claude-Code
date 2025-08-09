@@ -7,3 +7,4 @@ access_executive_summary_report,access.executive.summary.report,model_account_ex
 access_tax_return_report,access.tax.return.report,model_account_tax_return_report,account.group_account_user,1,0,0,0
 access_general_ledger_report,access.general.ledger.report,model_account_general_ledger_report,account.group_account_user,1,0,0,0
 access_trial_balance_report,access.trial.balance.report,model_account_trial_balance_report,account.group_account_user,1,0,0,0
+access_journal_audit_report,access.journal.audit.report,model_account_journal_audit_report,account.group_account_user,1,0,0,0

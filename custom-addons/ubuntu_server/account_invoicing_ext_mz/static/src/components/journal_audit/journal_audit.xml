@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="account_invoicing_ext_mz.JournalAuditReport" owl="1">
+        <div class="o_journal_audit_report">
+            <div class="o_control_panel">
+                <div class="o_control_panel_main">
+                    <div class="o_control_panel_actions">
+                        <!-- Export buttons -->
+                        <button class="btn btn-primary" t-on-click="() => this.exportToPDF()">
+                            <i class="fa fa-file-pdf-o"/> PDF
+                        </button>
+                        <button class="btn btn-primary ms-1" t-on-click="() => this.exportToXLSX()">
+                            <i class="fa fa-file-excel-o"/> XLSX
+                        </button>
+                        
+                        <span class="text-muted mx-3">Journal Audit</span>
+                        
+                        <!-- Date Range filter -->
+                        <div class="btn-group">
+                            <button class="btn btn-outline-secondary">
+                                <i class="fa fa-calendar"/>
+                                <t t-if="state.filters.date_from">
+                                    <t t-esc="this.formatDateRange(state.filters.date_from)"/>
+                                </t>
+                                <t t-else="">2025 - 2026</t>
+                            </button>
+                            <input type="text" 
+                                   class="d-none" 
+                                   placeholder="YYYY-YYYY"
+                                   t-att-value="state.filters.date_from"
+                                   t-on-change="(ev) => this.onDateRangeChange(ev)"/>
+                        </div>
+                        
+                        <!-- All Journals dropdown -->
+                        <div class="btn-group ms-1">
+                            <button class="btn btn-outline-secondary dropdown-toggle" 
+                                    data-bs-toggle="dropdown">
+                                <i class="fa fa-book"/>
+                                <t t-if="state.filters.journals === 'all'">All Journals</t>
+                                <t t-else="">Selected Journals</t>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" 
+                                       t-on-click.prevent="() => this.onJournalFilterClick('all')">
+                                    All Journals
+                                </a></li>
+                                <li><hr class="dropdown-divider"/></li>
+                                <li class="dropdown-header">By Type</li>
+                                <li><a class="dropdown-item" href="#" 
+                                       t-on-click.prevent="() => this.onJournalFilterClick('sale')">
+                                    <i class="fa fa-check-square-o me-2"/> Sales
+                                </a></li>
+                                <li><a class="dropdown-item" href="#" 
+                                       t-on-click.prevent="() => this.onJournalFilterClick('purchase')">
+                                    <i class="fa fa-square-o me-2"/> Purchases
+                                </a></li>
+                                <li><a class="dropdown-item" href="#" 
+                                       t-on-click.prevent="() => this.onJournalFilterClick('cash')">
+                                    <i class="fa fa-square-o me-2"/> Cash
+                                </a></li>
+                                <li><a class="dropdown-item" href="#" 
+                                       t-on-click.prevent="() => this.onJournalFilterClick('bank')">
+                                    <i class="fa fa-square-o me-2"/> Bank
+                                </a></li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Posted Entries -->
+                        <button class="btn btn-outline-secondary ms-1"
+                                t-att-class="{ 'active': state.filters.posted_entries }"
+                                t-on-click="() => this.onPostedEntriesToggle()">
+                            <i class="fa fa-check-square" t-if="state.filters.posted_entries"/>
+                            <i class="fa fa-square-o" t-else=""/>
+                            Posted Entries
+                        </button>
+                        
+                        <!-- Options dropdown -->
+                        <div class="btn-group ms-1">
+                            <button class="btn btn-outline-secondary" t-on-click="() => this.showSettings()">
+                                <i class="fa fa-cog"/>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="o_content">
+                <!-- Unposted warning -->
+                <div t-if="state.unpostedWarning" class="alert alert-info mb-3">
+                    <strong>There are unposted Journal Entries</strong> prior or included in this period.
+                </div>
+                
+                <!-- Loading state -->
+                <div t-if="state.isLoading" class="text-center py-5">
+                    <i class="fa fa-spinner fa-spin fa-3x mb-3"/>
+                    <p>Loading Journal Audit...</p>
+                </div>
+                
+                <!-- Error state -->
+                <div t-elif="state.error" class="alert alert-danger">
+                    <i class="fa fa-exclamation-triangle"/> <t t-esc="state.error"/>
+                </div>
+                
+                <!-- Journal Audit tables -->
+                <div t-else="">
+                    <!-- Journals table -->
+                    <div class="o_journal_audit_table mb-4">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2" style="vertical-align: middle; background-color: #c9cccf;">Name</th>
+                                    <th rowspan="2" style="vertical-align: middle; text-align: center; background-color: #c9cccf;">Code</th>
+                                    <th colspan="3" class="text-center" style="background-color: #c9cccf;">
+                                        <t t-if="state.filters.date_from">
+                                            <t t-esc="this.formatDateRange(state.filters.date_from)"/>
+                                        </t>
+                                        <t t-else="">2025 - 2026</t>
+                                    </th>
+                                    <th rowspan="2" style="width: 40px; background-color: #c9cccf; text-align: center;">
+                                        <i class="fa fa-cog" style="color: #6a737d; cursor: pointer;" t-on-click="() => this.showSettings()"/>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th class="text-end" style="background-color: #c9cccf;">Debit</th>
+                                    <th class="text-end" style="background-color: #c9cccf;">Credit</th>
+                                    <th class="text-end" style="background-color: #c9cccf;">Balance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="state.journals" t-as="journal" t-key="journal.id">
+                                    <!-- Journal header row -->
+                                    <tr class="journal-header">
+                                        <td>
+                                            <button class="btn btn-link p-0 me-2" 
+                                                    t-on-click="() => this.toggleJournal(journal.id)">
+                                                <i t-att-class="this.isExpanded(journal.id) ? 'fa fa-caret-down' : 'fa fa-caret-right'"/>
+                                            </button>
+                                            <t t-esc="journal.display_name || journal.name"/>
+                                        </td>
+                                        <td class="text-center">
+                                            <t t-esc="journal.code"/>
+                                        </td>
+                                        <td class="text-end">
+                                            <t t-esc="state.currencySymbol"/> <t t-esc="this.formatCurrency(journal.debit)"/>
+                                        </td>
+                                        <td class="text-end">
+                                            <t t-esc="state.currencySymbol"/> <t t-esc="this.formatCurrency(journal.credit)"/>
+                                        </td>
+                                        <td class="text-end">
+                                            <t t-esc="state.currencySymbol"/> <t t-esc="this.formatCurrency(journal.balance)"/>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    
+                                    <!-- Journal detail rows (expandable) -->
+                                    <t t-if="this.isExpanded(journal.id)">
+                                        <t t-foreach="journal.moves" t-as="move" t-key="move.id">
+                                            <tr class="journal-detail">
+                                                <td class="ps-5">
+                                                    <span class="text-muted">
+                                                        <t t-esc="move.date"/> - <t t-esc="move.name"/>
+                                                        <t t-if="move.partner"> - <t t-esc="move.partner"/></t>
+                                                    </span>
+                                                </td>
+                                                <td></td>
+                                                <td class="text-end">
+                                                    <t t-if="move.debit > 0">
+                                                        <t t-esc="this.formatCurrency(move.debit)"/>
+                                                    </t>
+                                                </td>
+                                                <td class="text-end">
+                                                    <t t-if="move.credit > 0">
+                                                        <t t-esc="this.formatCurrency(move.credit)"/>
+                                                    </t>
+                                                </td>
+                                                <td class="text-end">
+                                                    <t t-esc="this.formatCurrency(move.balance)"/>
+                                                </td>
+                                                <td></td>
+                                            </tr>
+                                        </t>
+                                    </t>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Global Tax Summary -->
+                    <div class="o_tax_summary_table">
+                        <table class="table">
+                            <thead>
+                                <tr style="background-color: #c9cccf;">
+                                    <th colspan="4">Global Tax Summary</th>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px;">
+                                        <span class="text-muted">Taxes Applied:</span>
+                                        <input type="text" 
+                                               class="form-control form-control-sm d-inline-block ms-2"
+                                               style="width: 150px;"
+                                               t-att-value="state.taxesApplied"
+                                               t-on-input="(ev) => this.onTaxesAppliedChange(ev.target.value)"/>
+                                    </td>
+                                    <td colspan="3"></td>
+                                </tr>
+                                <tr style="background-color: #f8f9fa;">
+                                    <th>Name</th>
+                                    <th class="text-end">Base Amount</th>
+                                    <th class="text-end">Tax Amount</th>
+                                    <th class="text-end">Due</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="state.taxSummary" t-as="tax" t-key="tax.id">
+                                    <tr>
+                                        <td>
+                                            <t t-esc="tax.name"/>
+                                        </td>
+                                        <td class="text-end">
+                                            <t t-esc="state.currencySymbol"/> <t t-esc="this.formatCurrency(tax.base_amount)"/>
+                                        </td>
+                                        <td class="text-end">
+                                            <t t-esc="state.currencySymbol"/> <t t-esc="this.formatCurrency(tax.tax_amount)"/>
+                                        </td>
+                                        <td class="text-end">
+                                            <t t-esc="state.currencySymbol"/> <t t-esc="this.formatCurrency(tax.due)"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>
