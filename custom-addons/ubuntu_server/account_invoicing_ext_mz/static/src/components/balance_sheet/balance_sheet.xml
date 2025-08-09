@@ -15,76 +15,40 @@
                     
                     <div class="o_control_panel_actions">
                         <!-- Export Buttons -->
-                        <button class="btn btn-primary" t-on-click="exportPDF">
+                        <button class="btn btn-primary" t-on-click="() => this.exportPDF()">
                             <i class="fa fa-file-pdf-o"/> PDF
                         </button>
-                        <button class="btn btn-primary ms-2" t-on-click="exportExcel">
+                        <button class="btn btn-primary ms-2" t-on-click="() => this.exportExcel()">
                             <i class="fa fa-file-excel-o"/> XLSX
                         </button>
                         
                         <!-- Date Filter -->
                         <div class="btn-group ms-3">
-                            <button class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
-                                <i class="fa fa-calendar"/> As of <t t-esc="state.date_to"/>
-                            </button>
-                            <div class="dropdown-menu">
-                                <div class="p-3">
-                                    <label>Date:</label>
-                                    <input type="date" class="form-control" 
-                                           t-att-value="state.date_to"
-                                           t-on-change="(ev) => onDateChange('date_to', ev.target.value)"/>
-                                </div>
-                            </div>
+                            <input type="date" class="form-control" 
+                                   t-att-value="state.date_to"
+                                   t-on-change="(ev) => this.onDateChange('date_to', ev)"/>
                         </div>
                         
                         <!-- Comparison Toggle -->
                         <button class="btn btn-secondary ms-2" 
                                 t-attf-class="{{state.comparison ? 'active' : ''}}"
-                                t-on-click="onComparisonToggle">
+                                t-on-click="() => this.onComparisonToggle()">
                             <i class="fa fa-balance-scale"/> Comparison
                         </button>
-                        
-                        <!-- Journal Filter -->
-                        <div class="btn-group ms-2">
-                            <button class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
-                                <i class="fa fa-book"/> 
-                                <t t-if="state.allJournals">All Journals</t>
-                                <t t-else="">Selected Journals</t>
-                            </button>
-                            <div class="dropdown-menu p-3" style="min-width: 200px;">
-                                <t t-foreach="state.journals" t-as="journal" t-key="journal.id">
-                                    <div class="form-check">
-                                        <input type="checkbox" class="form-check-input"
-                                               t-att-id="'journal_' + journal.id"
-                                               t-att-checked="state.filters.journals.includes(journal.id)"/>
-                                        <label class="form-check-label" t-att-for="'journal_' + journal.id">
-                                            <t t-esc="journal.name"/>
-                                        </label>
-                                    </div>
-                                </t>
-                            </div>
-                        </div>
                         
                         <!-- Analytic Toggle -->
                         <button class="btn btn-secondary ms-2"
                                 t-attf-class="{{state.showAnalytic ? 'active' : ''}}"
-                                t-on-click="onAnalyticToggle">
+                                t-on-click="() => this.onAnalyticToggle()">
                             <i class="fa fa-bar-chart"/> Analytic
                         </button>
                         
                         <!-- Posted Entries Filter -->
                         <button class="btn btn-secondary ms-2"
                                 t-attf-class="{{state.onlyPosted ? 'active' : ''}}"
-                                t-on-click="onPostedEntriesToggle">
+                                t-on-click="() => this.onPostedEntriesToggle()">
                             <i class="fa fa-check-square"/> Posted Entries
                         </button>
-                        
-                        <!-- Filters Dropdown -->
-                        <div class="btn-group ms-2">
-                            <button class="btn btn-secondary" data-bs-toggle="dropdown">
-                                <i class="fa fa-filter"/> In
-                            </button>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -141,8 +105,8 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <t t-foreach="getVisibleLines()" t-as="line" t-key="line.id">
-                                    <tr t-att-class="getLineClass(line)" 
+                                <t t-foreach="this.getVisibleLines()" t-as="line" t-key="line.id">
+                                    <tr t-att-class="this.getLineClass(line)" 
                                         t-att-data-line-id="line.id">
                                         <td>
                                             <!-- Indentation based on level -->
@@ -150,8 +114,8 @@
                                                 <!-- Expand/Collapse Button -->
                                                 <t t-if="line.unfoldable">
                                                     <button class="btn btn-sm btn-link p-0 me-1"
-                                                            t-on-click="() => toggleLine(line.id)">
-                                                        <i t-attf-class="fa fa-{{isExpanded(line.id) ? 'caret-down' : 'caret-right'}}"/>
+                                                            t-on-click.stop="() => this.toggleLine(line.id)">
+                                                        <i t-attf-class="fa fa-{{this.isExpanded(line.id) ? 'caret-down' : 'caret-right'}}"/>
                                                     </button>
                                                 </t>
                                                 <t t-else="">
@@ -168,7 +132,7 @@
                                         <!-- Current Balance -->
                                         <td class="text-end">
                                             <span t-attf-class="{{line.is_total ? 'fw-bold' : ''}}">
-                                                <t t-esc="formatCurrency(line.balance)"/>
+                                                <t t-esc="this.formatCurrency(line.balance)"/>
                                             </span>
                                         </td>
                                         
@@ -177,7 +141,7 @@
                                             <td class="text-end">
                                                 <span t-attf-class="{{line.is_total ? 'fw-bold' : ''}}">
                                                     <t t-if="state.data.comparison and state.data.comparison.lines">
-                                                        <t t-esc="formatCurrency(line.comparison_balance)"/>
+                                                        <t t-esc="this.formatCurrency(line.comparison_balance)"/>
                                                     </t>
                                                 </span>
                                             </td>

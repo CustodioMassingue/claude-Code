@@ -6,7 +6,8 @@
       "Bash(rm:*)",
       "Bash(docker exec:*)",
       "Bash(docker ps:*)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "WebFetch(domain:github.com)"
     ],
     "deny": []
   }

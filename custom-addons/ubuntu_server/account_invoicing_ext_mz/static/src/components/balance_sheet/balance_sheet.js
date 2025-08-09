@@ -3,7 +3,6 @@
 import { Component, useState, onWillStart, onMounted } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
-import { loadJS } from "@web/core/assets";
 
 export class BalanceSheetReport extends Component {
     static template = "account_invoicing_ext_mz.BalanceSheetReport";
@@ -58,7 +57,7 @@ export class BalanceSheetReport extends Component {
         try {
             const journals = await this.orm.searchRead(
                 "account.journal",
-                [["company_id", "=", this.user.context.company_id]],
+                [["company_id", "=", this.user.context.company_id || false]],
                 ["id", "name", "code", "type"]
             );
             this.state.journals = journals;
@@ -76,7 +75,7 @@ export class BalanceSheetReport extends Component {
                 date_to: this.state.date_to,
                 date_from: this.state.date_from,
                 journals: this.state.allJournals ? null : this.state.filters.journals,
-                company_id: this.user.context.company_id,
+                company_id: this.user.context.company_id || false,
                 comparison: this.state.comparison,
             });
             
@@ -103,16 +102,20 @@ export class BalanceSheetReport extends Component {
         }
     }
     
-    async toggleLine(lineId) {
+    toggleLine(lineId) {
         if (this.state.expandedLines.has(lineId)) {
             this.state.expandedLines.delete(lineId);
+            // Force re-render by creating new Set
+            this.state.expandedLines = new Set(this.state.expandedLines);
         } else {
             this.state.expandedLines.add(lineId);
+            // Force re-render by creating new Set
+            this.state.expandedLines = new Set(this.state.expandedLines);
             
             // Load detailed accounts if needed
             const line = this.findLine(lineId);
             if (line && !line.children_loaded) {
-                await this.loadLineDetails(lineId);
+                this.loadLineDetails(lineId);
             }
         }
     }
@@ -123,7 +126,7 @@ export class BalanceSheetReport extends Component {
                 line_id: lineId,
                 date_to: this.state.date_to,
                 journals: this.state.allJournals ? null : this.state.filters.journals,
-                company_id: this.user.context.company_id,
+                company_id: this.user.context.company_id || false,
             });
             
             if (result.success) {
@@ -131,6 +134,8 @@ export class BalanceSheetReport extends Component {
                 if (line) {
                     line.children = result.sub_lines;
                     line.children_loaded = true;
+                    // Force re-render
+                    this.state.data = { ...this.state.data };
                 }
             }
         } catch (error) {
@@ -184,7 +189,8 @@ export class BalanceSheetReport extends Component {
         return classes.join(' ');
     }
     
-    async onDateChange(field, value) {
+    async onDateChange(field, event) {
+        const value = event.target.value;
         this.state.filters[field] = value;
         this.state[field] = value;
         await this.loadBalanceSheetData();
@@ -226,7 +232,7 @@ export class BalanceSheetReport extends Component {
         const dateInput = document.querySelector('.date-filter input');
         if (dateInput) {
             dateInput.addEventListener('change', (e) => {
-                this.onDateChange('date_to', e.target.value);
+                this.onDateChange('date_to', e);
             });
         }
     }
