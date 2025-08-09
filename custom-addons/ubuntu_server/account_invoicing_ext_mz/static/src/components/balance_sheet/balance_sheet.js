@@ -27,9 +27,11 @@ export class BalanceSheetReport extends Component {
             comparison: false,
             journals: [],
             allJournals: true,
+            selectedJournalsCount: 0,
             showAnalytic: false,
             onlyPosted: true,
             hasUnposted: false,
+            hideZeroBalances: false,
             filters: {
                 date_to: this.getDefaultDate(),
                 date_from: null,
@@ -199,6 +201,37 @@ export class BalanceSheetReport extends Component {
     async onJournalChange(journalIds) {
         this.state.filters.journals = journalIds;
         this.state.allJournals = journalIds.length === 0;
+        this.state.selectedJournalsCount = journalIds.length;
+        await this.loadBalanceSheetData();
+    }
+    
+    async toggleAllJournals() {
+        this.state.allJournals = !this.state.allJournals;
+        if (this.state.allJournals) {
+            this.state.filters.journals = [];
+            this.state.selectedJournalsCount = 0;
+        } else {
+            // Select all journals
+            this.state.filters.journals = this.state.journals.map(j => j.id);
+            this.state.selectedJournalsCount = this.state.journals.length;
+        }
+        await this.loadBalanceSheetData();
+    }
+    
+    async onJournalToggle(journalId, event) {
+        const checked = event.target.checked;
+        if (checked) {
+            if (!this.state.filters.journals.includes(journalId)) {
+                this.state.filters.journals.push(journalId);
+            }
+        } else {
+            const index = this.state.filters.journals.indexOf(journalId);
+            if (index > -1) {
+                this.state.filters.journals.splice(index, 1);
+            }
+        }
+        this.state.selectedJournalsCount = this.state.filters.journals.length;
+        this.state.allJournals = this.state.filters.journals.length === 0;
         await this.loadBalanceSheetData();
     }
     

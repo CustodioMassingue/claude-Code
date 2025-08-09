@@ -31,8 +31,27 @@ class AccountBalanceSheet(models.TransientModel):
             
         move_lines = self.env['account.move.line'].search(domain)
         
-        # Group accounts by type
+        # Group accounts by type with details
         account_balances = {}
+        accounts_detail = {
+            'asset_cash': [],
+            'liability_credit_card': [],
+            'asset_receivable': [],
+            'asset_current': [],
+            'asset_prepayments': [],
+            'asset_fixed': [],
+            'asset_non_current': [],
+            'liability_payable': [],
+            'liability_current': [],
+            'liability_non_current': [],
+            'equity': [],
+            'equity_unaffected': [],
+            'income': [],
+            'income_other': [],
+            'expense': [],
+            'expense_depreciation': []
+        }
+        
         for line in move_lines:
             account = line.account_id
             key = account.id
@@ -45,6 +64,24 @@ class AccountBalanceSheet(models.TransientModel):
                     'account_type': account.account_type
                 }
             account_balances[key]['balance'] += line.balance
+        
+        # Organize accounts by type for detail view
+        for acc_id, acc_data in account_balances.items():
+            acc_type = acc_data['account_type']
+            if acc_type in accounts_detail and acc_data['balance'] != 0:
+                accounts_detail[acc_type].append({
+                    'id': f'account_{acc_id}',
+                    'code': acc_data['code'],
+                    'name': f"{acc_data['code']} {acc_data['name']}" if acc_data['code'] else acc_data['name'],
+                    'balance': acc_data['balance'],
+                    'level': 3,
+                    'unfoldable': False,
+                    'account_type': acc_type
+                })
+        
+        # Sort accounts by code
+        for acc_type in accounts_detail:
+            accounts_detail[acc_type].sort(key=lambda x: x.get('code', ''))
             
         # Build hierarchical structure
         balance_sheet = {
@@ -54,68 +91,54 @@ class AccountBalanceSheet(models.TransientModel):
             'lines': []
         }
         
-        # ASSETS
-        assets_total = 0.0
-        current_assets_total = 0.0
-        fixed_assets_total = 0.0
+        # Calculate totals
+        # Bank and Cash
+        bank_cash_accounts = accounts_detail.get('asset_cash', []) + accounts_detail.get('liability_credit_card', [])
+        bank_cash_total = sum(acc['balance'] for acc in bank_cash_accounts)
         
-        # Current Assets
-        bank_cash = sum(acc['balance'] for acc in account_balances.values() 
-                       if acc['account_type'] in ['asset_cash', 'liability_credit_card'])
-        receivables = sum(acc['balance'] for acc in account_balances.values() 
-                         if acc['account_type'] == 'asset_receivable')
-        current_assets_other = sum(acc['balance'] for acc in account_balances.values() 
-                                  if acc['account_type'] == 'asset_current')
-        prepayments = sum(acc['balance'] for acc in account_balances.values() 
-                         if acc['account_type'] == 'asset_prepayments')
+        # Receivables
+        receivables_accounts = accounts_detail.get('asset_receivable', [])
+        receivables_total = sum(acc['balance'] for acc in receivables_accounts)
         
-        current_assets_total = bank_cash + receivables + current_assets_other + prepayments
+        # Current Assets Other
+        current_assets_accounts = accounts_detail.get('asset_current', [])
+        current_assets_other_total = sum(acc['balance'] for acc in current_assets_accounts)
+        
+        # Prepayments
+        prepayments_accounts = accounts_detail.get('asset_prepayments', [])
+        prepayments_total = sum(acc['balance'] for acc in prepayments_accounts)
+        
+        current_assets_total = bank_cash_total + receivables_total + current_assets_other_total + prepayments_total
         
         # Fixed Assets
-        fixed_assets = sum(acc['balance'] for acc in account_balances.values() 
-                          if acc['account_type'] in ['asset_fixed', 'asset_non_current'])
-        fixed_assets_total = fixed_assets
+        fixed_assets_accounts = accounts_detail.get('asset_fixed', []) + accounts_detail.get('asset_non_current', [])
+        fixed_assets_total = sum(acc['balance'] for acc in fixed_assets_accounts)
         
         assets_total = current_assets_total + fixed_assets_total
         
-        # LIABILITIES
-        liabilities_total = 0.0
-        current_liabilities_total = 0.0
-        non_current_liabilities_total = 0.0
-        
         # Current Liabilities
-        payables = sum(acc['balance'] for acc in account_balances.values() 
-                      if acc['account_type'] == 'liability_payable')
-        current_liabilities_other = sum(acc['balance'] for acc in account_balances.values() 
-                                       if acc['account_type'] == 'liability_current')
+        current_liabilities_accounts = accounts_detail.get('liability_current', [])
+        current_liabilities_total = abs(sum(acc['balance'] for acc in current_liabilities_accounts))
         
-        current_liabilities_total = abs(payables + current_liabilities_other)
+        # Payables
+        payables_accounts = accounts_detail.get('liability_payable', [])
+        payables_total = abs(sum(acc['balance'] for acc in payables_accounts))
         
         # Non-current Liabilities
-        non_current_liabilities = sum(acc['balance'] for acc in account_balances.values() 
-                                     if acc['account_type'] == 'liability_non_current')
-        non_current_liabilities_total = abs(non_current_liabilities)
+        non_current_liabilities_accounts = accounts_detail.get('liability_non_current', [])
+        non_current_liabilities_total = abs(sum(acc['balance'] for acc in non_current_liabilities_accounts))
         
-        liabilities_total = current_liabilities_total + non_current_liabilities_total
+        liabilities_total = current_liabilities_total + payables_total + non_current_liabilities_total
         
-        # EQUITY
-        equity_total = 0.0
-        unallocated_earnings = 0.0
+        # Equity calculations
+        current_year_earnings = sum(acc['balance'] for acc in accounts_detail.get('income', []) + accounts_detail.get('income_other', []))
+        current_year_earnings -= sum(acc['balance'] for acc in accounts_detail.get('expense', []) + accounts_detail.get('expense_depreciation', []))
         
-        # Current Year Earnings
-        current_year_earnings = sum(acc['balance'] for acc in account_balances.values() 
-                                   if acc['account_type'] in ['income', 'income_other'])
-        current_year_earnings -= sum(acc['balance'] for acc in account_balances.values() 
-                                    if acc['account_type'] in ['expense', 'expense_depreciation'])
-        
-        # Previous Years Earnings
-        retained_earnings = sum(acc['balance'] for acc in account_balances.values() 
-                               if acc['account_type'] == 'equity_unaffected')
-        
+        retained_earnings = sum(acc['balance'] for acc in accounts_detail.get('equity_unaffected', []))
         unallocated_earnings = current_year_earnings + retained_earnings
         equity_total = unallocated_earnings
         
-        # Build report lines
+        # Build report lines with expandable sub-categories
         lines = [
             {
                 'id': 'assets',
@@ -139,33 +162,37 @@ class AccountBalanceSheet(models.TransientModel):
                                 'id': 'bank_cash',
                                 'name': 'Bank and Cash Accounts',
                                 'level': 2,
-                                'unfoldable': False,
-                                'balance': bank_cash,
-                                'account_type': 'asset_cash'
+                                'unfoldable': True,  # Now expandable
+                                'balance': bank_cash_total,
+                                'account_type': 'asset_cash',
+                                'children': bank_cash_accounts  # Add account details
                             },
                             {
                                 'id': 'receivables',
                                 'name': 'Receivables',
                                 'level': 2,
-                                'unfoldable': False,
-                                'balance': receivables,
-                                'account_type': 'asset_receivable'
+                                'unfoldable': True,  # Now expandable
+                                'balance': receivables_total,
+                                'account_type': 'asset_receivable',
+                                'children': receivables_accounts  # Add account details
                             },
                             {
                                 'id': 'current_assets_other',
                                 'name': 'Current Assets',
                                 'level': 2,
-                                'unfoldable': False,
-                                'balance': current_assets_other,
-                                'account_type': 'asset_current'
+                                'unfoldable': True,  # Now expandable
+                                'balance': current_assets_other_total,
+                                'account_type': 'asset_current',
+                                'children': current_assets_accounts  # Add account details
                             },
                             {
                                 'id': 'prepayments',
                                 'name': 'Prepayments',
                                 'level': 2,
-                                'unfoldable': False,
-                                'balance': prepayments,
-                                'account_type': 'asset_prepayments'
+                                'unfoldable': True if prepayments_accounts else False,
+                                'balance': prepayments_total,
+                                'account_type': 'asset_prepayments',
+                                'children': prepayments_accounts
                             }
                         ]
                     },
@@ -173,9 +200,10 @@ class AccountBalanceSheet(models.TransientModel):
                         'id': 'fixed_assets',
                         'name': 'Plus Fixed Assets',
                         'level': 1,
-                        'unfoldable': False,
+                        'unfoldable': True if fixed_assets_accounts else False,
                         'balance': fixed_assets_total,
-                        'account_type': 'asset_fixed'
+                        'account_type': 'asset_fixed',
+                        'children': fixed_assets_accounts
                     },
                     {
                         'id': 'non_current_assets',
@@ -183,7 +211,8 @@ class AccountBalanceSheet(models.TransientModel):
                         'level': 1,
                         'unfoldable': False,
                         'balance': 0.0,
-                        'account_type': 'asset_non_current'
+                        'account_type': 'asset_non_current',
+                        'children': []
                     }
                 ]
             },
@@ -202,24 +231,26 @@ class AccountBalanceSheet(models.TransientModel):
                         'level': 1,
                         'unfoldable': True,
                         'unfolded': False,
-                        'balance': current_liabilities_total,
+                        'balance': current_liabilities_total + payables_total,
                         'account_type': 'liability_current',
                         'children': [
                             {
-                                'id': 'payables',
+                                'id': 'current_liabilities_detail',
                                 'name': 'Current Liabilities',
                                 'level': 2,
-                                'unfoldable': False,
+                                'unfoldable': True,  # Now expandable
                                 'balance': current_liabilities_total,
-                                'account_type': 'liability_payable'
+                                'account_type': 'liability_current',
+                                'children': current_liabilities_accounts  # Add account details
                             },
                             {
-                                'id': 'other_payables',
+                                'id': 'payables',
                                 'name': 'Payables',
                                 'level': 2,
-                                'unfoldable': False,
-                                'balance': 0.0,
-                                'account_type': 'liability_current'
+                                'unfoldable': True if payables_accounts else False,
+                                'balance': payables_total,
+                                'account_type': 'liability_payable',
+                                'children': payables_accounts
                             }
                         ]
                     },
@@ -227,9 +258,10 @@ class AccountBalanceSheet(models.TransientModel):
                         'id': 'non_current_liabilities',
                         'name': 'Plus Non-current Liabilities',
                         'level': 1,
-                        'unfoldable': False,
+                        'unfoldable': True if non_current_liabilities_accounts else False,
                         'balance': non_current_liabilities_total,
-                        'account_type': 'liability_non_current'
+                        'account_type': 'liability_non_current',
+                        'children': non_current_liabilities_accounts
                     }
                 ]
             },
@@ -257,7 +289,8 @@ class AccountBalanceSheet(models.TransientModel):
                                 'level': 2,
                                 'unfoldable': False,
                                 'balance': current_year_earnings,
-                                'account_type': 'equity'
+                                'account_type': 'equity',
+                                'children': []
                             },
                             {
                                 'id': 'previous_years_earnings',
@@ -265,7 +298,8 @@ class AccountBalanceSheet(models.TransientModel):
                                 'level': 2,
                                 'unfoldable': False,
                                 'balance': retained_earnings,
-                                'account_type': 'equity_unaffected'
+                                'account_type': 'equity_unaffected',
+                                'children': []
                             }
                         ]
                     },
@@ -275,7 +309,8 @@ class AccountBalanceSheet(models.TransientModel):
                         'level': 1,
                         'unfoldable': False,
                         'balance': 0.0,
-                        'account_type': 'equity'
+                        'account_type': 'equity',
+                        'children': []
                     },
                     {
                         'id': 'current_year_retained',
@@ -283,7 +318,8 @@ class AccountBalanceSheet(models.TransientModel):
                         'level': 1,
                         'unfoldable': False,
                         'balance': 0.0,
-                        'account_type': 'equity'
+                        'account_type': 'equity',
+                        'children': []
                     },
                     {
                         'id': 'previous_years_retained',
@@ -291,7 +327,8 @@ class AccountBalanceSheet(models.TransientModel):
                         'level': 1,
                         'unfoldable': False,
                         'balance': 0.0,
-                        'account_type': 'equity'
+                        'account_type': 'equity',
+                        'children': []
                     }
                 ]
             },
@@ -303,7 +340,8 @@ class AccountBalanceSheet(models.TransientModel):
                 'unfolded': False,
                 'balance': liabilities_total + equity_total,
                 'account_type': 'total',
-                'is_total': True
+                'is_total': True,
+                'children': []
             }
         ]
         

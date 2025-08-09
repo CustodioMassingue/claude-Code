@@ -22,33 +22,109 @@
                             <i class="fa fa-file-excel-o"/> XLSX
                         </button>
                         
+                        <span class="ms-3 text-muted">Balance Sheet</span>
+                        
                         <!-- Date Filter -->
                         <div class="btn-group ms-3">
-                            <input type="date" class="form-control" 
-                                   t-att-value="state.date_to"
-                                   t-on-change="(ev) => this.onDateChange('date_to', ev)"/>
+                            <button class="btn btn-outline-secondary" disabled="">
+                                <i class="fa fa-calendar"/> As of <t t-esc="state.date_to"/>
+                            </button>
+                            <button class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" 
+                                    data-bs-toggle="dropdown">
+                                <span class="visually-hidden">Toggle Dropdown</span>
+                            </button>
+                            <div class="dropdown-menu p-3">
+                                <label>Select Date:</label>
+                                <input type="date" class="form-control" 
+                                       t-att-value="state.date_to"
+                                       t-on-change="(ev) => this.onDateChange('date_to', ev)"/>
+                            </div>
                         </div>
                         
                         <!-- Comparison Toggle -->
-                        <button class="btn btn-secondary ms-2" 
+                        <button class="btn btn-outline-secondary ms-2" 
                                 t-attf-class="{{state.comparison ? 'active' : ''}}"
                                 t-on-click="() => this.onComparisonToggle()">
                             <i class="fa fa-balance-scale"/> Comparison
                         </button>
                         
+                        <!-- All Journals Dropdown -->
+                        <div class="btn-group ms-2">
+                            <button class="btn btn-outline-secondary dropdown-toggle" 
+                                    data-bs-toggle="dropdown">
+                                <i class="fa fa-book"/> 
+                                <t t-if="state.allJournals">All Journals</t>
+                                <t t-else="">
+                                    <t t-esc="state.selectedJournalsCount"/> Journal<t t-if="state.selectedJournalsCount > 1">s</t>
+                                </t>
+                            </button>
+                            <div class="dropdown-menu p-3" style="min-width: 250px;">
+                                <h6 class="dropdown-header">Select Journals</h6>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" 
+                                           id="journal_all"
+                                           t-att-checked="state.allJournals"
+                                           t-on-change="() => this.toggleAllJournals()"/>
+                                    <label class="form-check-label" for="journal_all">
+                                        <strong>All Journals</strong>
+                                    </label>
+                                </div>
+                                <hr class="dropdown-divider"/>
+                                <t t-foreach="state.journals" t-as="journal" t-key="journal.id">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox"
+                                               t-att-id="'journal_' + journal.id"
+                                               t-att-checked="state.filters.journals.includes(journal.id)"
+                                               t-att-disabled="state.allJournals"
+                                               t-on-change="(ev) => this.onJournalToggle(journal.id, ev)"/>
+                                        <label class="form-check-label" 
+                                               t-att-for="'journal_' + journal.id">
+                                            <t t-esc="journal.code"/> - <t t-esc="journal.name"/>
+                                        </label>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                        
                         <!-- Analytic Toggle -->
-                        <button class="btn btn-secondary ms-2"
+                        <button class="btn btn-outline-secondary ms-2"
                                 t-attf-class="{{state.showAnalytic ? 'active' : ''}}"
                                 t-on-click="() => this.onAnalyticToggle()">
                             <i class="fa fa-bar-chart"/> Analytic
                         </button>
                         
                         <!-- Posted Entries Filter -->
-                        <button class="btn btn-secondary ms-2"
+                        <button class="btn btn-outline-secondary ms-2"
                                 t-attf-class="{{state.onlyPosted ? 'active' : ''}}"
                                 t-on-click="() => this.onPostedEntriesToggle()">
                             <i class="fa fa-check-square"/> Posted Entries
                         </button>
+                        
+                        <!-- In Filter Dropdown -->
+                        <div class="btn-group ms-2">
+                            <button class="btn btn-outline-secondary dropdown-toggle" 
+                                    data-bs-toggle="dropdown">
+                                In <i class="fa fa-filter"/>
+                            </button>
+                            <div class="dropdown-menu p-3" style="min-width: 200px;">
+                                <h6 class="dropdown-header">Filter Options</h6>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" 
+                                           id="filter_all"
+                                           checked="checked"/>
+                                    <label class="form-check-label" for="filter_all">
+                                        All Items
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" 
+                                           id="filter_zero"/>
+                                    <label class="form-check-label" for="filter_zero">
+                                        Hide Zero Balances
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -58,8 +134,7 @@
                 <!-- Unposted entries warning -->
                 <t t-if="state.hasUnposted">
                     <div class="alert alert-info d-flex align-items-center">
-                        <i class="fa fa-info-circle me-2"/>
-                        <span>There are unposted Journal Entries prior or included in this period.</span>
+                        <span>There are <strong>unposted Journal Entries</strong> prior or included in this period.</span>
                     </div>
                 </t>
                 
@@ -110,7 +185,7 @@
                                         t-att-data-line-id="line.id">
                                         <td>
                                             <!-- Indentation based on level -->
-                                            <span t-attf-style="padding-left: {{line.level * 20}}px;">
+                                            <span t-attf-style="padding-left: {{line.level * 30}}px;">
                                                 <!-- Expand/Collapse Button -->
                                                 <t t-if="line.unfoldable">
                                                     <button class="btn btn-sm btn-link p-0 me-1"
@@ -119,11 +194,13 @@
                                                     </button>
                                                 </t>
                                                 <t t-else="">
-                                                    <span class="me-3"></span>
+                                                    <t t-if="line.level > 2">
+                                                        <span class="ms-3"></span>
+                                                    </t>
                                                 </t>
                                                 
-                                                <!-- Line Name -->
-                                                <span t-attf-class="line-name {{line.is_total ? 'fw-bold' : ''}}">
+                                                <!-- Line Name with proper styling for account codes -->
+                                                <span t-attf-class="line-name {{line.is_total ? 'fw-bold' : ''}} {{line.level == 3 ? 'text-muted' : ''}}">
                                                     <t t-esc="line.name"/>
                                                 </span>
                                             </span>
@@ -131,7 +208,7 @@
                                         
                                         <!-- Current Balance -->
                                         <td class="text-end">
-                                            <span t-attf-class="{{line.is_total ? 'fw-bold' : ''}}">
+                                            <span t-attf-class="{{line.is_total ? 'fw-bold' : ''}} {{line.balance &lt; 0 ? 'text-danger' : ''}}">
                                                 <t t-esc="this.formatCurrency(line.balance)"/>
                                             </span>
                                         </td>
@@ -149,10 +226,10 @@
                                         
                                         <!-- Info/Action Column -->
                                         <td class="text-center">
-                                            <t t-if="line.has_details">
-                                                <button class="btn btn-sm btn-link" 
+                                            <t t-if="line.has_details or line.level == 3">
+                                                <button class="btn btn-sm btn-link p-0" 
                                                         title="View details">
-                                                    <i class="fa fa-info-circle"/>
+                                                    <i class="fa fa-info-circle text-muted"/>
                                                 </button>
                                             </t>
                                         </td>
