@@ -20,6 +20,8 @@
             "/account_invoicing_ext_mz/static/src/components/balance_sheet/balance_sheet.xml",
             "/account_invoicing_ext_mz/static/src/components/profit_loss/profit_loss.js",
             "/account_invoicing_ext_mz/static/src/components/profit_loss/profit_loss.xml",
+            "/account_invoicing_ext_mz/static/src/components/cash_flow/cash_flow.js",
+            "/account_invoicing_ext_mz/static/src/components/cash_flow/cash_flow.xml",
             "/account_invoicing_ext_mz/static/src/scss/financial_reports.scss"
         ]
     },

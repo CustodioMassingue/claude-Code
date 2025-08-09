@@ -114,15 +114,14 @@
             parent="menu_mz_reporting_statement" action="action_client_profit_loss_report_mz"
             groups="account.group_account_user" sequence="112"/>
 
-  <record id="act_mz_cash_flow" model="ir.actions.act_window">
+  <!-- Cash Flow Statement Client Action -->
+  <record id="action_client_cash_flow_report_mz" model="ir.actions.client">
     <field name="name">Cash Flow Statement</field>
-    <field name="res_model">account.move.line</field>
-    <field name="view_mode">tree,form</field>
-    <field name="domain">[('journal_id.type','=','bank')]</field>
-    <field name="context">{'search_default_group_by_date':1}</field>
+    <field name="tag">account_cash_flow_report</field>
+    <field name="target">main</field>
   </record>
-  <menuitem id="menu_mz_cash_flow" name="Cash Flow Statement"
-            parent="menu_mz_reporting_statement" action="act_mz_cash_flow"
+  <menuitem id="menu_cash_flow_new" name="Cash Flow Statement"
+            parent="menu_mz_reporting_statement" action="action_client_cash_flow_report_mz"
             groups="account.group_account_user" sequence="113"/>
 
   <record id="act_mz_exec_summary" model="ir.actions.act_window">

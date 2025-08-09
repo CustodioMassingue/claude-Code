@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="account_invoicing_ext_mz.CashFlowReport" owl="1">
+        <div class="o_cash_flow_report">
+            <div class="o_control_panel">
+                <div class="o_control_panel_main">
+                    <div class="o_control_panel_actions">
+                        <!-- Export buttons -->
+                        <button class="btn btn-primary" t-on-click="() => this.exportToPDF()">
+                            <i class="fa fa-file-pdf-o"/> PDF
+                        </button>
+                        <button class="btn btn-primary ms-1" t-on-click="() => this.exportToXLSX()">
+                            <i class="fa fa-file-excel-o"/> XLSX
+                        </button>
+                        
+                        <span class="text-muted mx-3">Cash Flow Statement</span>
+                        
+                        <!-- Date filter -->
+                        <div class="btn-group">
+                            <button class="btn btn-outline-secondary">
+                                <i class="fa fa-calendar"/>
+                                <t t-if="state.filters.date_to">
+                                    <t t-esc="formatDate(state.filters.date_to + '-01')"/>
+                                </t>
+                                <t t-else="">Jul 2025</t>
+                            </button>
+                            <input type="month" 
+                                   class="d-none" 
+                                   t-att-value="state.filters.date_to"
+                                   t-on-change="(ev) => this.onDateChange(ev)"/>
+                        </div>
+                        
+                        <!-- All Journals dropdown -->
+                        <div class="btn-group ms-1">
+                            <button class="btn btn-outline-secondary dropdown-toggle" 
+                                    data-bs-toggle="dropdown">
+                                <i class="fa fa-book"/>
+                                <t t-if="state.filters.journals === 'all'">All Journals</t>
+                                <t t-else="">Selected Journals</t>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" 
+                                       t-on-click.prevent="() => this.onJournalFilterClick('all')">
+                                    All Journals
+                                </a></li>
+                                <li><hr class="dropdown-divider"/></li>
+                                <li class="dropdown-header">By Type</li>
+                                <li><a class="dropdown-item" href="#" 
+                                       t-on-click.prevent="() => this.onJournalFilterClick('sale')">
+                                    <i class="fa fa-check-square-o me-2"/> Sales
+                                </a></li>
+                                <li><a class="dropdown-item" href="#" 
+                                       t-on-click.prevent="() => this.onJournalFilterClick('purchase')">
+                                    <i class="fa fa-square-o me-2"/> Purchases
+                                </a></li>
+                                <li><a class="dropdown-item" href="#" 
+                                       t-on-click.prevent="() => this.onJournalFilterClick('cash')">
+                                    <i class="fa fa-square-o me-2"/> Cash
+                                </a></li>
+                                <li><a class="dropdown-item" href="#" 
+                                       t-on-click.prevent="() => this.onJournalFilterClick('bank')">
+                                    <i class="fa fa-square-o me-2"/> Bank
+                                </a></li>
+                                <li><a class="dropdown-item" href="#" 
+                                       t-on-click.prevent="() => this.onJournalFilterClick('general')">
+                                    <i class="fa fa-square-o me-2"/> Miscellaneous
+                                </a></li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Posted Entries -->
+                        <button class="btn btn-outline-secondary ms-1"
+                                t-att-class="{ 'active': state.filters.posted_entries }"
+                                t-on-click="() => this.onPostedEntriesToggle()">
+                            <i class="fa fa-check-square" t-if="state.filters.posted_entries"/>
+                            <i class="fa fa-square-o" t-else=""/>
+                            Posted Entries
+                        </button>
+                        
+                        <!-- Options dropdown -->
+                        <div class="btn-group ms-1">
+                            <button class="btn btn-outline-secondary" t-on-click="() => this.showSettings()">
+                                <i class="fa fa-cog"/>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="o_content">
+                <!-- Unposted warning -->
+                <div t-if="state.unpostedWarning" class="alert alert-info mb-3">
+                    <strong>There are unposted Journal Entries</strong> prior or included in this period.
+                </div>
+                
+                <!-- Loading state -->
+                <div t-if="state.isLoading" class="text-center py-5">
+                    <i class="fa fa-spinner fa-spin fa-3x mb-3"/>
+                    <p>Loading Cash Flow Statement...</p>
+                </div>
+                
+                <!-- Error state -->
+                <div t-elif="state.error" class="alert alert-danger">
+                    <i class="fa fa-exclamation-triangle"/> <t t-esc="state.error"/>
+                </div>
+                
+                <!-- Cash Flow table -->
+                <div t-else="" class="o_cash_flow_table">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th class="text-end">
+                                    <t t-if="state.filters.date_to">
+                                        <t t-esc="formatDate(state.filters.date_to + '-01')"/>
+                                    </t>
+                                    <t t-else="">Jul 2025</t>
+                                </th>
+                                <th style="width: 60px;"></th>
+                            </tr>
+                            <tr>
+                                <th></th>
+                                <th class="text-end">Balance</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="getVisibleLines()" t-as="line" t-key="line.id">
+                                <tr t-att-class="getRowClass(line)"
+                                    t-att-style="line.is_header ? 'background-color: #e7e8e9;' : ''">
+                                    <td>
+                                        <span t-att-style="getIndentStyle(line.level)">
+                                            <t t-if="line.has_children">
+                                                <button class="btn btn-link p-0 me-1" 
+                                                        t-on-click="() => this.toggleLine(line.id)">
+                                                    <i t-att-class="isExpanded(line.id) ? 'fa fa-caret-down' : 'fa fa-caret-right'"/>
+                                                </button>
+                                            </t>
+                                            <span t-att-class="{ 'fw-bold': line.is_header || line.level === 0 }"
+                                                  class="line-name">
+                                                <t t-esc="line.name"/>
+                                            </span>
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <t t-if="line.amount !== 0">
+                                            <t t-esc="formatCurrency(line.amount)"/>
+                                        </t>
+                                    </td>
+                                    <td class="text-center">
+                                        <t t-if="line.level > 2 and !line.is_header">
+                                            <i class="fa fa-info-circle text-muted" 
+                                               style="cursor: pointer;"
+                                               t-on-click="() => this.showAccountDetails(line)"/>
+                                        </t>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>
