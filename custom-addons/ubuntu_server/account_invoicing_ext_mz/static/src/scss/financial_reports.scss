@@ -15,7 +15,9 @@
 // Common styles for all financial reports
 .o_balance_sheet_report,
 .o_profit_loss_report,
-.o_cash_flow_report {
+.o_cash_flow_report,
+.o_executive_summary_report,
+.o_tax_return_report {
     position: relative !important;
     height: 100% !important;
     width: 100% !important;
@@ -173,7 +175,9 @@
         // Main table container
         .o_balance_sheet_table,
         .o_profit_loss_table,
-        .o_cash_flow_table {
+        .o_cash_flow_table,
+        .o_executive_summary_table,
+        .o_tax_return_table {
             background: white;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
@@ -292,6 +296,15 @@
                             td {
                                 font-weight: 600;
                                 padding: 10px 16px;
+                            }
+                        }
+                        
+                        // Section headers for Executive Summary
+                        &.section-header {
+                            td {
+                                font-weight: 600;
+                                padding: 10px 16px;
+                                border-top: 1px solid #dee2e6;
                             }
                         }
                         
@@ -425,7 +438,9 @@
 @media (max-width: 1200px) {
     .o_balance_sheet_report,
     .o_profit_loss_report,
-    .o_cash_flow_report {
+    .o_cash_flow_report,
+    .o_executive_summary_report,
+    .o_tax_return_report {
         .o_control_panel {
             padding: 8px 16px;
             
@@ -443,7 +458,9 @@
             
             .o_balance_sheet_table,
             .o_profit_loss_table,
-            .o_cash_flow_table {
+            .o_cash_flow_table,
+            .o_executive_summary_table,
+            .o_tax_return_table {
                 border-radius: 4px;
             }
         }
@@ -453,7 +470,9 @@
 @media (max-width: 768px) {
     .o_balance_sheet_report,
     .o_profit_loss_report,
-    .o_cash_flow_report {
+    .o_cash_flow_report,
+    .o_executive_summary_report,
+    .o_tax_return_report {
         .o_control_panel {
             .o_control_panel_main {
                 flex-direction: column;
@@ -481,7 +500,9 @@
             
             .o_balance_sheet_table,
             .o_profit_loss_table,
-            .o_cash_flow_table {
+            .o_cash_flow_table,
+            .o_executive_summary_table,
+            .o_tax_return_table {
                 table {
                     font-size: 11px;
                     
@@ -507,7 +528,9 @@
 @media print {
     .o_balance_sheet_report,
     .o_profit_loss_report,
-    .o_cash_flow_report {
+    .o_cash_flow_report,
+    .o_executive_summary_report,
+    .o_tax_return_report {
         .o_control_panel {
             display: none !important;
         }
@@ -522,7 +545,9 @@
             
             .o_balance_sheet_table,
             .o_profit_loss_table,
-            .o_cash_flow_table {
+            .o_cash_flow_table,
+            .o_executive_summary_table,
+            .o_tax_return_table {
                 box-shadow: none;
                 max-width: 100%;
                 

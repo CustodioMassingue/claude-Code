@@ -22,6 +22,10 @@
             "/account_invoicing_ext_mz/static/src/components/profit_loss/profit_loss.xml",
             "/account_invoicing_ext_mz/static/src/components/cash_flow/cash_flow.js",
             "/account_invoicing_ext_mz/static/src/components/cash_flow/cash_flow.xml",
+            "/account_invoicing_ext_mz/static/src/components/executive_summary/executive_summary.js",
+            "/account_invoicing_ext_mz/static/src/components/executive_summary/executive_summary.xml",
+            "/account_invoicing_ext_mz/static/src/components/tax_return/tax_return.js",
+            "/account_invoicing_ext_mz/static/src/components/tax_return/tax_return.xml",
             "/account_invoicing_ext_mz/static/src/scss/financial_reports.scss"
         ]
     },

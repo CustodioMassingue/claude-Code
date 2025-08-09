@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="account_invoicing_ext_mz.ExecutiveSummaryReport" owl="1">
+        <div class="o_executive_summary_report">
+            <div class="o_control_panel">
+                <div class="o_control_panel_main">
+                    <div class="o_control_panel_actions">
+                        <!-- Export buttons -->
+                        <button class="btn btn-primary" t-on-click="() => this.exportToPDF()">
+                            <i class="fa fa-file-pdf-o"/> PDF
+                        </button>
+                        <button class="btn btn-primary ms-1" t-on-click="() => this.exportToXLSX()">
+                            <i class="fa fa-file-excel-o"/> XLSX
+                        </button>
+                        
+                        <span class="text-muted mx-3">Executive Summary</span>
+                        
+                        <!-- Date Range filter -->
+                        <div class="btn-group">
+                            <button class="btn btn-outline-secondary">
+                                <i class="fa fa-calendar"/>
+                                <t t-if="state.filters.date_to">
+                                    <t t-esc="formatDateRange(state.filters.date_to)"/>
+                                </t>
+                                <t t-else="">2025 - 2026</t>
+                            </button>
+                            <input type="text" 
+                                   class="d-none" 
+                                   placeholder="YYYY-YYYY"
+                                   t-att-value="state.filters.date_to"
+                                   t-on-change="(ev) => this.onDateRangeChange(ev)"/>
+                        </div>
+                        
+                        <!-- Comparison -->
+                        <button class="btn btn-outline-secondary ms-1"
+                                t-on-click="() => this.onComparisonClick()">
+                            <i class="fa fa-percent"/>
+                            Comparison
+                        </button>
+                        
+                        <!-- Posted Entries -->
+                        <button class="btn btn-outline-secondary ms-1"
+                                t-att-class="{ 'active': state.filters.posted_entries }"
+                                t-on-click="() => this.onPostedEntriesToggle()">
+                            <i class="fa fa-check-square" t-if="state.filters.posted_entries"/>
+                            <i class="fa fa-square-o" t-else=""/>
+                            Posted Entries
+                        </button>
+                        
+                        <!-- Options dropdown -->
+                        <div class="btn-group ms-1">
+                            <button class="btn btn-outline-secondary" t-on-click="() => this.showSettings()">
+                                <i class="fa fa-cog"/>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="o_content">
+                <!-- Unposted warning -->
+                <div t-if="state.unpostedWarning" class="alert alert-info mb-3">
+                    <strong>There are unposted Journal Entries</strong> prior or included in this period.
+                </div>
+                
+                <!-- Loading state -->
+                <div t-if="state.isLoading" class="text-center py-5">
+                    <i class="fa fa-spinner fa-spin fa-3x mb-3"/>
+                    <p>Loading Executive Summary...</p>
+                </div>
+                
+                <!-- Error state -->
+                <div t-elif="state.error" class="alert alert-danger">
+                    <i class="fa fa-exclamation-triangle"/> <t t-esc="state.error"/>
+                </div>
+                
+                <!-- Executive Summary table -->
+                <div t-else="" class="o_executive_summary_table">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th style="width: 70%;"></th>
+                                <th class="text-end">
+                                    <t t-if="state.filters.date_to">
+                                        <t t-esc="formatDateRange(state.filters.date_to)"/>
+                                    </t>
+                                    <t t-else="">2025 - 2026</t>
+                                </th>
+                                <th style="width: 60px;"></th>
+                            </tr>
+                            <tr>
+                                <th></th>
+                                <th class="text-end">Balance</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="state.sections" t-as="section" t-key="section.id">
+                                <!-- Section Header -->
+                                <tr class="section-header" t-att-style="'background-color: ' + getSectionHeaderClass(section) + ';'">
+                                    <td colspan="3" class="fw-bold">
+                                        <t t-esc="section.name"/>
+                                    </td>
+                                </tr>
+                                
+                                <!-- Section Items -->
+                                <t t-foreach="section.items" t-as="item" t-key="item.id">
+                                    <tr t-att-class="getRowClass(item)">
+                                        <td class="ps-4">
+                                            <t t-esc="item.name"/>
+                                        </td>
+                                        <td class="text-end">
+                                            <t t-esc="formatValue(item)"/>
+                                        </td>
+                                        <td class="text-center">
+                                            <t t-if="item.info">
+                                                <i class="fa fa-info-circle text-muted" 
+                                                   style="cursor: pointer;"
+                                                   t-on-click="() => this.showItemDetails(item)"/>
+                                            </t>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

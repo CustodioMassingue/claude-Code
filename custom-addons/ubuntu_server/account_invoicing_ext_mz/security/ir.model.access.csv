@@ -3,3 +3,5 @@ access_asset_simple_user,access.asset.simple.user,model_account_asset_simple,bas
 access_balance_sheet_report,access.balance.sheet.report,model_account_balance_sheet_report,account.group_account_user,1,0,0,0
 access_profit_loss_report,access.profit.loss.report,model_account_profit_loss_report,account.group_account_user,1,0,0,0
 access_cash_flow_report,access.cash.flow.report,model_account_cash_flow_report,account.group_account_user,1,0,0,0
+access_executive_summary_report,access.executive.summary.report,model_account_executive_summary_report,account.group_account_user,1,0,0,0
+access_tax_return_report,access.tax.return.report,model_account_tax_return_report,account.group_account_user,1,0,0,0
