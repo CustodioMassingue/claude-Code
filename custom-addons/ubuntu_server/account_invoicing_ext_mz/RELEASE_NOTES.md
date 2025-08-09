@@ -1,4 +1,4 @@
-# 🎉 Balance Sheet - Release Notes v2.0
+# 🎉 Balance Sheet - Release Notes v2.1
 
 ## ✅ Novas Funcionalidades Implementadas
 
@@ -33,6 +33,19 @@ Todos os filtros da versão Enterprise foram implementados:
 - **As of [Date]** ✅ - Seletor de data com dropdown
 - **Comparison** ✅ - Toggle para comparação de períodos
 - **All Journals** ✅ - Dropdown para seleção de diários
+  - **Filtros Rápidos** ✨ NOVO!
+    - Bank - Seleciona todos os diários bancários
+    - Cash - Seleciona todos os diários de caixa
+    - Cash Bakery - Seleciona diário específico
+    - Cash Basis Taxes - Seleciona diário de impostos
+    - Cash Clothes Shop - Seleciona diário de loja de roupas
+    - Cash Furn. Shop - Seleciona diário de loja de móveis
+    - Customer Invoices - Seleciona diários de vendas
+    - Exchange Difference - Seleciona diário de diferenças cambiais
+    - Inventory Valuation - Seleciona diário de avaliação de estoque
+    - Miscellaneous Operations - Seleciona diários gerais
+    - Point of Sale - Seleciona diário de PDV
+    - Vendor Bills - Seleciona diários de compras
   - Checkbox "All Journals"
   - Lista individual de diários
   - Contador de diários selecionados
@@ -85,6 +98,8 @@ Todos os filtros da versão Enterprise foram implementados:
 ### Novos Métodos JavaScript
 - `toggleAllJournals()` - Gerencia seleção de todos os diários
 - `onJournalToggle()` - Controla seleção individual de diários
+- `selectJournalsByType(journalType)` - ✨ NOVO! Seleciona diários por tipo (bank, cash, sale, purchase, general)
+- `selectJournalsByName(journalName)` - ✨ NOVO! Seleciona diários por nome (busca parcial case-insensitive)
 - Propriedade `selectedJournalsCount` - Contador de diários selecionados
 
 ### Estrutura de Dados Expandida
@@ -115,6 +130,7 @@ Todos os filtros da versão Enterprise foram implementados:
 - Todas as funcionalidades expandíveis implementadas
 - Dados reais das contas sendo exibidos
 - Todos os filtros do cabeçalho restaurados
+- **Filtros rápidos de diários implementados** ✨ NOVO!
 - Interface idêntica à versão Enterprise
 - Sem quebrar funcionalidades existentes
 
@@ -130,6 +146,6 @@ Todos os filtros da versão Enterprise foram implementados:
 - Contas com saldo zero podem não aparecer (configurável)
 
 ---
-**Versão:** 2.0.0  
-**Data:** 09/11/2024  
+**Versão:** 2.1.0  
+**Data:** 09/08/2025  
 **Desenvolvido com qualidade profissional** 🏆

@@ -235,6 +235,53 @@ export class BalanceSheetReport extends Component {
         await this.loadBalanceSheetData();
     }
     
+    async selectJournalsByType(journalType) {
+        // Clear current selection
+        this.state.filters.journals = [];
+        this.state.allJournals = false;
+        
+        // Select journals of the specified type
+        const journalsOfType = this.state.journals.filter(j => j.type === journalType);
+        if (journalsOfType.length > 0) {
+            this.state.filters.journals = journalsOfType.map(j => j.id);
+            this.state.selectedJournalsCount = journalsOfType.length;
+        } else {
+            // If no journals of this type, show notification
+            this.notification.add(`No ${journalType} journals found`, {
+                type: 'info',
+                title: 'Journal Filter'
+            });
+            this.state.selectedJournalsCount = 0;
+        }
+        
+        await this.loadBalanceSheetData();
+    }
+    
+    async selectJournalsByName(journalName) {
+        // Clear current selection
+        this.state.filters.journals = [];
+        this.state.allJournals = false;
+        
+        // Select journals with matching name (case insensitive partial match)
+        const matchingJournals = this.state.journals.filter(j => 
+            j.name.toLowerCase().includes(journalName.toLowerCase())
+        );
+        
+        if (matchingJournals.length > 0) {
+            this.state.filters.journals = matchingJournals.map(j => j.id);
+            this.state.selectedJournalsCount = matchingJournals.length;
+        } else {
+            // If no matching journals, show notification
+            this.notification.add(`No journals matching "${journalName}" found`, {
+                type: 'info',
+                title: 'Journal Filter'
+            });
+            this.state.selectedJournalsCount = 0;
+        }
+        
+        await this.loadBalanceSheetData();
+    }
+    
     async onComparisonToggle() {
         this.state.comparison = !this.state.comparison;
         await this.loadBalanceSheetData();

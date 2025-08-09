@@ -58,9 +58,52 @@
                                     <t t-esc="state.selectedJournalsCount"/> Journal<t t-if="state.selectedJournalsCount > 1">s</t>
                                 </t>
                             </button>
-                            <div class="dropdown-menu p-3" style="min-width: 250px;">
+                            <div class="dropdown-menu p-3" style="min-width: 300px; max-height: 500px; overflow-y: auto;">
+                                <!-- Quick Filters Section -->
+                                <div class="quick-filters-section">
+                                    <button class="dropdown-item px-2" t-on-click="() => this.selectJournalsByType('bank')">
+                                        Bank
+                                    </button>
+                                    <button class="dropdown-item px-2" t-on-click="() => this.selectJournalsByType('cash')">
+                                        Cash
+                                    </button>
+                                    <button class="dropdown-item px-2" t-on-click="() => this.selectJournalsByName('Cash Bakery')">
+                                        Cash Bakery
+                                    </button>
+                                    <button class="dropdown-item px-2" t-on-click="() => this.selectJournalsByName('Cash Basis Taxes')">
+                                        Cash Basis Taxes
+                                    </button>
+                                    <button class="dropdown-item px-2" t-on-click="() => this.selectJournalsByName('Cash Clothes Shop')">
+                                        Cash Clothes Shop
+                                    </button>
+                                    <button class="dropdown-item px-2" t-on-click="() => this.selectJournalsByName('Cash Furn. Shop')">
+                                        Cash Furn. Shop
+                                    </button>
+                                    <button class="dropdown-item px-2" t-on-click="() => this.selectJournalsByType('sale')">
+                                        Customer Invoices
+                                    </button>
+                                    <button class="dropdown-item px-2" t-on-click="() => this.selectJournalsByName('Exchange Difference')">
+                                        Exchange Difference
+                                    </button>
+                                    <button class="dropdown-item px-2" t-on-click="() => this.selectJournalsByName('Inventory Valuation')">
+                                        Inventory Valuation
+                                    </button>
+                                    <button class="dropdown-item px-2" t-on-click="() => this.selectJournalsByType('general')">
+                                        Miscellaneous Operations
+                                    </button>
+                                    <button class="dropdown-item px-2" t-on-click="() => this.selectJournalsByName('Point of Sale')">
+                                        Point of Sale
+                                    </button>
+                                    <button class="dropdown-item px-2" t-on-click="() => this.selectJournalsByType('purchase')">
+                                        Vendor Bills
+                                    </button>
+                                </div>
+                                
+                                <hr class="dropdown-divider"/>
+                                
+                                <!-- All Journals Checkbox -->
                                 <h6 class="dropdown-header">Select Journals</h6>
-                                <div class="form-check">
+                                <div class="form-check px-3">
                                     <input class="form-check-input" type="checkbox" 
                                            id="journal_all"
                                            t-att-checked="state.allJournals"
@@ -69,20 +112,25 @@
                                         <strong>All Journals</strong>
                                     </label>
                                 </div>
+                                
                                 <hr class="dropdown-divider"/>
-                                <t t-foreach="state.journals" t-as="journal" t-key="journal.id">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox"
-                                               t-att-id="'journal_' + journal.id"
-                                               t-att-checked="state.filters.journals.includes(journal.id)"
-                                               t-att-disabled="state.allJournals"
-                                               t-on-change="(ev) => this.onJournalToggle(journal.id, ev)"/>
-                                        <label class="form-check-label" 
-                                               t-att-for="'journal_' + journal.id">
-                                            <t t-esc="journal.code"/> - <t t-esc="journal.name"/>
-                                        </label>
-                                    </div>
-                                </t>
+                                
+                                <!-- Individual Journals List -->
+                                <div class="journals-list px-3">
+                                    <t t-foreach="state.journals" t-as="journal" t-key="journal.id">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox"
+                                                   t-att-id="'journal_' + journal.id"
+                                                   t-att-checked="state.filters.journals.includes(journal.id)"
+                                                   t-att-disabled="state.allJournals"
+                                                   t-on-change="(ev) => this.onJournalToggle(journal.id, ev)"/>
+                                            <label class="form-check-label" 
+                                                   t-att-for="'journal_' + journal.id">
+                                                <t t-esc="journal.code"/> - <t t-esc="journal.name"/>
+                                            </label>
+                                        </div>
+                                    </t>
+                                </div>
                             </div>
                         </div>
                         
